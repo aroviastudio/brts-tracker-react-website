@@ -1,0 +1,642 @@
+BRTS CROWDSOURCED BUS TRACKING WEB APP — LOGIC SPECIFICATION
+
+PURPOSE
+Build a web app similar in concept to Where Is My Train, but for BRTS buses.
+The system combines route/stop data, user-selected journeys, GPS data, and crowdsourced observations to identify the likely route and bus, estimate its position, and calculate ETA.
+
+1. CORE IDEA
+
+The system should NOT require every user to manually select a bus number.
+
+A user normally selects:
+- Starting stop
+- Destination stop
+
+The backend already knows:
+- Which routes serve each stop
+- The complete stop sequence of every route
+- Which routes overlap
+- Which routes diverge
+- Expected direction
+- Scheduled/historical timing where available
+
+From this information, the system automatically determines the most likely route(s).
+
+The user may optionally select a route/bus if they want, but automatic route detection should be the default.
+
+2. DATA SOURCES
+
+A. OFFICIAL / GOVERNMENT / TRANSPORT-OPERATOR DATA
+Use this whenever legally and technically available:
+- Route numbers
+- Stop names and IDs
+- Stop coordinates
+- Route geometry/path
+- Stop sequence
+- Timetables
+- Bus/vehicle IDs
+- Live vehicle GPS, if available
+- Service status
+- Depot information
+
+B. USER DATA
+With appropriate permission, users can provide:
+- GPS latitude/longitude
+- Timestamp
+- Speed
+- Heading/direction
+- Selected starting stop
+- Selected destination stop
+- Selected route, if manually chosen
+- App/session status
+- Optional motion/sensor information
+
+Do not collect unnecessary personal information.
+
+3. ROUTE DATABASE
+
+Each route should contain structured data such as:
+
+Route:
+- route_id
+- route_number
+- direction
+- stop_sequence
+- stop IDs
+- stop coordinates
+- route geometry
+
+Example:
+
+15C:
+Althan -> ... -> Kharwar Nagar -> Parvat Patiya -> Aaspass Data Temple -> Someshwar Junction
+
+12:
+Althan -> ... -> Kharwar Nagar -> Parvat Patiya -> another branch
+
+The database must know exactly where routes are common and where they diverge.
+
+4. USER JOURNEY INPUT
+
+Normal flow:
+
+User selects:
+FROM = Kharwar Nagar
+TO = Someshwar Junction
+
+Backend checks all routes containing both stops in the correct order.
+
+If only 15C serves this journey:
+
+Likely route = 15C
+
+The user does NOT need to manually select 15C.
+
+If several routes can serve the journey:
+- Show possible routes
+- Rank them
+- Use GPS and later movement to determine the actual route
+
+5. ROUTE IDENTIFICATION
+
+Route identification should use multiple signals.
+
+Signal 1:
+User's selected FROM/TO stops.
+
+Signal 2:
+Whether the route actually serves both stops.
+
+Signal 3:
+GPS distance from the known route path.
+
+Signal 4:
+Direction of movement.
+
+Signal 5:
+Whether the user's movement follows the route's stop sequence.
+
+Signal 6:
+Speed and movement pattern.
+
+Signal 7:
+Other nearby users following the same route.
+
+Example:
+
+User:
+Kharwar Nagar -> Someshwar Junction
+
+Only 15C can make this journey.
+
+Initial result:
+15C candidate = HIGH confidence.
+
+After GPS starts:
+GPS is close to 15C route.
+
+Confidence increases.
+
+6. BOARDING DETECTION
+
+The system should estimate when the user boards the bus.
+
+Before boarding:
+User may be stationary near Kharwar Nagar.
+
+Possible boarding event:
+- User is near the stop
+- Then starts moving
+- Movement follows the selected route
+- Speed becomes consistent with bus travel
+- Movement continues through the route
+
+This creates a likely boarding event.
+
+Example:
+
+10:02 — user near Kharwar Nagar
+10:04 — user starts moving
+10:05 — GPS follows 15C route
+10:07 — speed around 20–30 km/h
+
+System:
+Likely boarded a 15C bus at Kharwar Nagar.
+
+7. BUS IDENTIFICATION
+
+IMPORTANT:
+Route identification and physical bus identification are different.
+
+Example:
+
+15C may have multiple buses:
+
+15C Bus A
+15C Bus B
+15C Bus C
+
+The user's destination can identify the route, but not necessarily the exact physical vehicle.
+
+To identify the physical bus, combine:
+- User GPS
+- Route
+- Direction
+- Timestamp
+- Speed
+- Position
+- Boarding stop
+- Other users
+- Official vehicle GPS if available
+- Estimated bus positions
+
+8. CROWDSOURCED BUS CLUSTERING
+
+If multiple users are travelling together:
+
+User A -> GPS position
+User B -> GPS position
+User C -> GPS position
+User D -> GPS position
+
+If they:
+- Are close together
+- Move in the same direction
+- Have similar speed
+- Follow the same BRTS route
+- Remain together over time
+
+Then group them into a possible bus cluster.
+
+Example:
+
+15C Bus Cluster #1:
+User A
+User B
+User C
+
+15C Bus Cluster #2:
+User D
+User E
+User F
+
+The system can estimate that these represent different physical 15C buses.
+
+9. PHYSICAL BUS POSITION ESTIMATION
+
+If official live GPS is available:
+Use official vehicle location as the primary source.
+
+If official GPS is unavailable:
+Estimate bus position from passenger GPS clusters.
+
+Example:
+
+Users A, B, C are probably on the same bus.
+
+Their average/weighted GPS position becomes:
+
+Estimated Bus Position = weighted cluster position
+
+The system should account for GPS errors and outliers.
+
+10. USER GPS PROCESSING
+
+Do NOT simply trust every GPS point.
+
+Each observation should contain:
+
+- user/session ID (preferably anonymized)
+- latitude
+- longitude
+- timestamp
+- speed
+- heading
+- accuracy
+
+Filter:
+- Very inaccurate GPS
+- Impossible jumps
+- Unrealistic speed
+- Duplicate/stale observations
+- Locations far outside the route without explanation
+
+Example:
+
+Point 1:
+21.15, 72.83
+
+Point 2:
+21.1501, 72.8302
+
+Point 3:
+Suddenly 21.25, 72.95
+
+Point 3 may be a GPS error and should be rejected.
+
+11. ROUTE MATCHING
+
+Map-match GPS points against known BRTS route geometry.
+
+For each GPS point calculate:
+- Distance to route
+- Direction difference
+- Expected route position
+- Nearest route segment
+
+Example:
+
+GPS point:
+21.xxxx, 72.xxxx
+
+Distance:
+15 m from 15C route
+420 m from 12 route
+
+Therefore:
+15C gets a much higher probability.
+
+12. STOP-SEQUENCE MATCHING
+
+A very important logic.
+
+If a user should travel:
+
+Kharwar Nagar
+-> Parvat Patiya
+-> Aaspass
+-> Someshwar Junction
+
+and their GPS movement follows this sequence, confidence increases.
+
+If their movement goes in the opposite direction or skips into another branch, confidence decreases.
+
+13. CONFIDENCE SCORE
+
+Do not make identification purely binary.
+
+Use a confidence score.
+
+Possible scoring concept:
+
+Journey route match: +30
+Boarding stop match: +15
+GPS route match: +20
+Direction match: +10
+Speed/movement match: +5
+Stop-sequence match: +10
+Crowd cluster match: +10
+
+Total = 100
+
+Example:
+
+15C:
+92% confidence
+
+12:
+8% confidence
+
+The exact weights should be tuned after testing real data.
+
+14. MANUAL BUS/ROUTE SELECTION
+
+The app should support an optional manual selection.
+
+Normal:
+User chooses FROM + TO.
+System automatically determines route.
+
+Optional:
+User chooses route number manually.
+
+Example:
+
+[Auto Detect]
+[15C]
+[12]
+
+Manual selection can be useful when:
+- Multiple routes are possible
+- User already knows the bus
+- GPS is temporarily unavailable
+- Testing/debugging the system
+
+Manual selection should not override impossible route data without warning.
+
+15. ETA CALCULATION
+
+Once a bus position is known:
+
+Distance to destination/stop
++
+Expected travel time
++
+Stop dwell time
++
+Traffic adjustment
++
+Historical travel time
+
+can be used to estimate ETA.
+
+Basic calculation:
+
+ETA = remaining travel distance / expected speed
+
+But a better system uses historical travel times.
+
+Example:
+
+Kharwar Nagar -> Someshwar Junction
+
+Morning average:
+8 minutes
+
+Evening average:
+12 minutes
+
+Current traffic:
+Heavy
+
+Predicted ETA:
+14 minutes
+
+16. HISTORICAL DATA
+
+Store anonymous operational observations such as:
+
+- Route
+- Time
+- Stop
+- Travel time
+- Direction
+- Estimated bus position
+- Delay
+
+Over time this creates a historical dataset.
+
+Example:
+
+15C:
+Kharwar Nagar -> Parvat Patiya
+
+Monday 8 AM:
+average = 4.8 min
+
+Monday 6 PM:
+average = 7.2 min
+
+This improves future ETA predictions.
+
+17. OFFICIAL + CROWDSOURCED DATA FUSION
+
+Preferred priority:
+
+1. Official live GPS
+2. Verified/strong crowdsourced cluster
+3. Individual GPS estimate
+4. Historical prediction
+5. Timetable-only estimate
+
+The UI should ideally indicate the source.
+
+Example:
+
+LIVE
+Official GPS
+
+or:
+
+ESTIMATED
+Based on 6 passengers
+
+or:
+
+SCHEDULED
+No live data available
+
+18. MULTIPLE BUSES ON THE SAME ROUTE
+
+Example:
+
+15C Bus #1 = 1 km ahead
+15C Bus #2 = user is probably inside
+15C Bus #3 = 3 km behind
+
+If another user searches:
+Kharwar Nagar -> Someshwar Junction
+
+The system can recommend:
+
+15C
+Bus #2
+Estimated arrival: 3 min
+
+The physical bus ID may be official if available.
+Otherwise use an internal temporary ID such as:
+
+15C_CLUSTER_02
+
+19. USER SEARCH CAN HELP TRACKING
+
+A user searching for a journey is itself useful context.
+
+Example:
+
+User searches:
+FROM = Kharwar Nagar
+TO = Someshwar Junction
+
+System knows:
+15C is the only valid route.
+
+Then the user's later GPS can become evidence for the current 15C bus.
+
+Therefore:
+SEARCH -> ROUTE CANDIDATE -> BOARDING -> GPS -> BUS CLUSTER -> BUS POSITION
+
+20. IMPORTANT PRIVACY RULE
+
+The system should obtain user permission before collecting location.
+
+Use:
+- Clear location permission
+- Clear explanation of why location is collected
+- Anonymous/pseudonymous session IDs where possible
+- Minimum necessary data
+- Data retention rules
+- Ability to stop sharing location
+
+Do not secretly track users.
+
+21. COMPLETE SYSTEM FLOW
+
+USER
+|
+| Select FROM + TO
+v
+ROUTE ENGINE
+|
+| Find possible routes
+v
+ROUTE CANDIDATES
+|
+| User grants GPS
+v
+GPS COLLECTION
+|
+v
+GPS FILTERING
+|
+v
+MAP MATCHING
+|
+v
+ROUTE + DIRECTION MATCHING
+|
+v
+BOARDING DETECTION
+|
+v
+BUS IDENTIFICATION
+|
++-----------------------------+
+|                             |
+v                             v
+Official GPS available?       No official GPS
+|                             |
+v                             v
+Use official position         Crowd/user GPS
+                              |
+                              v
+                         User clustering
+                              |
+                              v
+                         Estimated bus
+                              |
+                              +-------------+
+                                            |
+                                            v
+                                      BUS POSITION
+                                            |
+                                            v
+                                      ETA ENGINE
+                                            |
+                                            v
+                                      USER RESULTS
+
+22. SIMPLE MVP VERSION
+
+Do NOT build every advanced feature initially.
+
+Version 1 should contain:
+
+- BRTS route database
+- Stop database
+- FROM/TO search
+- Automatic route identification
+- User GPS permission
+- GPS collection
+- Route matching
+- Basic bus/passenger clustering
+- Estimated bus position
+- Basic ETA
+- Map display
+
+Version 2:
+
+- Better bus identification
+- Historical travel times
+- Better ETA
+- Multiple bus separation
+- Confidence scores
+- Crowdsourced reliability
+- Official data integration
+
+Version 3:
+
+- Machine-learning-based prediction
+- Advanced anomaly detection
+- Traffic integration
+- Better GPS/map matching
+- Delay prediction
+- Automatic route learning
+
+23. IMPORTANT LIMITATION
+
+The system cannot magically know the exact physical bus from a user's destination alone.
+
+Destination/stop information can strongly identify the ROUTE.
+
+GPS + movement + other users + official vehicle data are needed to identify the specific PHYSICAL BUS.
+
+Therefore the correct architecture is:
+
+DESTINATION
++
+ROUTE DATABASE
++
+GPS
++
+MOVEMENT
++
+STOP SEQUENCE
++
+CROWDSOURCING
++
+OFFICIAL DATA
+=
+BUS IDENTIFICATION + POSITION + ETA
+
+24. MAIN CONCEPT FOR AN AI DEVELOPER
+
+Build the application as a transit data fusion system.
+
+The core problem is not simply displaying GPS.
+
+The core problem is:
+
+"Given a user's intended journey, known BRTS routes/stops, GPS observations, and available official vehicle data, infer which route and physical vehicle the user is most likely travelling on, estimate the vehicle's current position, and predict its arrival time."
+
+Every inference should have a confidence score and should be allowed to change as new GPS observations arrive.

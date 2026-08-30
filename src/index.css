@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-slate-950 text-slate-100 antialiased font-sans;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.custom-station-icon, .user-pulse-icon, .bus-bubble-icon {
+  background: transparent;
+  border: none;
+}
