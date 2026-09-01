@@ -1,14 +1,20 @@
 @import "tailwindcss";
 
-@layer base {
-  body {
-    @apply bg-slate-950 text-slate-100 antialiased font-sans;
-    margin: 0;
-    padding: 0;
-  }
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f0f4f8;
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
 }
 
-.custom-station-icon, .user-pulse-icon, .bus-bubble-icon {
-  background: transparent;
-  border: none;
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+@keyframes bus-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37,99,235,0.5); }
+  50% { transform: scale(1.15); box-shadow: 0 0 0 10px rgba(37,99,235,0); }
 }
+.bus-pulse { animation: bus-pulse 1.8s ease-in-out infinite; }

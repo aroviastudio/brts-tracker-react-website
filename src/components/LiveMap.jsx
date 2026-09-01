@@ -1,186 +1,138 @@
 import React, { useEffect, useRef } from 'react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { BRTS_STATIONS, BRTS_ROUTES } from '../engine/data/sitilinkData.js';
+import { MapPin } from 'lucide-react';
+import { BRTS_STATIONS } from '../engine/data/sitilinkData.js';
 
-export function LiveMap({ route, telemetry, activeBusCluster, _allClusters = [] }) {
-  const mapContainerRef = useRef(null);
-  const mapInstanceRef = useRef(null);
-  const markersRef = useRef({ bus: null, user: null, stations: [], polylines: [] });
+export function LiveMap({ route, activeBusCluster }) {
+  const containerRef = useRef(null);
+  const mapRef = useRef(null);
+  const markersRef = useRef([]);
+  const polylineRef = useRef(null);
+  const busMarkerRef = useRef(null);
 
   useEffect(() => {
-    if (!mapContainerRef.current) return;
-    if (mapInstanceRef.current) return;
+    if (!containerRef.current || mapRef.current) return;
 
+    let L;
     try {
-      if (mapContainerRef.current._leaflet_id) {
-        mapContainerRef.current._leaflet_id = null;
-      }
-
-      const map = L.map(mapContainerRef.current, {
-        center: [21.1702, 72.8311],
-        zoom: 13,
-        zoomControl: false
-      });
-
-      L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-        maxZoom: 19
-      }).addTo(map);
-
-      mapInstanceRef.current = map;
-    } catch (err) {
-      console.warn('Leaflet map initialization notice:', err);
+      L = window.L || require('leaflet');
+    } catch {
+      return;
     }
 
+    // Default center: Surat BRTS Ring area
+    const map = L.map(containerRef.current, {
+      center: [21.175, 72.845],
+      zoom: 13,
+      zoomControl: true,
+      scrollWheelZoom: false,
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19,
+    }).addTo(map);
+
+    mapRef.current = map;
+
     return () => {
-      if (mapInstanceRef.current) {
-        try {
-          mapInstanceRef.current.remove();
-        } catch {}
-        mapInstanceRef.current = null;
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
       }
     };
   }, []);
 
-  // Update Route Polylines and Stations
+  // Draw route stops & polyline when route changes
   useEffect(() => {
-    const map = mapInstanceRef.current;
-    if (!map) return;
+    const map = mapRef.current;
+    if (!map || !route?.stopSequence) return;
 
-    try {
-      markersRef.current.stations.forEach((m) => {
-        try { m.remove(); } catch {}
-      });
-      markersRef.current.polylines.forEach((l) => {
-        try { l.remove(); } catch {}
-      });
-      markersRef.current.stations = [];
-      markersRef.current.polylines = [];
+    let L;
+    try { L = window.L || require('leaflet'); } catch { return; }
 
-      for (const rId in BRTS_ROUTES) {
-        const r = BRTS_ROUTES[rId];
-        if (!r || !r.stopSequence) continue;
+    // Clear old markers/polyline
+    markersRef.current.forEach(m => m.remove());
+    markersRef.current = [];
+    if (polylineRef.current) { polylineRef.current.remove(); polylineRef.current = null; }
 
-        const coords = r.stopSequence
-          .map((sId) => BRTS_STATIONS[sId])
-          .filter(Boolean)
-          .map((s) => [s.lat, s.lng]);
+    const coords = [];
 
-        if (coords.length < 2) continue;
+    route.stopSequence.forEach((stopId, idx) => {
+      const st = BRTS_STATIONS[stopId];
+      if (!st) return;
+      coords.push([st.lat, st.lng]);
 
-        const isCurrentRoute = route && route.routeId === r.routeId;
-        const polyline = L.polyline(coords, {
-          color: isCurrentRoute ? (r.color || '#059669') : '#64748B',
-          weight: isCurrentRoute ? 6 : 3,
-          opacity: isCurrentRoute ? 0.9 : 0.4,
-          dashArray: isCurrentRoute ? null : '6, 6'
-        }).addTo(map);
+      const isFirst = idx === 0;
+      const isLast  = idx === route.stopSequence.length - 1;
 
-        markersRef.current.polylines.push(polyline);
-      }
-
-      const activeStops = route && route.stopSequence
-        ? route.stopSequence.map((sId) => BRTS_STATIONS[sId]).filter(Boolean)
-        : Object.values(BRTS_STATIONS);
-
-      activeStops.forEach((st) => {
-        if (!st || !st.lat || !st.lng) return;
-
-        const stationIcon = L.divIcon({
-          className: 'custom-station-icon',
-          html: `<div style="background-color: #059669; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 6px rgba(0,0,0,0.4);"></div>`,
-          iconSize: [12, 12],
-          iconAnchor: [6, 6]
-        });
-
-        const marker = L.marker([st.lat, st.lng], { icon: stationIcon })
-          .bindPopup(`<b>${st.name}</b><br/>Code: ${st.code}`)
-          .addTo(map);
-
-        markersRef.current.stations.push(marker);
+      const icon = L.divIcon({
+        html: `<div style="
+          width:${isFirst || isLast ? 14 : 10}px;
+          height:${isFirst || isLast ? 14 : 10}px;
+          border-radius:50%;
+          background:${isFirst ? '#16A34A' : isLast ? '#2563EB' : '#fff'};
+          border:2.5px solid ${isFirst ? '#16A34A' : isLast ? '#2563EB' : '#64748B'};
+          box-shadow:0 1px 4px rgba(0,0,0,0.2);">
+        </div>`,
+        className: '',
+        iconAnchor: [isFirst || isLast ? 7 : 5, isFirst || isLast ? 7 : 5],
       });
 
-      if (route && activeStops.length > 0) {
-        const bounds = L.latLngBounds(activeStops.map((s) => [s.lat, s.lng]));
-        map.fitBounds(bounds, { padding: [50, 50] });
-      }
-    } catch (err) {
-      console.warn('Error rendering map layers:', err);
+      const marker = L.marker([st.lat, st.lng], { icon })
+        .bindTooltip(st.shortName, { permanent: false, direction: 'top', className: 'text-xs' })
+        .addTo(map);
+      markersRef.current.push(marker);
+    });
+
+    if (coords.length > 1) {
+      polylineRef.current = L.polyline(coords, {
+        color: route.color || '#2563EB',
+        weight: 4,
+        opacity: 0.75,
+      }).addTo(map);
+
+      map.fitBounds(polylineRef.current.getBounds(), { padding: [24, 24] });
     }
   }, [route]);
 
-  // Update Live Bus Cluster and User Position
+  // Move bus marker when cluster changes
   useEffect(() => {
-    const map = mapInstanceRef.current;
+    const map = mapRef.current;
     if (!map) return;
 
-    try {
-      // 1. User Position marker
-      if (telemetry?.lat && telemetry?.lng) {
-        if (!markersRef.current.user) {
-          const userIcon = L.divIcon({
-            className: 'user-pulse-icon',
-            html: `<div style="background-color: #3B82F6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px #3B82F6;"></div>`,
-            iconSize: [16, 16],
-            iconAnchor: [8, 8]
-          });
-          markersRef.current.user = L.marker([telemetry.lat, telemetry.lng], { icon: userIcon }).addTo(map);
-        } else {
-          markersRef.current.user.setLatLng([telemetry.lat, telemetry.lng]);
-        }
-      }
+    let L;
+    try { L = window.L || require('leaflet'); } catch { return; }
 
-      // 2. Bus Cluster marker
-      const busPos = activeBusCluster || (telemetry?.lat ? { lat: telemetry.lat, lng: telemetry.lng, speedKmh: telemetry.speedKmh } : null);
-      if (busPos && busPos.lat && busPos.lng) {
-        const busHtml = `
-          <div style="
-            background: #10B981;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 20px;
-            border: 2px solid white;
-            font-weight: 800;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5);
-            white-space: nowrap;
-          ">
-            🚌 ${route ? route.routeNumber : 'BRTS'} • ${busPos.speedKmh || 0} km/h
-          </div>
-        `;
+    if (busMarkerRef.current) { busMarkerRef.current.remove(); busMarkerRef.current = null; }
 
-        const busIcon = L.divIcon({
-          className: 'bus-bubble-icon',
-          html: busHtml,
-          iconSize: [80, 24],
-          iconAnchor: [40, 12]
-        });
-
-        if (!markersRef.current.bus) {
-          markersRef.current.bus = L.marker([busPos.lat, busPos.lng], { icon: busIcon }).addTo(map);
-        } else {
-          markersRef.current.bus.setLatLng([busPos.lat, busPos.lng]);
-          markersRef.current.bus.setIcon(busIcon);
-        }
-      }
-    } catch (err) {
-      console.warn('Error updating map markers:', err);
+    if (activeBusCluster?.centroidLat) {
+      const busIcon = L.divIcon({
+        html: `<div style="
+          width:28px;height:28px;border-radius:50%;
+          background:#2563EB;border:3px solid #fff;
+          box-shadow:0 2px 10px rgba(37,99,235,0.5);
+          display:flex;align-items:center;justify-content:center;
+          font-size:13px;">🚌</div>`,
+        className: 'bus-pulse',
+        iconAnchor: [14, 14],
+      });
+      busMarkerRef.current = L.marker(
+        [activeBusCluster.centroidLat, activeBusCluster.centroidLng],
+        { icon: busIcon }
+      ).addTo(map);
     }
-  }, [telemetry, activeBusCluster, route]);
+  }, [activeBusCluster]);
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl flex flex-col h-[360px]">
-      <div className="bg-slate-800/80 px-4 py-2.5 border-b border-slate-700 flex items-center justify-between">
-        <span className="text-xs font-semibold text-slate-300">🗺️ Live BRTS Corridor & Bus Geometry</span>
-        <span className="text-[11px] text-emerald-400 font-mono">Surat Sitilink Network</span>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <MapPin className="w-4 h-4 text-blue-500" />
+          <span className="text-sm font-semibold text-gray-800">Live Map</span>
+        </div>
+        <span className="text-xs text-gray-400">Tap stops for name</span>
       </div>
-      <div ref={mapContainerRef} className="flex-1 w-full h-full" />
+      <div ref={containerRef} style={{ height: '280px', width: '100%' }} />
     </div>
   );
 }
