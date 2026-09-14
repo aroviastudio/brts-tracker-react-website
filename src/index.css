@@ -1,37 +1,87 @@
-@import "leaflet/dist/leaflet.css";
 @import "tailwindcss";
 
-* { box-sizing: border-box; }
+@layer base {
+  :root {
+    --henna-burgundy: #7f1d1d;
+    --henna-maroon: #881337;
+    --henna-deep: #4c0519;
+    --henna-gold: #d97706;
+    --henna-gold-light: #fef3c7;
+    --henna-sand: #fdfbf7;
+  }
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f0f4f8;
-  color: #1e293b;
-  -webkit-font-smoothing: antialiased;
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #fdfbf7;
+    color: #292524;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-royal {
+    font-family: 'Playfair Display', 'Cormorant Garamond', serif;
+  }
 }
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-@keyframes bus-pulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37,99,235,0.5); }
-  50% { transform: scale(1.15); box-shadow: 0 0 0 10px rgba(37,99,235,0); }
+/* Custom Utilities & Animations */
+.font-serif-luxury {
+  font-family: 'Cormorant Garamond', 'Playfair Display', serif;
 }
-.bus-pulse { animation: bus-pulse 1.8s ease-in-out infinite; }
 
-/* Custom Station Labels on Map */
-.station-label {
-  background: rgba(255, 255, 255, 0.9) !important;
-  border: 1px solid #cbd5e1 !important;
-  border-radius: 6px !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
-  font-size: 10px !important;
-  font-weight: 700 !important;
-  color: #334155 !important;
-  padding: 2px 5px !important;
-  white-space: nowrap !important;
+.font-playfair {
+  font-family: 'Playfair Display', serif;
 }
-.leaflet-tooltip.station-label::before {
-  display: none !important;
+
+.font-sans-clean {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Henna Pattern background effect */
+.bg-henna-pattern {
+  background-color: #fdfbf7;
+  background-image: radial-gradient(#9f1239 0.75px, transparent 0.75px), radial-gradient(#d97706 0.75px, #fdfbf7 0.75px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+  background-opacity: 0.05;
+}
+
+.gold-glow {
+  box-shadow: 0 0 25px rgba(217, 119, 6, 0.25);
+}
+
+.maroon-glow {
+  box-shadow: 0 10px 30px -10px rgba(136, 19, 55, 0.35);
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(2deg); }
+}
+
+.animate-float {
+  animation: float-slow 4s ease-in-out infinite;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 0.4; }
+  100% { transform: scale(1.25); opacity: 0; }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom elegant scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #fbf7f0;
+}
+::-webkit-scrollbar-thumb {
+  background: #d6808f;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #881337;
 }
