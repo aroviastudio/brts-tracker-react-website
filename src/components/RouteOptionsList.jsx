@@ -25,7 +25,6 @@ export function RouteOptionsList({ availableBuses, selectedBusId, onSelectBus, f
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-      {/* Header */}
       <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
         <div>
           <p className="text-sm font-semibold text-gray-900">
@@ -35,10 +34,9 @@ export function RouteOptionsList({ availableBuses, selectedBusId, onSelectBus, f
             {fromName} <ArrowRight className="w-3 h-3" /> {toName}
           </p>
         </div>
-        <span className="text-xs text-gray-400">Tap to see stops</span>
+        <span className="text-xs text-gray-400">Tap to see live</span>
       </div>
 
-      {/* Route cards */}
       <div className="divide-y divide-gray-100">
         {availableBuses.map((bus) => {
           const route = bus.routeOption;
@@ -46,8 +44,9 @@ export function RouteOptionsList({ availableBuses, selectedBusId, onSelectBus, f
           const colors = getColors(routeNum);
           const isSelected = bus.busId === selectedBusId;
           const isLoop = route?.type === 'CIRCULAR_LOOP';
-          const currentStName = BRTS_STATIONS[bus.currentStopId]?.shortName || 'En Route';
-          const arriving = bus.arrivalMinutes <= 3;
+          const currentStName = bus.currentStopId ? (BRTS_STATIONS[bus.currentStopId]?.shortName || 'En Route') : 'Waiting for live GPS...';
+          const arriving = bus.arrivalMinutes !== '??' && bus.arrivalMinutes <= 3;
+          const isWaiting = bus.arrivalMinutes === '??';
 
           return (
             <button
@@ -57,13 +56,11 @@ export function RouteOptionsList({ availableBuses, selectedBusId, onSelectBus, f
                 isSelected ? 'bg-blue-50/60' : ''
               }`}
             >
-              {/* Route badge */}
               <div className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center shrink-0 ${colors.bg} border ${colors.border}`}>
                 <Bus className={`w-5 h-5 ${colors.text} mb-0.5`} />
                 <span className={`text-xs font-bold ${colors.text}`}>{routeNum}</span>
               </div>
 
-              {/* Details */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-semibold text-gray-900 text-sm">Bus {routeNum}</span>
@@ -79,22 +76,23 @@ export function RouteOptionsList({ availableBuses, selectedBusId, onSelectBus, f
                   )}
                 </div>
                 <p className="text-xs text-gray-500 mt-0.5 truncate">
-                  Now at: <span className="text-gray-700 font-medium">{currentStName}</span>
+                  <span className="text-gray-700 font-medium">{currentStName}</span>
                 </p>
                 <p className="text-xs text-gray-500 mt-0.5">
                   {route?.stopCount ? `${route.stopCount - 1} stops` : ''} · {route?.estimatedTravelMinutes || '—'} min journey
                 </p>
               </div>
 
-              {/* ETA */}
               <div className="shrink-0 flex flex-col items-end gap-1">
-                <span className={`text-lg font-bold ${arriving ? 'text-green-600' : 'text-gray-800'}`}>
-                  {bus.arrivalMinutes} min
+                <span className={`text-lg font-bold ${arriving ? 'text-green-600' : isWaiting ? 'text-blue-600 text-sm' : 'text-gray-800'}`}>
+                  {isWaiting ? 'Tap to track' : `${bus.arrivalMinutes} min`}
                 </span>
-                <span className="text-[10px] text-gray-400 flex items-center gap-0.5">
-                  <Clock className="w-3 h-3" />
-                  to your stop
-                </span>
+                {!isWaiting && (
+                  <span className="text-[10px] text-gray-400 flex items-center gap-0.5">
+                    <Clock className="w-3 h-3" />
+                    to your stop
+                  </span>
+                )}
               </div>
 
               <ChevronRight className={`w-4 h-4 shrink-0 transition ${isSelected ? 'text-blue-500 rotate-90' : 'text-gray-300'}`} />

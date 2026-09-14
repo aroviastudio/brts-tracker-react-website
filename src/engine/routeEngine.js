@@ -94,7 +94,7 @@ export class RouteEngine {
   /**
    * Get all live physical buses currently running on routes serving this journey
    */
-  static getAvailableBusesForJourney(fromStopId, toStopId, liveFleet = INITIAL_BUS_FLEET) {
+    static getAvailableBusesForJourney(fromStopId, toStopId, liveFleet = INITIAL_BUS_FLEET) {
     const candidateRoutes = this.findRoutes(fromStopId, toStopId);
     if (candidateRoutes.length === 0) return [];
 
@@ -105,49 +105,80 @@ export class RouteEngine {
       if (!route || !route.stopSequence) continue;
 
       const matchingBuses = liveFleet.filter((b) => b.routeId === journeyOption.routeId);
-
-      for (const bus of matchingBuses) {
-        const currentStation = BRTS_STATIONS[bus.currentStopId];
-        const nextStation = BRTS_STATIONS[bus.nextStopId];
-
-        const currentStopIdx = route.stopSequence.indexOf(bus.currentStopId);
-        const originStopIdx = route.stopSequence.indexOf(fromStopId);
-
-        let stopsAway = 0;
-        let arrivalMinutes = 0;
-        let busStatusText = '';
-
-        if (currentStopIdx !== -1 && originStopIdx !== -1) {
-          if (currentStopIdx <= originStopIdx) {
-            stopsAway = originStopIdx - currentStopIdx;
-            arrivalMinutes = Math.max(1, stopsAway * 3);
-            busStatusText = stopsAway === 0 ? 'Arriving now at your stop' : `${stopsAway} stop(s) away • ETA ${arrivalMinutes} mins`;
-          } else {
-            stopsAway = route.stopSequence.length - currentStopIdx + originStopIdx;
-            arrivalMinutes = Math.max(8, stopsAway * 3);
-            busStatusText = `On loop via Depot • Arrives in ~${arrivalMinutes} mins`;
-          }
-        } else {
-          arrivalMinutes = 5;
-          busStatusText = 'En route';
+      
+      if (matchingBuses.length > 0) {
+        for (const bus of matchingBuses) {
+          availableBuses.push(this._formatBusData(bus, journeyOption, route, fromStopId));
         }
-
+      } else {
+        // If no live bus data, push an empty placeholder so the user can still select the route
         availableBuses.push({
-          ...bus,
+          busId: `ROUTE_${journeyOption.routeId}_PENDING`,
+          routeId: journeyOption.routeId,
+          busNumber: `Bus ${journeyOption.routeNumber}`,
+          currentStopId: null, // Unknown until live data arrives
+          nextStopId: null,
+          status: 'WAITING_FOR_LIVE_DATA',
           routeOption: journeyOption,
-          currentStationName: currentStation ? currentStation.name : 'En Route',
-          nextStationName: nextStation ? nextStation.name : 'Approaching Station',
-          stopsAway,
-          arrivalMinutes,
-          busStatusText,
-          isRecommended: journeyOption.type === 'DIRECT' && stopsAway >= 0 && stopsAway <= 3
+          currentStationName: 'Waiting for live tracking...',
+          stopsAway: null,
+          arrivalMinutes: '??',
+          busStatusText: 'Waiting for commuters to share location',
+          isRecommended: journeyOption.type === 'DIRECT'
         });
       }
     }
 
-    availableBuses.sort((a, b) => a.arrivalMinutes - b.arrivalMinutes);
+    // Sort by arrival time if available, otherwise keep fast routes first
+    availableBuses.sort((a, b) => {
+      if (a.arrivalMinutes === '??' && b.arrivalMinutes !== '??') return 1;
+      if (a.arrivalMinutes !== '??' && b.arrivalMinutes === '??') return -1;
+      if (a.arrivalMinutes === '??' && b.arrivalMinutes === '??') return 0;
+      return a.arrivalMinutes - b.arrivalMinutes;
+    });
+    
     return availableBuses;
   }
+
+  static _formatBusData(bus, journeyOption, route, fromStopId) {
+    const currentStation = BRTS_STATIONS[bus.currentStopId];
+    const nextStation = BRTS_STATIONS[bus.nextStopId];
+
+    const currentStopIdx = route.stopSequence.indexOf(bus.currentStopId);
+    const originStopIdx = route.stopSequence.indexOf(fromStopId);
+
+    let stopsAway = 0;
+    let arrivalMinutes = 0;
+    let busStatusText = '';
+
+    if (currentStopIdx !== -1 && originStopIdx !== -1) {
+      if (currentStopIdx <= originStopIdx) {
+        stopsAway = originStopIdx - currentStopIdx;
+        arrivalMinutes = Math.max(1, stopsAway * 3);
+        busStatusText = stopsAway === 0 ? 'Arriving now at your stop' : `${stopsAway} stop(s) away • ETA ${arrivalMinutes} mins`;
+      } else {
+        stopsAway = route.stopSequence.length - currentStopIdx + originStopIdx;
+        arrivalMinutes = Math.max(8, stopsAway * 3);
+        busStatusText = `On loop via Depot • Arrives in ~${arrivalMinutes} mins`;
+      }
+    } else {
+      arrivalMinutes = 5;
+      busStatusText = 'En route';
+    }
+
+    return {
+      ...bus,
+      routeOption: journeyOption,
+      currentStationName: currentStation ? currentStation.name : 'En Route',
+      nextStationName: nextStation ? nextStation.name : 'Approaching Station',
+      stopsAway,
+      arrivalMinutes,
+      busStatusText,
+      isRecommended: journeyOption.type === 'DIRECT' && stopsAway >= 0 && stopsAway <= 3
+    };
+  }
+
+
 
   /**
    * Calculate Multi-Signal Confidence Score (0 - 100%)

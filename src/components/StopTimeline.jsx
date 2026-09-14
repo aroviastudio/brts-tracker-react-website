@@ -9,9 +9,7 @@ export function StopTimeline({ bus, fromStop, toStop, onBack }) {
   const stops = route?.intermediateStops || [];
   const routeNum = route?.routeNumber || bus.routeId;
 
-  // Find where the bus is currently on the stop list
-  const busCurrentIdx = stops.indexOf(bus.currentStopId);
-  // Find destination index
+  const busCurrentIdx = bus.currentStopId ? stops.indexOf(bus.currentStopId) : -1;
   const destIdx = stops.indexOf(toStop);
 
   const fromName = BRTS_STATIONS[fromStop]?.shortName || fromStop;
@@ -26,10 +24,11 @@ export function StopTimeline({ bus, fromStop, toStop, onBack }) {
     '204':  'bg-amber-600',
   };
   const badgeColor = ROUTE_BADGE_COLORS[routeNum] || 'bg-gray-600';
+  
+  const isWaiting = !bus.currentStopId;
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-      {/* Header */}
       <div className="px-4 py-3 border-b border-gray-100">
         <div className="flex items-center gap-3">
           <button
@@ -47,16 +46,17 @@ export function StopTimeline({ bus, fromStop, toStop, onBack }) {
             </p>
           </div>
           <div className="shrink-0 text-right">
-            <p className="text-sm font-bold text-gray-900">{bus.arrivalMinutes} min</p>
+            <p className="text-sm font-bold text-gray-900">{isWaiting ? '--' : bus.arrivalMinutes} {isWaiting ? '' : 'min'}</p>
             <p className="text-[10px] text-gray-400">to your stop</p>
           </div>
         </div>
 
-        {/* Journey summary bar */}
         <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
           <span className="flex items-center gap-1">
             <Bus className="w-3 h-3" />
-            Now at <span className="font-medium text-gray-800 ml-0.5">{BRTS_STATIONS[bus.currentStopId]?.shortName || 'En Route'}</span>
+            <span className={`font-medium ml-0.5 ${isWaiting ? 'text-blue-500 animate-pulse' : 'text-gray-800'}`}>
+              {isWaiting ? 'Connecting to live bus...' : `Now at ${BRTS_STATIONS[bus.currentStopId]?.shortName || 'En Route'}`}
+            </span>
           </span>
           <span>·</span>
           <span className="flex items-center gap-1">
@@ -66,34 +66,34 @@ export function StopTimeline({ bus, fromStop, toStop, onBack }) {
         </div>
       </div>
 
-      {/* Stop list */}
       <div className="px-4 py-3">
         {stops.length === 0 ? (
           <p className="text-sm text-gray-400 text-center py-6">No stop data available</p>
         ) : (
-          <div className="space-y-0">
+          <div className="space-y-0 relative">
+            {isWaiting && (
+              <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 flex items-center justify-center pointer-events-none">
+                 {/* Optional: subtle overlay while waiting for data */}
+              </div>
+            )}
             {stops.map((stopId, idx) => {
               const station = BRTS_STATIONS[stopId];
               const name = station?.shortName || stopId;
               const isBusHere  = idx === busCurrentIdx;
               const isOrigin   = stopId === fromStop;
               const isDest     = stopId === toStop;
-              const isPassed   = idx < busCurrentIdx;
-              const isFuture   = idx > busCurrentIdx;
+              const isPassed   = !isWaiting && idx < busCurrentIdx;
+              const isFuture   = isWaiting || idx > busCurrentIdx;
 
-              // ETA from bus position to this stop
               const stopsFromBus = idx - busCurrentIdx;
-              const etaMins = stopsFromBus > 0
+              const etaMins = (!isWaiting && stopsFromBus > 0)
                 ? Math.round(stopsFromBus * 3)
                 : null;
 
               return (
                 <div key={stopId} className="flex gap-3">
-                  {/* Timeline line + dot */}
                   <div className="flex flex-col items-center">
-                    {/* top connector */}
                     <div className={`w-0.5 h-3 ${idx === 0 ? 'bg-transparent' : isPassed ? 'bg-gray-300' : isBusHere ? 'bg-blue-400' : 'bg-gray-200'}`} />
-                    {/* dot */}
                     {isBusHere ? (
                       <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center bus-pulse shrink-0">
                         <Bus className="w-3.5 h-3.5 text-white" />
@@ -111,7 +111,6 @@ export function StopTimeline({ bus, fromStop, toStop, onBack }) {
                           : 'bg-white border-gray-300'
                       }`} />
                     )}
-                    {/* bottom connector */}
                     <div className={`w-0.5 flex-1 min-h-[20px] ${
                       idx === stops.length - 1 ? 'bg-transparent'
                       : isPassed ? 'bg-gray-300'
@@ -120,7 +119,6 @@ export function StopTimeline({ bus, fromStop, toStop, onBack }) {
                     }`} />
                   </div>
 
-                  {/* Stop info */}
                   <div className={`flex-1 flex items-center justify-between py-2 ${
                     isDest ? 'bg-blue-50 -mx-1 px-1 rounded-xl' : ''
                   }`}>
