@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="46" fill="#881337" stroke="#fbbf24" stroke-width="2.5" />
+  <circle cx="50" cy="50" r="38" fill="none" stroke="#fef3c7" stroke-width="1" stroke-dasharray="3,3" />
+  <circle cx="50" cy="50" r="28" fill="#9f1239" stroke="#f59e0b" stroke-width="1.5" />
+  <!-- Floral Petals / Mandala -->
+  <g fill="#f59e0b" opacity="0.9">
+    <circle cx="50" cy="26" r="4" />
+    <circle cx="50" cy="74" r="4" />
+    <circle cx="26" cy="50" r="4" />
+    <circle cx="74" cy="50" r="4" />
+    <circle cx="33" cy="33" r="3.5" />
+    <circle cx="67" cy="33" r="3.5" />
+    <circle cx="33" cy="67" r="3.5" />
+    <circle cx="67" cy="67" r="3.5" />
+  </g>
+  <!-- Center Monogram -->
+  <text x="50" y="56" font-family="'Playfair Display', serif, Georgia" font-size="20" font-weight="bold" fill="#fef3c7" text-anchor="middle" letter-spacing="1">BM</text>
+</svg>
