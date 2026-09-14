@@ -27,25 +27,25 @@ export function LiveMap({ route, activeBusCluster }) {
       scrollWheelZoom: false,
     });
 
-    // 1. Standard Street Map (Roads & Names)
-    const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap',
-      maxZoom: 19,
+    // 1. Google Maps Standard Roads
+    const googleStreets = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+      attribution: '© Google Maps',
+      maxZoom: 20,
     });
 
-    // 2. Satellite Map (Esri World Imagery)
-    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      attribution: '© Esri',
-      maxZoom: 19,
+    // 2. Google Maps Satellite
+    const googleSatellite = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+      attribution: '© Google Maps',
+      maxZoom: 20,
     });
 
     // Add default layer
-    streetLayer.addTo(map);
+    googleStreets.addTo(map);
 
     // Add Layer Control Toggle (Top Right)
     const baseMaps = {
-      "Standard (Roads)": streetLayer,
-      "Satellite": satelliteLayer
+      "Road Map (Google)": googleStreets,
+      "Satellite (Google)": googleSatellite
     };
     L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
@@ -95,23 +95,63 @@ export function LiveMap({ route, activeBusCluster }) {
         iconAnchor: [isFirst || isLast ? 7 : 5, isFirst || isLast ? 7 : 5],
       });
 
-      const marker = L.marker([st.lat, st.lng], { icon })
-        .bindTooltip(st.shortName, { permanent: false, direction: 'top', className: 'text-xs font-bold' })
+      // Permanent visible label for every station
+      const marker = L.marker([st.lat, st.lng], { icon, zIndexOffset: 500 })
+        .bindTooltip(st.shortName, { 
+          permanent: true, 
+          direction: 'right', 
+          className: 'station-label',
+          offset: [isFirst || isLast ? 8 : 6, 0]
+        })
         .addTo(map);
       markersRef.current.push(marker);
     });
 
-    // Draw bold route outline connecting the stops
     if (coords.length > 1) {
-      polylineRef.current = L.polyline(coords, {
-        color: route.color || '#2563EB',
-        weight: 5,
-        opacity: 0.8,
-        lineCap: 'round',
-        lineJoin: 'round'
-      }).addTo(map);
+      // Async fetch exact road geometries via OSRM public API
+      const fetchRealRoads = async () => {
+        try {
+          // OSRM requires "lng,lat;lng,lat"
+          const coordsStr = coords.map(c => `${c[1]},${c[0]}`).join(';');
+          // Limit to max 50 coordinates for public API safely (most BRTS routes are < 40 stops)
+          if (coords.length > 80) throw new Error("Too many coords for OSRM");
 
-      map.fitBounds(polylineRef.current.getBounds(), { padding: [24, 24] });
+          const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${coordsStr}?overview=full&geometries=geojson`);
+          const data = await res.json();
+
+          if (data.code === 'Ok' && data.routes && data.routes[0]) {
+            const geojsonCoords = data.routes[0].geometry.coordinates;
+            // OSRM returns [lon, lat], Leaflet needs [lat, lon]
+            const realRoadLatLngs = geojsonCoords.map(c => [c[1], c[0]]);
+
+            polylineRef.current = L.polyline(realRoadLatLngs, {
+              color: route.color || '#2563EB',
+              weight: 5,
+              opacity: 0.8,
+              lineCap: 'round',
+              lineJoin: 'round'
+            }).addTo(map);
+
+            map.fitBounds(polylineRef.current.getBounds(), { padding: [24, 24] });
+            return; // Success!
+          }
+        } catch (e) {
+          console.warn("Real road outline fetch failed, falling back to straight lines:", e);
+        }
+
+        // Fallback: straight lines between stops
+        polylineRef.current = L.polyline(coords, {
+          color: route.color || '#2563EB',
+          weight: 5,
+          opacity: 0.8,
+          lineCap: 'round',
+          lineJoin: 'round',
+          dashArray: '10, 10' // dashed to indicate it's a fallback straight line
+        }).addTo(map);
+        map.fitBounds(polylineRef.current.getBounds(), { padding: [24, 24] });
+      };
+
+      fetchRealRoads();
     }
   }, [route]);
 
@@ -132,13 +172,13 @@ export function LiveMap({ route, activeBusCluster }) {
           background:#2563EB;border:3px solid #fff;
           box-shadow:0 2px 10px rgba(37,99,235,0.8);
           display:flex;align-items:center;justify-content:center;
-          font-size:13px; z-index: 1000;">🚌</div>`,
+          font-size:13px; z-index: 2000;">🚌</div>`,
         className: 'bus-pulse',
         iconAnchor: [14, 14],
       });
       busMarkerRef.current = L.marker(
         [activeBusCluster.centroidLat, activeBusCluster.centroidLng],
-        { icon: busIcon, zIndexOffset: 1000 }
+        { icon: busIcon, zIndexOffset: 2000 }
       ).addTo(map);
     }
   }, [activeBusCluster]);
@@ -152,7 +192,7 @@ export function LiveMap({ route, activeBusCluster }) {
         </div>
         <span className="text-xs text-gray-400">Layer button at top right →</span>
       </div>
-      <div ref={containerRef} style={{ height: '320px', width: '100%' }} className="z-0" />
+      <div ref={containerRef} style={{ height: '360px', width: '100%' }} className="z-0" />
     </div>
   );
 }

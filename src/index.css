@@ -19,3 +19,19 @@ body {
   50% { transform: scale(1.15); box-shadow: 0 0 0 10px rgba(37,99,235,0); }
 }
 .bus-pulse { animation: bus-pulse 1.8s ease-in-out infinite; }
+
+/* Custom Station Labels on Map */
+.station-label {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 6px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: #334155 !important;
+  padding: 2px 5px !important;
+  white-space: nowrap !important;
+}
+.leaflet-tooltip.station-label::before {
+  display: none !important;
+}
