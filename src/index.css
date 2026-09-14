@@ -1,87 +1,73 @@
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --henna-burgundy: #7f1d1d;
-    --henna-maroon: #881337;
-    --henna-deep: #4c0519;
-    --henna-gold: #d97706;
-    --henna-gold-light: #fef3c7;
-    --henna-sand: #fdfbf7;
-  }
-
-  body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background-color: #fdfbf7;
-    color: #292524;
-    overflow-x: hidden;
-  }
-
-  h1, h2, h3, .font-royal {
-    font-family: 'Playfair Display', 'Cormorant Garamond', serif;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-/* Custom Utilities & Animations */
-.font-serif-luxury {
-  font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+:root {
+  --ink: #0d0d0d;
+  --muted: #6b6b6b;
+  --border: #e5e5e5;
+  --bg: #fafaf8;
+  --accent: #8b1a2d;
 }
 
-.font-playfair {
-  font-family: 'Playfair Display', serif;
+html {
+  scroll-behavior: smooth;
 }
 
-.font-sans-clean {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-/* Henna Pattern background effect */
-.bg-henna-pattern {
-  background-color: #fdfbf7;
-  background-image: radial-gradient(#9f1239 0.75px, transparent 0.75px), radial-gradient(#d97706 0.75px, #fdfbf7 0.75px);
-  background-size: 30px 30px;
-  background-position: 0 0, 15px 15px;
-  background-opacity: 0.05;
+/* Display font — all editorial headings */
+.display {
+  font-family: 'Cormorant Garamond', Georgia, serif;
 }
 
-.gold-glow {
-  box-shadow: 0 0 25px rgba(217, 119, 6, 0.25);
+/* Fade-up on scroll */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up {
+  animation: fadeUp 0.7s ease forwards;
+}
+.fade-up-delay-1 { animation-delay: 0.1s; opacity: 0; }
+.fade-up-delay-2 { animation-delay: 0.2s; opacity: 0; }
+.fade-up-delay-3 { animation-delay: 0.35s; opacity: 0; }
+
+/* Image hover zoom */
+.img-zoom img {
+  transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.img-zoom:hover img {
+  transform: scale(1.04);
 }
 
-.maroon-glow {
-  box-shadow: 0 10px 30px -10px rgba(136, 19, 55, 0.35);
+/* WhatsApp float */
+.wa-float {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 100;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #25d366;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.35);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
-
-@keyframes float-slow {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-8px) rotate(2deg); }
-}
-
-.animate-float {
-  animation: float-slow 4s ease-in-out infinite;
-}
-
-@keyframes pulse-ring {
-  0% { transform: scale(0.95); opacity: 0.8; }
-  50% { transform: scale(1.15); opacity: 0.4; }
-  100% { transform: scale(1.25); opacity: 0; }
-}
-
-.animate-pulse-ring {
-  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Custom elegant scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #fbf7f0;
-}
-::-webkit-scrollbar-thumb {
-  background: #d6808f;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #881337;
+.wa-float:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 28px rgba(37, 211, 102, 0.45);
 }
