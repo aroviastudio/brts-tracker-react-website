@@ -27,10 +27,27 @@ export function LiveMap({ route, activeBusCluster }) {
       scrollWheelZoom: false,
     });
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
+    // 1. Standard Street Map (Roads & Names)
+    const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap',
       maxZoom: 19,
-    }).addTo(map);
+    });
+
+    // 2. Satellite Map (Esri World Imagery)
+    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '© Esri',
+      maxZoom: 19,
+    });
+
+    // Add default layer
+    streetLayer.addTo(map);
+
+    // Add Layer Control Toggle (Top Right)
+    const baseMaps = {
+      "Standard (Roads)": streetLayer,
+      "Satellite": satelliteLayer
+    };
+    L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
     mapRef.current = map;
 
@@ -42,7 +59,7 @@ export function LiveMap({ route, activeBusCluster }) {
     };
   }, []);
 
-  // Draw route stops & polyline when route changes
+  // Draw route stops & outline when route changes
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !route?.stopSequence) return;
@@ -79,23 +96,26 @@ export function LiveMap({ route, activeBusCluster }) {
       });
 
       const marker = L.marker([st.lat, st.lng], { icon })
-        .bindTooltip(st.shortName, { permanent: false, direction: 'top', className: 'text-xs' })
+        .bindTooltip(st.shortName, { permanent: false, direction: 'top', className: 'text-xs font-bold' })
         .addTo(map);
       markersRef.current.push(marker);
     });
 
+    // Draw bold route outline connecting the stops
     if (coords.length > 1) {
       polylineRef.current = L.polyline(coords, {
         color: route.color || '#2563EB',
-        weight: 4,
-        opacity: 0.75,
+        weight: 5,
+        opacity: 0.8,
+        lineCap: 'round',
+        lineJoin: 'round'
       }).addTo(map);
 
       map.fitBounds(polylineRef.current.getBounds(), { padding: [24, 24] });
     }
   }, [route]);
 
-  // Move bus marker when cluster changes
+  // Move live bus marker when someone broadcasts location
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -110,29 +130,29 @@ export function LiveMap({ route, activeBusCluster }) {
         html: `<div style="
           width:28px;height:28px;border-radius:50%;
           background:#2563EB;border:3px solid #fff;
-          box-shadow:0 2px 10px rgba(37,99,235,0.5);
+          box-shadow:0 2px 10px rgba(37,99,235,0.8);
           display:flex;align-items:center;justify-content:center;
-          font-size:13px;">🚌</div>`,
+          font-size:13px; z-index: 1000;">🚌</div>`,
         className: 'bus-pulse',
         iconAnchor: [14, 14],
       });
       busMarkerRef.current = L.marker(
         [activeBusCluster.centroidLat, activeBusCluster.centroidLng],
-        { icon: busIcon }
+        { icon: busIcon, zIndexOffset: 1000 }
       ).addTo(map);
     }
   }, [activeBusCluster]);
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden relative z-0">
+      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-white relative z-10">
         <div className="flex items-center gap-2">
           <MapPin className="w-4 h-4 text-blue-500" />
-          <span className="text-sm font-semibold text-gray-800">Live Map</span>
+          <span className="text-sm font-semibold text-gray-800">Live Map Tracker</span>
         </div>
-        <span className="text-xs text-gray-400">Tap stops for name</span>
+        <span className="text-xs text-gray-400">Layer button at top right →</span>
       </div>
-      <div ref={containerRef} style={{ height: '280px', width: '100%' }} />
+      <div ref={containerRef} style={{ height: '320px', width: '100%' }} className="z-0" />
     </div>
   );
 }
