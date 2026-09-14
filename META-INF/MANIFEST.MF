@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Created-By: 11.0.31 (Oracle Corporation)
+
+Name: instantclient_23_26/SQLPLUS_LICENSE
+SHA-256-Digest: vH+ijVNH2Tv81S22s2sB2DdZyPAz98GzO/NUDI8tvkU=
+
+Name: instantclient_23_26/sqlplus
+SHA-256-Digest: uGH2b8jD95zHGFp+E3DvJk9ywALmge/9Qg/hkjsNE3U=
+
+Name: instantclient_23_26/libsqlplusic.so
+SHA-256-Digest: 7Bj5b93vcf/4YNwk/OyopHxLiCbb90gNCrPKMfLWYwY=
+
+Name: instantclient_23_26/glogin.sql
+SHA-256-Digest: wAAubKSoQJ0ff5xlM4WGMcGJJs4R0hl0K8okKvm/k0w=
+
+Name: instantclient_23_26/SQLPLUS_README
+SHA-256-Digest: Il+qZlR2vL3lQCnSIAMqXgkBzVU4bMsgkDMuv/l9wOM=
+
+Name: instantclient_23_26/libsqlplus.so
+SHA-256-Digest: 7CzYHVq/nPAj8HPJxJwb/gXsfb+sYUt5GkqoydTvPKg=
+
