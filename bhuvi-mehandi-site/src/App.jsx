@@ -504,10 +504,21 @@ Custom Notes: ${form.notes || 'None'}`;
         {/* CHAPTER 00: PROLOGUE — THE GENESIS                       */}
         {/* ======================================================== */}
         {currentChapter === 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center py-6 animate-fadeIn">
+          <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-12 items-center py-6 animate-fadeIn rounded-3xl overflow-hidden">
+
+            {/* Full-section flatlay background */}
+            <div className="absolute inset-0 -z-10">
+              <img
+                src="/images/hero_flatlay_bg.webp"
+                alt=""
+                aria-hidden="true"
+                className="w-full h-full object-cover object-center"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#140e0c]/92 via-[#140e0c]/75 to-[#140e0c]/40" />
+            </div>
             
-            <div className="lg:col-span-7 space-y-8">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1d1614] border border-[#2a201d] text-xs text-[#c46851] uppercase tracking-[0.25em] font-syne">
+            <div className="lg:col-span-7 space-y-8 relative z-10 px-2 sm:px-4">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1d1614]/80 border border-[#2a201d] text-xs text-[#c46851] uppercase tracking-[0.25em] font-syne backdrop-blur-sm">
                 <Sparkles className="w-3.5 h-3.5" />
                 Prologue • The Philosophy
               </div>
@@ -533,14 +544,14 @@ Custom Notes: ${form.notes || 'None'}`;
 
                 <button
                   onClick={() => setCurrentChapter(5)}
-                  className="px-8 py-4 rounded-xl border border-[#2a201d] hover:border-[#c46851] text-[#e5d3c1] font-syne text-xs uppercase tracking-[0.25em] transition-colors cursor-pointer"
+                  className="px-8 py-4 rounded-xl border border-[#2a201d] hover:border-[#c46851] text-[#e5d3c1] font-syne text-xs uppercase tracking-[0.25em] transition-colors cursor-pointer backdrop-blur-sm"
                 >
                   Direct VIP Booking
                 </button>
               </div>
 
               {/* Minimalist Metrics */}
-              <div className="pt-8 border-t border-[#2a201d] grid grid-cols-3 gap-6 max-w-lg">
+              <div className="pt-8 border-t border-[#2a201d]/60 grid grid-cols-3 gap-6 max-w-lg">
                 <div>
                   <span className="font-syne text-3xl font-bold text-[#c46851]">850+</span>
                   <span className="text-[10px] uppercase tracking-wider text-[#8f817b] block mt-0.5">Bespoke Brides</span>
@@ -556,17 +567,21 @@ Custom Notes: ${form.notes || 'None'}`;
               </div>
             </div>
 
-            <div className="lg:col-span-5 relative">
-              <div className="relative aspect-[4/5] rounded-3xl overflow-hidden border border-[#2a201d] shadow-2xl p-2 bg-[#1d1614]">
+            {/* Right column — olive hand portrait */}
+            <div className="lg:col-span-5 relative z-10">
+              {/* Mobile: show as centered card; Desktop: full portrait card */}
+              <div className="relative aspect-[3/4] sm:aspect-[4/5] rounded-3xl overflow-hidden border border-[#c46851]/25 shadow-2xl shadow-[#140e0c]/60 mx-auto max-w-xs lg:max-w-none">
                 <img
-                  src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85"
-                  alt="Heirloom Bridal Henna"
-                  className="w-full h-full object-cover rounded-2xl"
+                  src="/images/hero_hand_olive.webp"
+                  alt="Elegant Bridal Mehndi — Olive Tones"
+                  className="w-full h-full object-cover object-top"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#140e0c] via-transparent to-transparent opacity-80" />
-                <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-[#140e0c]/90 backdrop-blur-md border border-[#2a201d]">
-                  <p className="font-syne text-xs uppercase tracking-widest text-[#c46851]">Heirloom Standard</p>
-                  <p className="font-italiana text-lg text-[#f5efe6] mt-0.5">Natural 48-Hour Deep Mahogany Stain</p>
+                {/* Subtle vignette at bottom */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#140e0c]/80 via-transparent to-transparent" />
+                {/* Caption card */}
+                <div className="absolute bottom-4 left-4 right-4 p-3.5 rounded-2xl bg-[#140e0c]/85 backdrop-blur-md border border-[#2a201d]">
+                  <p className="font-syne text-[10px] uppercase tracking-widest text-[#c46851]">Heirloom Standard</p>
+                  <p className="font-italiana text-base text-[#f5efe6] mt-0.5">Natural 48-Hour Deep Mahogany Stain</p>
                 </div>
               </div>
             </div>
