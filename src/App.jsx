@@ -7,6 +7,7 @@ import {
   ArrowRight,
   ArrowLeft,
   ChevronRight,
+  ChevronLeft,
   Clock,
   ShieldCheck,
   Calendar,
@@ -241,15 +242,36 @@ export default function App() {
     }
   };
 
-  // Keyboard navigation
+  // Keyboard navigation & Wheel Scroll navigation with cooldown
+  const lastScrollTime = useRef(0);
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextChapter();
       if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prevChapter();
     };
+
+    const handleWheel = (e) => {
+      // Ignore wheel if modal/menu is open
+      if (menuOpen) return;
+      const now = Date.now();
+      if (now - lastScrollTime.current < 800) return; // 800ms cooldown
+
+      if (e.deltaY > 35) {
+        lastScrollTime.current = now;
+        nextChapter();
+      } else if (e.deltaY < -35) {
+        lastScrollTime.current = now;
+        prevChapter();
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentChapter]);
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('wheel', handleWheel);
+    };
+  }, [currentChapter, menuOpen]);
 
   // Investment calculation
   const getBasePrice = () => {
@@ -414,6 +436,44 @@ Custom Notes: ${form.notes || 'None'}`;
           </div>
         </div>
       )}
+
+      {/* ─── FLOATING SIDE NAVIGATION ARROWS ──────────────────────── */}
+      {currentChapter > 0 && (
+        <button
+          onClick={prevChapter}
+          className="fixed left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-[#1d1614]/90 border border-[#c46851]/50 text-[#c46851] hover:text-[#f5efe6] hover:bg-[#c46851] hover:border-[#c46851] backdrop-blur-md flex items-center justify-center transition-all shadow-xl cursor-pointer"
+          aria-label="Previous Chapter"
+          title="Previous Chapter (पिछला अध्याय)"
+        >
+          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+        </button>
+      )}
+
+      {currentChapter < CHAPTERS.length - 1 && (
+        <button
+          onClick={nextChapter}
+          className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-[#1d1614]/90 border border-[#c46851] text-[#c46851] hover:text-[#140e0c] hover:bg-[#c46851] backdrop-blur-md flex items-center justify-center transition-all shadow-xl shadow-[#c46851]/20 cursor-pointer animate-pulse"
+          aria-label="Next Chapter"
+          title="Next Chapter (अगला अध्याय)"
+        >
+          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+        </button>
+      )}
+
+      {/* ─── BLINKING HINDI/ENGLISH SWIPE & SCROLL AFFORDANCE ───── */}
+      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-30 pointer-events-none transition-all duration-500">
+        <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#1d1614]/95 border border-[#c46851]/80 backdrop-blur-md shadow-2xl shadow-[#c46851]/30">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#c46851] opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#c46851]"></span>
+          </span>
+          <span className="text-[11px] sm:text-xs font-syne tracking-wider text-[#f5efe6] flex items-center gap-2 font-medium whitespace-nowrap">
+            <span className="text-[#c46851] font-bold">स्वाइप करें ↔</span>
+            <span className="text-[#8f817b]">•</span>
+            <span>Swipe Cards or Scroll Down</span>
+          </span>
+        </div>
+      </div>
 
       {/* ─── 2. FULL-SCREEN CHAPTER ENGINE ───────────────────────── */}
       <main className="flex-1 flex flex-col justify-center px-6 sm:px-12 py-10 max-w-7xl mx-auto w-full">
