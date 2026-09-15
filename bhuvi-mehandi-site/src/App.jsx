@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import MehandiHeroHand from './components/MehandiHeroHand';
 import {
   createWhatsAppUrl,
   fetchDesigns,
@@ -291,6 +292,11 @@ export default function App() {
           </div>
         )}
       </header>
+
+      {/* ------------------------------------------------------------- */}
+      {/* 3D INTERACTIVE MEHANDI HAND HERO (THREE.JS + GSAP)            */}
+      {/* ------------------------------------------------------------- */}
+      <MehandiHeroHand />
 
       {/* ------------------------------------------------------------- */}
       {/* HERO SECTION                                                  */}
