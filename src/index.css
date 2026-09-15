@@ -1,92 +1,157 @@
 @import "tailwindcss";
 
 @theme {
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-display: 'Cormorant Garamond', Georgia, serif;
-  --color-canvas: #fafaf8;
-  --color-ink: #111111;
-  --color-henna: #8b1a2d;
-  --color-muted: #777777;
-  --color-border: #e5e5e0;
+  --font-cinzel: 'Cinzel', serif;
+  --font-cinzel-dec: 'Cinzel Decorative', serif;
+  --font-italiana: 'Italiana', serif;
+  --font-playfair: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  
+  --color-noir: #0e0c0d;
+  --color-velvet: #181416;
+  --color-card-dark: #221c1f;
+  --color-alabaster: #fdfbf7;
+  --color-silk: #f6f0e6;
+  --color-henna: #96283b;
+  --color-henna-dark: #6e1a29;
+  --color-henna-light: #ba334a;
+  --color-gold: #d4af37;
+  --color-gold-light: #f5df88;
+  --color-gold-dark: #a07d1c;
+  --color-taupe: #8a7e7b;
+  --color-border-dark: rgba(212, 175, 55, 0.18);
+  --color-border-light: rgba(150, 40, 59, 0.12);
 }
 
 :root {
-  --ink: #111111;
-  --muted: #666666;
-  --border: #e5e5e0;
-  --bg: #fafaf8;
-  --accent: #8b1a2d;
+  --bg-primary: #0e0c0d;
+  --bg-secondary: #181416;
+  --text-primary: #fdfbf7;
+  --text-muted: #a69894;
+  --accent-gold: #d4af37;
+  --accent-henna: #96283b;
 }
 
 html {
   scroll-behavior: smooth;
-  background-color: #fafaf8;
-  color: #111111;
+  background-color: #0e0c0d;
+  color: #fdfbf7;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background-color: #fafaf8;
-  color: #111111;
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #0e0c0d;
+  color: #fdfbf7;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
-/* Primary editorial serif font for headings */
-.display, h1, h2, h3 {
-  font-family: 'Cormorant Garamond', Georgia, serif;
+/* Typography Helpers */
+.font-cinzel {
+  font-family: 'Cinzel', serif;
 }
 
-/* Image zoom effect on hover */
-.img-zoom {
-  overflow: hidden;
+.font-cinzel-dec {
+  font-family: 'Cinzel Decorative', serif;
 }
 
-.img-zoom img {
-  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+.font-italiana {
+  font-family: 'Italiana', serif;
+}
+
+.font-playfair {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* Gold Gradient Shimmer Text */
+.gold-gradient-text {
+  background: linear-gradient(135deg, #f5df88 0%, #d4af37 50%, #aa8012 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.henna-gradient-text {
+  background: linear-gradient(135deg, #fdfbf7 0%, #ba334a 60%, #96283b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Luxury Glassmorphism & Borders */
+.glass-panel {
+  background: rgba(24, 20, 22, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.glass-panel-hover {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
   will-change: transform;
 }
 
-.img-zoom:hover img {
-  transform: scale(1.04);
+@media (hover: hover) and (pointer: fine) {
+  .glass-panel-hover:hover {
+    transform: translateY(-4px);
+    border-color: rgba(212, 175, 55, 0.45);
+    box-shadow: 0 16px 40px -10px rgba(150, 40, 59, 0.35);
+  }
 }
 
-/* Floating WhatsApp Button */
-.wa-float {
+/* Subtle Gold Glow */
+.gold-glow {
+  box-shadow: 0 0 35px -5px rgba(212, 175, 55, 0.25);
+}
+
+.henna-glow {
+  box-shadow: 0 0 35px -5px rgba(150, 40, 59, 0.35);
+}
+
+/* Mobile Touch-First Button Feedback */
+button:active, a:active {
+  transform: scale(0.98);
+  transition: transform 0.08s ease;
+}
+
+/* Floating Luxury WhatsApp Button */
+.wa-float-luxury {
   position: fixed;
-  bottom: 28px;
-  right: 28px;
-  z-index: 100;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background-color: #25d366;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+  right: calc(env(safe-area-inset-right, 0px) + 20px);
+  z-index: 99;
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  gap: 10px;
+  padding: 12px 20px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #1f9d55 0%, #15733d 100%);
+  color: #ffffff;
+  box-shadow: 0 10px 25px -3px rgba(31, 157, 85, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease;
   cursor: pointer;
 }
 
-.wa-float:hover {
-  transform: scale(1.08);
-  box-shadow: 0 6px 28px rgba(37, 211, 102, 0.55);
+@media (hover: hover) and (pointer: fine) {
+  .wa-float-luxury:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 14px 32px -2px rgba(31, 157, 85, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.4);
+  }
 }
 
-/* Custom subtle scrollbar */
+/* Custom Luxury Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #fafaf8;
+  background: #0e0c0d;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d4d4d0;
+  background: #2a2225;
   border-radius: 3px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #8b1a2d;
+  background: #96283b;
 }

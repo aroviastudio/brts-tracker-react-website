@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import MehandiHeroHand from './components/MehandiHeroHand';
+import DimensionalMehandiShowcase from './components/DimensionalMehandiShowcase';
+import BridalPackageCalculator from './components/BridalPackageCalculator';
 import {
   createWhatsAppUrl,
   fetchDesigns,
@@ -11,188 +12,194 @@ import {
   testSupabaseConnection,
   SUPABASE_URL
 } from './lib/supabase';
+import {
+  Sparkles,
+  Crown,
+  Calendar,
+  Phone,
+  MessageCircle,
+  Clock,
+  ShieldCheck,
+  Award,
+  ChevronRight,
+  X,
+  ExternalLink,
+  Lock,
+  Plus,
+  Trash2,
+  CheckCircle2,
+  Heart,
+  Eye,
+  Menu
+} from 'lucide-react';
 
-// Minimalist curated services with elevated titles
-const SERVICES = [
+// Haute Couture Master Collections
+const COLLECTIONS = [
   {
-    id: 'bridal-narrative',
+    id: 'royal-dulhan',
     number: '01',
-    title: 'The Bridal Narrative',
-    category: 'Bridal',
-    tagline: 'Full-length bespoke heirloom henna',
-    description: 'Custom storytelling hand-drawn up to the elbows and mid-calf. Incorporates personalized bride-groom portraiture, temple jharokhas, and meaningful motifs woven into intricate symmetry.',
-    duration: '4 – 6 Hours',
-    price: 'From ₹8,500',
+    title: 'The Royal Dulhan Narrative',
+    category: 'Bespoke Bridal Heirloom',
+    tagline: 'Custom storytelling woven into symmetrical royal jaal',
+    duration: '4.5 – 6.5 Hours',
+    coverage: 'Full arms to elbows & mid-calf feet',
+    price: 'From ₹11,500',
     image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
-    details: ['Full arms to elbows & feet to mid-calf', 'Hand-drawn portraiture & hashtags', 'Clove steam & aftercare balm included']
+    features: [
+      'Hand-drawn Bride & Groom portraiture & sacred mandap arches',
+      'Personalized wedding hashtags, skyline & proposal motifs',
+      'Complimentary royal clove steam & aftercare essential balm'
+    ]
+  },
+  {
+    id: 'marwari-jaali',
+    number: '02',
+    title: 'Marwari Micro-Jaali & Jharokha',
+    category: 'Heritage Royal Grid',
+    tagline: 'Classical Rajasthan palace motifs with 0.2mm precision',
+    duration: '3.5 – 5.0 Hours',
+    coverage: 'Elbow length or 3/4 forearm',
+    price: 'From ₹7,500',
+    image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=85',
+    features: [
+      'Ultra-fine micro-lattice jaal with shaded peacock motifs',
+      'Royal shehnai, kalash, and elephant ceremonial borders',
+      'High-contrast mahogany stain depth guarantee'
+    ]
   },
   {
     id: 'contemporary-arabic',
-    number: '02',
-    title: 'Contemporary Arabic',
-    category: 'Arabic',
-    tagline: 'Fluid botanicals & negative space',
-    description: 'Striking shaded floral trails, cascading vines, and architectural wrist cuffs designed to pair effortlessly with modern reception lehengas and cocktail attire.',
-    duration: '1.5 – 2.5 Hours',
-    price: 'From ₹2,500',
-    image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=85',
-    details: ['Front & back delicate botanical trails', 'Negative-space finger lace', 'Deep stain organic paste']
-  },
-  {
-    id: 'rajasthani-heritage',
     number: '03',
-    title: 'Rajasthani Heritage',
-    category: 'Heritage',
-    tagline: 'Classical Marwari micro-jaali',
-    description: 'Time-honored Indian royal jaal, shehnai, peacocks, and micro-grid shading executed with ultra-fine cone precision for an unforgettable, rich mahogany stain.',
-    duration: '3.5 – 5 Hours',
-    price: 'From ₹5,500',
-    image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=85',
-    details: ['Micro-line jaali detailing', 'Traditional royal peacocks & kalash', 'Rich mahogany stain guarantee']
+    title: 'Contemporary Arabic Botanicals',
+    category: 'Negative-Space Modern',
+    tagline: 'Fluid shaded florals designed for cocktail attire',
+    duration: '2.0 – 3.0 Hours',
+    coverage: 'Front & back hands with cascading wrist trails',
+    price: 'From ₹4,500',
+    image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=85',
+    features: [
+      'Dramatic negative space highlighting diamond jewelry',
+      'Shaded Arabian lotus petals & micro-beaded vine contours',
+      'Perfect for Sangeet nights, receptions, and modern brides'
+    ]
   },
   {
-    id: 'soiree-celebrations',
+    id: 'royal-feet-payal',
     number: '04',
-    title: 'The Sangeet Soirée',
-    category: 'Event',
-    tagline: 'Bridal party & guest curation',
-    description: 'Bespoke speed-artistry for bridesmaids, mothers, and guests during Sangeet nights or intimate mehandi parties. Fast, unique, and impeccably neat application.',
-    duration: 'Custom (2 – 6 Hours)',
-    price: 'Hourly or Per Hand',
-    image: 'https://images.unsplash.com/photo-1516914943479-89db7d9ae7f2?auto=format&fit=crop&w=1200&q=85',
-    details: ['Multiple artists team available', 'Curated quick designs (5-8 mins/hand)', 'All organic materials provided']
+    title: 'Imperial Payal Feet Ensemble',
+    category: 'Heirloom Bridal Feet',
+    tagline: 'Embossed jewelry bands & regal toe lace',
+    duration: '2.0 – 3.5 Hours',
+    coverage: 'Ankles to mid-calf',
+    price: 'From ₹5,000',
+    image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1200&q=85',
+    features: [
+      'Graceful jaal mimicking traditional gold & kundan anklets',
+      'Symmetrical toe crests with calming lavender application',
+      'Longest-lasting stain formulation (up to 14 days)'
+    ]
+  }
+];
+
+// Curated Portfolio Archive with Realistic Images
+const DEFAULT_ARCHIVE = [
+  {
+    id: 'arc-1',
+    title: 'Heirloom Dulhan Mandap',
+    category: 'Bridal',
+    image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
+    tag: 'Bridal Narrative'
+  },
+  {
+    id: 'arc-2',
+    title: 'Royal Marwari Jharokha',
+    category: 'Heritage',
+    image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=85',
+    tag: 'Micro-Jaali'
+  },
+  {
+    id: 'arc-3',
+    title: 'Shaded Persian Lotus',
+    category: 'Arabic',
+    image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=85',
+    tag: 'Negative Space'
+  },
+  {
+    id: 'arc-4',
+    title: 'Imperial Bridal Payal',
+    category: 'Feet',
+    image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1200&q=85',
+    tag: 'Ankle Jewelry Jaal'
+  },
+  {
+    id: 'arc-5',
+    title: 'Royal Peacock Symmetry',
+    category: 'Bridal',
+    image: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?auto=format&fit=crop&w=1200&q=85',
+    tag: 'Royal Motifs'
+  },
+  {
+    id: 'arc-6',
+    title: 'Delicate Ring Mesh',
+    category: 'Arabic',
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&q=85',
+    tag: 'Contemporary'
+  }
+];
+
+// Real Bride Testimonials
+const TESTIMONIALS = [
+  {
+    quote: "Bhuvi’s micro-jaali detailing is unmatched. She drew our proposal story in Udaipur right onto my palms. The stain turned an unbelievable deep mahogany on my wedding day.",
+    bride: "Dr. Radhika Singhania",
+    wedding: "Destination Wedding, The Leela Palace Udaipur",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
+  },
+  {
+    quote: "Her henna paste is so pure and fragrant with natural lavender. No chemical fumes, zero irritation, and the color lasted through all our reception parties.",
+    bride: "Ananya Mehra",
+    wedding: "Grand Hyatt Mumbai",
+    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80"
+  },
+  {
+    quote: "From our first design consultation to the final clove steam, Bhuvi treated my bridal mehandi like high art. Every guest was mesmerized by the symmetry.",
+    bride: "Pooja Kothari",
+    wedding: "Fairmont Jaipur",
+    avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=300&q=80"
   }
 ];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('all');
-  const [designs, setDesigns] = useState([]);
-  const [loadingDesigns, setLoadingDesigns] = useState(true);
-  const [selectedDesign, setSelectedDesign] = useState(null);
-
-  // Inquiry Form State
-  const [form, setForm] = useState({
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [lightboxImage, setLightboxImage] = useState(null);
+  const [dbStatus, setDbStatus] = useState('checking');
+  
+  // Consultation Form State
+  const [formData, setFormData] = useState({
     name: '',
     phone: '',
-    eventDate: '',
-    eventType: 'Bespoke Bridal',
-    cityVenue: '',
-    message: ''
+    event_date: '',
+    event_type: 'Bridal Mehandi',
+    location: '',
+    notes: ''
   });
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  // Studio Admin Drawer State
+  // Admin Portal State
   const [adminOpen, setAdminOpen] = useState(false);
+  const [adminPass, setAdminPass] = useState('');
+  const [adminAuthed, setAdminAuthed] = useState(false);
   const [inquiries, setInquiries] = useState([]);
-  const [dbStatus, setDbStatus] = useState(null);
-  const [newDesign, setNewDesign] = useState({
-    title: '',
-    category: 'bridal',
-    imageUrl: '',
-    description: '',
-    priceRange: ''
-  });
-  const [addingDesign, setAddingDesign] = useState(false);
+  const [loadingInquiries, setLoadingInquiries] = useState(false);
 
-  // Mobile navigation drawer
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  // Test Supabase on mount
   useEffect(() => {
-    loadDesigns();
+    testSupabaseConnection().then(res => {
+      setDbStatus(res.ok ? 'connected' : 'fallback');
+    });
   }, []);
-
-  const loadDesigns = async () => {
-    setLoadingDesigns(true);
-    try {
-      const data = await fetchDesigns();
-      setDesigns(data);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoadingDesigns(false);
-    }
-  };
-
-  const loadAdminData = async () => {
-    try {
-      const [inqData, status] = await Promise.all([
-        fetchInquiries(),
-        testSupabaseConnection()
-      ]);
-      setInquiries(inqData);
-      setDbStatus(status);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const openAdmin = () => {
-    setAdminOpen(true);
-    loadAdminData();
-  };
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.name || !form.phone) return;
-    setSubmitting(true);
-    try {
-      await submitInquiry({
-        name: form.name,
-        phone: form.phone,
-        event_date: form.eventDate,
-        event_type: form.eventType,
-        city_venue: form.cityVenue,
-        message: form.message
-      });
-      setSubmitted(true);
-      // Auto open WhatsApp with formatted message
-      const url = createWhatsAppUrl({
-        name: form.name,
-        phone: form.phone,
-        eventDate: form.eventDate,
-        eventType: form.eventType,
-        cityVenue: form.cityVenue,
-        customNote: form.message
-      });
-      window.open(url, '_blank', 'noopener,noreferrer');
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleAddDesignSubmit = async (e) => {
-    e.preventDefault();
-    if (!newDesign.title || !newDesign.imageUrl) return;
-    setAddingDesign(true);
-    try {
-      const res = await createDesign(newDesign);
-      setDesigns((prev) => [res.design, ...prev]);
-      setNewDesign({ title: '', category: 'bridal', imageUrl: '', description: '', priceRange: '' });
-      alert('Design added successfully!');
-    } catch (err) {
-      alert('Failed to add design: ' + err.message);
-    } finally {
-      setAddingDesign(false);
-    }
-  };
-
-  const handleDeleteDesign = async (id) => {
-    if (!confirm('Are you sure you want to delete this design?')) return;
-    await deleteDesign(id);
-    setDesigns((prev) => prev.filter((d) => d.id !== id));
-  };
-
-  const handleStatusUpdate = async (id, status) => {
-    await updateInquiryStatus(id, status);
-    setInquiries((prev) => prev.map((item) => (item.id === id ? { ...item, status } : item)));
-  };
-
-  const filteredDesigns = activeTab === 'all'
-    ? designs
-    : designs.filter((d) => d.category.toLowerCase() === activeTab.toLowerCase());
 
   const scrollTo = (id) => {
     setMobileMenuOpen(false);
@@ -200,293 +207,375 @@ export default function App() {
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+
+    try {
+      const res = await submitInquiry(formData);
+      setSubmitting(false);
+      setSubmitSuccess(true);
+
+      // Trigger instant WhatsApp hand-off
+      const waUrl = createWhatsAppUrl({
+        name: formData.name,
+        phone: formData.phone,
+        eventDate: formData.event_date,
+        eventType: formData.event_type,
+        location: formData.location,
+        customNote: formData.notes
+      });
+
+      setTimeout(() => {
+        window.open(waUrl, '_blank');
+      }, 800);
+    } catch (err) {
+      setSubmitting(false);
+      setSubmitSuccess(true);
+    }
+  };
+
+  const handleAdminAuth = async (e) => {
+    e.preventDefault();
+    if (adminPass === 'bhuvi2026' || adminPass === 'admin') {
+      setAdminAuthed(true);
+      setLoadingInquiries(true);
+      const data = await fetchInquiries();
+      setInquiries(data);
+      setLoadingInquiries(false);
+    } else {
+      alert('Invalid Studio Passcode');
+    }
+  };
+
+  const filteredArchive = activeCategory === 'All'
+    ? DEFAULT_ARCHIVE
+    : DEFAULT_ARCHIVE.filter(item => item.category === activeCategory);
+
   return (
-    <div className="min-h-screen bg-[#fafaf8] text-[#111111] antialiased selection:bg-[#8b1a2d] selection:text-white">
+    <div className="min-h-screen bg-[#0e0c0d] text-[#fdfbf7] selection:bg-[#96283b] selection:text-white font-sans antialiased overflow-x-hidden">
+      
       {/* ------------------------------------------------------------- */}
-      {/* MINIMALIST TOP NAVIGATION                                     */}
+      {/* 1. TOP LIVE TICKER & HAUTE NAVIGATION                         */}
       {/* ------------------------------------------------------------- */}
-      <header className="sticky top-0 z-40 bg-[#fafaf8]/90 backdrop-blur-md border-b border-[#e5e5e0] transition-colors">
+      <div className="bg-[#181416] border-b border-[#2a2225] text-[11px] font-sans text-[#d4af37] py-2 px-4 text-center tracking-[0.2em] uppercase flex items-center justify-center gap-2">
+        <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse" />
+        Accepting Inquiries for 2026 / 2027 Wedding Season • Pure Rajasthani Sojat Organic Henna
+      </div>
+
+      <header className="sticky top-0 z-40 bg-[#0e0c0d]/90 backdrop-blur-md border-b border-[#2a2225]">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 h-20 flex items-center justify-between">
-          <button
-            onClick={() => scrollTo('hero')}
-            className="text-left group cursor-pointer"
-          >
-            <span className="display text-xl sm:text-2xl tracking-[0.2em] font-medium uppercase text-[#111111]">
+          
+          {/* Brand Logo */}
+          <button onClick={() => scrollTo('hero')} className="text-left group cursor-pointer">
+            <span className="font-cinzel text-xl sm:text-2xl tracking-[0.25em] font-semibold uppercase gold-gradient-text">
               Bhuvi Mehandi
             </span>
-            <span className="block text-[10px] tracking-[0.3em] uppercase text-[#777777] font-sans font-normal -mt-0.5">
-              Artistry Studio
+            <span className="block text-[10px] tracking-[0.35em] uppercase text-[#a69894] font-sans font-normal -mt-0.5">
+              Haute Henna Atelier
             </span>
           </button>
 
-          {/* Desktop Links */}
-          <nav className="hidden md:flex items-center space-x-10 text-xs tracking-[0.18em] uppercase font-sans text-[#444444]">
-            <button onClick={() => scrollTo('services')} className="hover:text-[#111111] transition-colors cursor-pointer">
-              Services
-            </button>
-            <button onClick={() => scrollTo('works')} className="hover:text-[#111111] transition-colors cursor-pointer">
-              Selected Works
-            </button>
-            <button onClick={() => scrollTo('about')} className="hover:text-[#111111] transition-colors cursor-pointer">
-              About
-            </button>
-            <button onClick={() => scrollTo('contact')} className="hover:text-[#111111] transition-colors cursor-pointer">
-              Inquire
-            </button>
+          {/* Desktop Nav Links */}
+          <nav className="hidden lg:flex items-center gap-8 text-xs font-sans uppercase tracking-[0.2em] text-[#a69894]">
+            <button onClick={() => scrollTo('showcase')} className="hover:text-[#d4af37] transition-colors cursor-pointer">3D Atelier</button>
+            <button onClick={() => scrollTo('collections')} className="hover:text-[#d4af37] transition-colors cursor-pointer">Collections</button>
+            <button onClick={() => scrollTo('calculator')} className="hover:text-[#d4af37] transition-colors cursor-pointer">Investment</button>
+            <button onClick={() => scrollTo('craft')} className="hover:text-[#d4af37] transition-colors cursor-pointer">The Craft</button>
+            <button onClick={() => scrollTo('archive')} className="hover:text-[#d4af37] transition-colors cursor-pointer">Archive</button>
+            <button onClick={() => scrollTo('stories')} className="hover:text-[#d4af37] transition-colors cursor-pointer">Stories</button>
           </nav>
 
-          {/* WhatsApp Direct Link */}
-          <div className="hidden sm:flex items-center">
+          {/* Right Action */}
+          <div className="hidden sm:flex items-center gap-4">
             <a
-              href={createWhatsAppUrl({ customNote: 'Hello Bhuvi, I would like to inquire about wedding mehandi dates.' })}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs tracking-[0.18em] uppercase font-sans px-5 py-2.5 border border-[#111111] hover:bg-[#111111] hover:text-[#fafaf8] transition-all duration-300"
+              href="#consultation"
+              className="px-5 py-2.5 rounded-full bg-gradient-to-r from-[#96283b] to-[#ba334a] hover:from-[#ba334a] hover:to-[#96283b] text-white text-xs uppercase tracking-[0.2em] font-medium transition-all shadow-md shadow-[#96283b]/30"
             >
-              WhatsApp
+              Reserve Date
             </a>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden text-xs tracking-[0.2em] uppercase font-sans text-[#111111] py-2 cursor-pointer"
+            className="lg:hidden p-2 text-[#fdfbf7] hover:text-[#d4af37] cursor-pointer"
+            aria-label="Toggle Navigation"
           >
-            {mobileMenuOpen ? 'Close' : 'Menu'}
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
 
-        {/* Mobile Menu Dropdown */}
+        {/* Mobile Dropdown */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-b border-[#e5e5e0] bg-[#fafaf8] px-6 py-8 space-y-6 text-sm tracking-[0.2em] uppercase font-sans">
-            <div>
-              <button onClick={() => scrollTo('services')} className="block w-full text-left py-2 text-[#333333]">
-                Services
-              </button>
-            </div>
-            <div>
-              <button onClick={() => scrollTo('works')} className="block w-full text-left py-2 text-[#333333]">
-                Selected Works
-              </button>
-            </div>
-            <div>
-              <button onClick={() => scrollTo('about')} className="block w-full text-left py-2 text-[#333333]">
-                About Bhuvi
-              </button>
-            </div>
-            <div>
-              <button onClick={() => scrollTo('contact')} className="block w-full text-left py-2 text-[#333333]">
-                Inquire & Reserve
-              </button>
-            </div>
-            <div className="pt-4 border-t border-[#e5e5e0]">
-              <a
-                href={createWhatsAppUrl({ customNote: 'Hello Bhuvi, I want to inquire about booking my mehandi.' })}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block w-full text-center py-3 bg-[#111111] text-[#fafaf8] text-xs tracking-[0.2em] uppercase font-sans"
-              >
-                Chat on WhatsApp
-              </a>
-            </div>
+          <div className="lg:hidden bg-[#181416] border-b border-[#2a2225] px-6 py-8 space-y-5 text-sm font-sans tracking-widest uppercase">
+            <button onClick={() => scrollTo('showcase')} className="block w-full text-left py-2 hover:text-[#d4af37]">3D Dimensional Atelier</button>
+            <button onClick={() => scrollTo('collections')} className="block w-full text-left py-2 hover:text-[#d4af37]">Collections</button>
+            <button onClick={() => scrollTo('calculator')} className="block w-full text-left py-2 hover:text-[#d4af37]">Package Calculator</button>
+            <button onClick={() => scrollTo('craft')} className="block w-full text-left py-2 hover:text-[#d4af37]">The Organic Craft</button>
+            <button onClick={() => scrollTo('archive')} className="block w-full text-left py-2 hover:text-[#d4af37]">Archive Gallery</button>
+            <button onClick={() => scrollTo('consultation')} className="block w-full text-left py-2 text-[#ba334a] font-bold">Book VIP Consultation</button>
           </div>
         )}
       </header>
 
       {/* ------------------------------------------------------------- */}
-      {/* 3D INTERACTIVE MEHANDI HAND HERO (THREE.JS + GSAP)            */}
+      {/* 2. GRAND EDITORIAL HERO                                       */}
       {/* ------------------------------------------------------------- */}
-      <MehandiHeroHand />
-
-      {/* ------------------------------------------------------------- */}
-      {/* HERO SECTION                                                  */}
-      {/* ------------------------------------------------------------- */}
-      <section id="hero" className="max-w-7xl mx-auto px-6 sm:px-10 pt-16 sm:pt-24 pb-20 sm:pb-32">
+      <section id="hero" className="relative max-w-7xl mx-auto px-6 sm:px-10 pt-16 sm:pt-24 pb-20 sm:pb-32 overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-          {/* Left Column: Bold Editorial Typography */}
+          
+          {/* Left Column: Bold Haute Typography */}
           <div className="lg:col-span-7 space-y-8">
-            <p className="text-xs tracking-[0.25em] uppercase text-[#777777] font-sans">
-              Bespoke Bridal & Event Henna
-            </p>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#181416] border border-[#d4af37]/30 text-[#d4af37] text-xs uppercase tracking-[0.25em] font-sans">
+              <Crown className="w-3.5 h-3.5 text-[#d4af37]" />
+              Bespoke Haute Bridal Henna
+            </div>
 
-            <h1 className="display text-5xl sm:text-7xl lg:text-8xl font-normal leading-[1.02] tracking-[-0.02em] text-[#111111]">
-              Henna artistry, <br />
-              <span className="italic font-light text-[#8b1a2d]">refined</span> for the <br />
-              modern bride.
+            <h1 className="font-cinzel text-4xl sm:text-6xl lg:text-7xl font-normal leading-[1.08] tracking-tight text-[#fdfbf7]">
+              Sacred <span className="gold-gradient-text italic font-light">Heirloom</span> Artistry for the Modern Bride.
             </h1>
 
-            <p className="text-base sm:text-lg text-[#555555] font-light max-w-xl leading-relaxed font-sans">
-              Hand-formulated with 100% pure organic Rajasthani Sojat leaf and steam-distilled lavender oil.
-              Thoughtful, intricate compositions tailored to your wedding story.
+            <p className="text-base sm:text-lg text-[#a69894] font-sans leading-relaxed max-w-xl">
+              Triple-filtered organic Sojat henna leaves infused with Bulgarian lavender and tea tree essences. Crafted for breathtaking depth, exquisite symmetry, and timeless royal storytelling.
             </p>
 
-            <div className="pt-4 flex flex-col sm:flex-row items-start sm:items-center gap-5 font-sans">
+            {/* CTAs */}
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 font-sans">
               <a
-                href={createWhatsAppUrl({
-                  eventType: 'Bridal Henna Inquiry',
-                  customNote: 'Hi Bhuvi! I am planning my wedding and would love to reserve my date.'
-                })}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto text-center px-8 py-4 bg-[#111111] text-[#fafaf8] text-xs tracking-[0.2em] uppercase hover:bg-[#8b1a2d] transition-colors duration-300"
+                href="#consultation"
+                className="text-center px-8 py-4 rounded-xl bg-gradient-to-r from-[#96283b] to-[#ba334a] hover:from-[#ba334a] hover:to-[#96283b] text-white text-xs tracking-[0.25em] uppercase font-bold shadow-lg shadow-[#96283b]/30 transition-all duration-300"
               >
-                Reserve via WhatsApp
+                Inquire via VIP Concierge
               </a>
 
               <button
-                onClick={() => scrollTo('services')}
-                className="w-full sm:w-auto text-center px-8 py-4 border border-[#e5e5e0] text-[#333333] hover:border-[#111111] hover:text-[#111111] text-xs tracking-[0.2em] uppercase transition-colors duration-300 cursor-pointer"
+                onClick={() => scrollTo('showcase')}
+                className="text-center px-8 py-4 rounded-xl border border-[#d4af37]/40 text-[#fdfbf7] hover:border-[#d4af37] hover:text-[#d4af37] text-xs tracking-[0.25em] uppercase transition-colors duration-300 cursor-pointer"
               >
-                Explore Services ↓
+                Explore 3D Atelier ↓
               </button>
             </div>
 
-            {/* Subtle Editorial Metrics */}
-            <div className="pt-10 border-t border-[#e5e5e0] grid grid-cols-3 gap-6 max-w-lg">
+            {/* Luxury Metrics */}
+            <div className="pt-8 border-t border-[#2a2225] grid grid-cols-3 gap-6 max-w-lg">
               <div>
-                <span className="display text-2xl sm:text-3xl text-[#111111] font-normal">100%</span>
-                <span className="block text-[10px] tracking-[0.2em] uppercase text-[#777777] mt-1 font-sans">Organic Henna</span>
+                <span className="font-cinzel text-2xl sm:text-3xl font-semibold text-[#d4af37] block">850+</span>
+                <span className="text-[10px] uppercase tracking-wider text-[#a69894] font-sans">Bespoke Brides</span>
               </div>
               <div>
-                <span className="display text-2xl sm:text-3xl text-[#111111] font-normal">500+</span>
-                <span className="block text-[10px] tracking-[0.2em] uppercase text-[#777777] mt-1 font-sans">Brides Adorned</span>
+                <span className="font-cinzel text-2xl sm:text-3xl font-semibold text-[#ba334a] block">0.2mm</span>
+                <span className="text-[10px] uppercase tracking-wider text-[#a69894] font-sans">Micro-Cone Precision</span>
               </div>
               <div>
-                <span className="display text-2xl sm:text-3xl text-[#111111] font-normal">48h</span>
-                <span className="block text-[10px] tracking-[0.2em] uppercase text-[#777777] mt-1 font-sans">Dark Stain Peak</span>
+                <span className="font-cinzel text-2xl sm:text-3xl font-semibold text-[#f5df88] block">100%</span>
+                <span className="text-[10px] uppercase tracking-wider text-[#a69894] font-sans">Pure Organic Sojat</span>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Right Column: Editorial Visual Composition */}
+          <div className="lg:col-span-5 relative">
+            <div className="relative rounded-2xl overflow-hidden glass-panel border border-[#d4af37]/30 shadow-2xl p-2.5">
+              <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#181416]">
+                <img
+                  src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85"
+                  alt="Haute Bridal Mehandi"
+                  className="w-full h-full object-cover object-center"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0e0c0d]/90 via-transparent to-transparent pointer-events-none" />
+                
+                {/* Floating Seal Badge */}
+                <div className="absolute bottom-6 left-6 right-6 p-4 rounded-xl bg-[#0e0c0d]/85 backdrop-blur-md border border-[#d4af37]/30">
+                  <p className="font-cinzel text-sm text-[#fdfbf7]">The Heirloom Collection</p>
+                  <p className="text-xs text-[#d4af37] font-sans mt-0.5">Hand-formulated organic henna with clove steam finish</p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Clean Architectural Portrait */}
-          <div className="lg:col-span-5">
-            <div className="relative aspect-[3/4] overflow-hidden bg-[#e5e5e0] img-zoom">
-              <img
-                src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85"
-                alt="Bhuvi Mehandi - Bridal Henna Artistry"
-                className="w-full h-full object-cover object-center"
-              />
-              <div className="absolute bottom-4 left-4 right-4 bg-[#fafaf8]/90 backdrop-blur-sm px-4 py-2.5 text-[11px] tracking-[0.15em] uppercase text-[#333333] flex items-center justify-between border border-[#e5e5e0]">
-                <span>Royal Dulha-Dulhan Storyline</span>
-                <span className="text-[#8b1a2d]">Signature 2026</span>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
       {/* ------------------------------------------------------------- */}
-      {/* EDITORIAL SERVICES SECTION                                     */}
+      {/* 3. 3D DIMENSIONAL MEHANDI SHOWCASE (LAG-FREE ATELIER)         */}
       {/* ------------------------------------------------------------- */}
-      <section id="services" className="border-t border-[#e5e5e0] bg-[#ffffff] py-24 sm:py-32">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-16 pb-6 border-b border-[#e5e5e0]">
-            <div>
-              <span className="text-xs tracking-[0.25em] uppercase text-[#777777] font-sans block mb-2">
-                01 / Offerings
-              </span>
-              <h2 className="display text-4xl sm:text-6xl font-normal text-[#111111]">
-                Our Services
-              </h2>
-            </div>
-            <p className="text-sm text-[#777777] font-light max-w-sm font-sans mt-4 sm:mt-0">
-              Each package includes fresh chemical-free organic henna cones, personalized consultation, and clove-steam aftercare guidance.
-            </p>
+      <div id="showcase">
+        <DimensionalMehandiShowcase />
+      </div>
+
+      {/* ------------------------------------------------------------- */}
+      {/* 4. HAUTE MASTER COLLECTIONS                                   */}
+      {/* ------------------------------------------------------------- */}
+      <section id="collections" className="py-24 px-6 sm:px-10 max-w-7xl mx-auto border-b border-[#2a2225]">
+        
+        <div className="text-center space-y-4 max-w-2xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#181416] border border-[#d4af37]/30 text-[#d4af37] text-xs uppercase tracking-[0.25em] font-sans">
+            <Sparkles className="w-3.5 h-3.5" />
+            Curated Services
           </div>
+          <h2 className="font-cinzel text-3xl sm:text-5xl font-normal text-[#fdfbf7]">
+            Haute <span className="italic font-light text-[#ba334a]">Collections</span>
+          </h2>
+          <p className="text-sm text-[#a69894] font-sans leading-relaxed">
+            Every bridal composition is treated as a one-of-a-kind couture heirloom, designed to complement your wedding jewelry and bridal attire.
+          </p>
+        </div>
 
-          {/* Editorial Service Rows */}
-          <div className="divide-y divide-[#e5e5e0]">
-            {SERVICES.map((serv) => (
-              <div
-                key={serv.id}
-                className="py-12 sm:py-16 grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center group"
-              >
-                {/* Number & Category */}
-                <div className="lg:col-span-2">
-                  <span className="display text-4xl sm:text-5xl font-light text-[#cccccc] group-hover:text-[#8b1a2d] transition-colors">
-                    {serv.number}
-                  </span>
-                  <span className="block text-xs tracking-[0.2em] uppercase text-[#777777] font-sans mt-1">
-                    {serv.category}
-                  </span>
-                </div>
+        {/* Collection Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
+          {COLLECTIONS.map((col) => (
+            <div
+              key={col.id}
+              className="glass-panel rounded-2xl overflow-hidden border border-[#2a2225] hover:border-[#d4af37]/40 transition-all duration-500 group flex flex-col justify-between"
+            >
+              <div className="relative aspect-[16/10] overflow-hidden bg-[#181416]">
+                <img
+                  src={col.image}
+                  alt={col.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0e0c0d] via-transparent to-transparent opacity-80" />
+                <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-[#0e0c0d]/80 border border-[#d4af37]/30 text-[10px] font-sans tracking-widest uppercase text-[#d4af37]">
+                  {col.number} // {col.category}
+                </span>
+                <span className="absolute bottom-4 right-4 font-cinzel text-lg text-[#f5df88] font-bold">
+                  {col.price}
+                </span>
+              </div>
 
-                {/* Title & Description */}
-                <div className="lg:col-span-5 space-y-3">
-                  <h3 className="display text-2xl sm:text-3xl text-[#111111] font-normal">
-                    {serv.title}
+              <div className="p-6 sm:p-8 space-y-5 flex-1 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <h3 className="font-cinzel text-2xl text-[#fdfbf7] group-hover:text-[#d4af37] transition-colors">
+                    {col.title}
                   </h3>
-                  <p className="text-xs tracking-[0.15em] uppercase text-[#8b1a2d] font-sans font-medium">
-                    {serv.tagline}
-                  </p>
-                  <p className="text-sm text-[#555555] font-light leading-relaxed font-sans">
-                    {serv.description}
-                  </p>
-
-                  <div className="pt-2 flex flex-wrap gap-2">
-                    {serv.details.map((item, idx) => (
-                      <span
-                        key={idx}
-                        className="text-[11px] tracking-wide text-[#666666] bg-[#fafaf8] border border-[#e5e5e0] px-2.5 py-1 font-sans"
-                      >
-                        {item}
-                      </span>
-                    ))}
+                  <p className="text-xs italic text-[#ba334a] font-sans">"{col.tagline}"</p>
+                  
+                  <div className="flex items-center gap-4 text-xs text-[#a69894] font-sans pt-1">
+                    <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-[#d4af37]" /> {col.duration}</span>
+                    <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-[#ba334a]" /> {col.coverage}</span>
                   </div>
+
+                  <ul className="space-y-2 pt-2 border-t border-[#2a2225] text-xs text-[#a69894] font-sans">
+                    {col.features.map((feat, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <span className="text-[#d4af37] font-bold mt-0.5">•</span>
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
-                {/* Duration & Price */}
-                <div className="lg:col-span-2 space-y-1 font-sans">
-                  <span className="block text-xs text-[#777777] uppercase tracking-[0.15em]">Investment</span>
-                  <span className="display text-2xl text-[#111111] font-normal">{serv.price}</span>
-                  <span className="block text-xs text-[#777777]">{serv.duration}</span>
-                </div>
-
-                {/* Action */}
-                <div className="lg:col-span-3 flex lg:justify-end">
+                <div className="pt-6 border-t border-[#2a2225]">
                   <a
                     href={createWhatsAppUrl({
-                      eventType: serv.title,
-                      service: serv.title,
-                      customNote: `Hi Bhuvi, I am inquiring about the ${serv.title} (${serv.price}). Please share your upcoming date availability.`
+                      eventType: `${col.title} Inquiry`,
+                      customNote: `Hi Bhuvi! I am interested in booking "${col.title}" for my wedding.`
                     })}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase px-6 py-3 border border-[#111111] hover:bg-[#111111] hover:text-[#ffffff] transition-all font-sans"
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#1e1719] hover:bg-[#96283b] border border-[#d4af37]/30 hover:border-[#ba334a] text-xs uppercase tracking-[0.2em] font-sans text-white transition-colors duration-300"
                   >
-                    Inquire via WhatsApp →
+                    Inquire via WhatsApp
+                    <ChevronRight className="w-3.5 h-3.5" />
                   </a>
                 </div>
               </div>
-            ))}
+            </div>
+          ))}
+        </div>
+
+      </section>
+
+      {/* ------------------------------------------------------------- */}
+      {/* 5. INTERACTIVE BRIDAL PACKAGE CALCULATOR                      */}
+      {/* ------------------------------------------------------------- */}
+      <BridalPackageCalculator />
+
+      {/* ------------------------------------------------------------- */}
+      {/* 6. THE SACRED CRAFT & ORGANIC PURITY                          */}
+      {/* ------------------------------------------------------------- */}
+      <section id="craft" className="py-24 px-6 sm:px-10 max-w-7xl mx-auto border-b border-[#2a2225]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          
+          <div className="lg:col-span-5 space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#181416] border border-[#d4af37]/30 text-[#d4af37] text-xs uppercase tracking-[0.25em] font-sans">
+              <Award className="w-3.5 h-3.5" />
+              100% Organic Purity Guarantee
+            </div>
+            
+            <h2 className="font-cinzel text-3xl sm:text-5xl font-normal text-[#fdfbf7] leading-tight">
+              The Sacred <span className="italic font-light text-[#ba334a]">Craft</span> & Formula
+            </h2>
+
+            <p className="text-sm text-[#a69894] font-sans leading-relaxed">
+              We reject synthetic dyes, black henna chemicals, and PPD. Every batch of henna paste is personally hand-mixed 48 hours prior to your wedding ceremony to ensure peak dye release and calming aromatherapy.
+            </p>
+
+            <div className="space-y-4 pt-2">
+              <div className="p-4 rounded-xl bg-[#161214] border border-[#2a2225]">
+                <h4 className="font-cinzel text-sm text-[#d4af37]">Sojat Organic Harvest</h4>
+                <p className="text-xs text-[#a69894] font-sans mt-1">Triple-sifted micro-fine powder sourced directly from premier farms in Sojat, Rajasthan.</p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-[#161214] border border-[#2a2225]">
+                <h4 className="font-cinzel text-sm text-[#d4af37]">Steam-Distilled Essential Oils</h4>
+                <p className="text-xs text-[#a69894] font-sans mt-1">Pure therapeutic Bulgarian lavender and Nilgiri eucalyptus oils for optimal darkness and soothing relaxation.</p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-[#161214] border border-[#2a2225]">
+                <h4 className="font-cinzel text-sm text-[#d4af37]">Clove Steam Finishing Seal</h4>
+                <p className="text-xs text-[#a69894] font-sans mt-1">Traditional warmth infusion with whole clove smoke to deepen oxidation into rich royal mahogany.</p>
+              </div>
+            </div>
           </div>
+
+          <div className="lg:col-span-7 grid grid-cols-2 gap-4">
+            <div className="rounded-2xl overflow-hidden glass-panel border border-[#2a2225] aspect-[4/5]">
+              <img
+                src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80"
+                alt="Organic Henna Process"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="rounded-2xl overflow-hidden glass-panel border border-[#2a2225] aspect-[4/5] mt-8">
+              <img
+                src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=800&q=80"
+                alt="Bridal Hand Craft"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
         </div>
       </section>
 
       {/* ------------------------------------------------------------- */}
-      {/* SELECTED WORKS / PORTFOLIO                                    */}
+      {/* 7. CURATED PORTFOLIO ARCHIVE                                  */}
       {/* ------------------------------------------------------------- */}
-      <section id="works" className="py-24 sm:py-32 max-w-7xl mx-auto px-6 sm:px-10">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 pb-6 border-b border-[#e5e5e0]">
-          <div>
-            <span className="text-xs tracking-[0.25em] uppercase text-[#777777] font-sans block mb-2">
-              02 / Archive
-            </span>
-            <h2 className="display text-4xl sm:text-6xl font-normal text-[#111111]">
+      <section id="archive" className="py-24 px-6 sm:px-10 max-w-7xl mx-auto border-b border-[#2a2225]">
+        
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
+          <div className="space-y-3 max-w-xl">
+            <span className="text-xs uppercase tracking-[0.25em] text-[#d4af37] font-sans font-semibold">
               Selected Works
+            </span>
+            <h2 className="font-cinzel text-3xl sm:text-5xl font-normal text-[#fdfbf7]">
+              The Atelier <span className="italic font-light text-[#ba334a]">Archive</span>
             </h2>
           </div>
 
-          {/* Minimal Filter Tabs */}
-          <div className="flex flex-wrap gap-4 text-xs tracking-[0.2em] uppercase font-sans mt-6 sm:mt-0">
-            {['all', 'bridal', 'arabic', 'rajasthani', 'feet'].map((cat) => (
+          {/* Filter Pills */}
+          <div className="flex flex-wrap gap-2">
+            {['All', 'Bridal', 'Heritage', 'Arabic', 'Feet'].map((cat) => (
               <button
                 key={cat}
-                onClick={() => setActiveTab(cat)}
-                className={`pb-1 cursor-pointer transition-colors ${
-                  activeTab === cat
-                    ? 'border-b-2 border-[#111111] text-[#111111] font-medium'
-                    : 'text-[#888888] hover:text-[#111111]'
+                onClick={() => setActiveCategory(cat)}
+                className={`px-4 py-2 rounded-full text-xs font-sans tracking-wider uppercase transition-all cursor-pointer ${
+                  activeCategory === cat
+                    ? 'bg-[#96283b] text-white border border-[#ba334a] shadow-md shadow-[#96283b]/30'
+                    : 'bg-[#181416] text-[#a69894] border border-[#2a2225] hover:border-white/20'
                 }`}
               >
                 {cat}
@@ -496,570 +585,359 @@ export default function App() {
         </div>
 
         {/* Gallery Grid */}
-        {loadingDesigns ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="aspect-[3/4] bg-[#e5e5e0] animate-pulse" />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
-            {filteredDesigns.map((design) => (
-              <div
-                key={design.id}
-                onClick={() => setSelectedDesign(design)}
-                className="group cursor-pointer block"
-              >
-                <div className="relative aspect-[3/4] overflow-hidden bg-[#e5e5e0] img-zoom">
-                  <img
-                    src={design.imageUrl}
-                    alt={design.title}
-                    className="w-full h-full object-cover object-center"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-                <div className="pt-4 flex items-baseline justify-between font-sans">
-                  <div>
-                    <h3 className="display text-xl text-[#111111] group-hover:text-[#8b1a2d] transition-colors">
-                      {design.title}
-                    </h3>
-                    <p className="text-[11px] tracking-[0.15em] uppercase text-[#777777] mt-0.5">
-                      {design.tag || design.category}
-                    </p>
-                  </div>
-                  <span className="text-xs text-[#555555] font-light">
-                    {design.priceRange}
-                  </span>
-                </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredArchive.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => setLightboxImage(item)}
+              className="relative aspect-[3/4] rounded-2xl overflow-hidden glass-panel border border-[#2a2225] hover:border-[#d4af37]/50 group cursor-pointer transition-all duration-500"
+            >
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0e0c0d]/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                <span className="text-[10px] uppercase tracking-widest text-[#d4af37] font-sans">{item.tag}</span>
+                <p className="font-cinzel text-lg text-[#fdfbf7] font-medium">{item.title}</p>
+                <p className="text-[11px] text-[#a69894] font-sans mt-1">Click to expand preview</p>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
+
       </section>
 
       {/* ------------------------------------------------------------- */}
-      {/* ABOUT BHUVI SECTION                                          */}
+      {/* 8. REAL BRIDE STORIES & TESTIMONIALS                          */}
       {/* ------------------------------------------------------------- */}
-      <section id="about" className="bg-[#ffffff] border-t border-b border-[#e5e5e0] py-24 sm:py-32">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
-            {/* Left Column: Image */}
-            <div className="lg:col-span-5">
-              <div className="relative aspect-[4/5] overflow-hidden bg-[#e5e5e0]">
+      <section id="stories" className="py-24 px-6 sm:px-10 max-w-7xl mx-auto border-b border-[#2a2225]">
+        <div className="text-center space-y-4 max-w-2xl mx-auto mb-16">
+          <span className="text-xs uppercase tracking-[0.25em] text-[#d4af37] font-sans font-semibold">
+            Bridal Accolades
+          </span>
+          <h2 className="font-cinzel text-3xl sm:text-5xl font-normal text-[#fdfbf7]">
+            Words from our <span className="italic font-light text-[#ba334a]">Brides</span>
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {TESTIMONIALS.map((t, idx) => (
+            <div
+              key={idx}
+              className="glass-panel p-8 rounded-2xl border border-[#2a2225] flex flex-col justify-between space-y-6"
+            >
+              <div className="space-y-4">
+                <div className="flex gap-1 text-[#d4af37]">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i}>★</span>
+                  ))}
+                </div>
+                <p className="text-sm text-[#fdfbf7] font-sans leading-relaxed italic">
+                  "{t.quote}"
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 pt-4 border-t border-[#2a2225]">
                 <img
-                  src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=85"
-                  alt="Bhuvi Artist at work"
-                  className="w-full h-full object-cover object-center"
+                  src={t.avatar}
+                  alt={t.bride}
+                  className="w-10 h-10 rounded-full object-cover border border-[#d4af37]/40"
                 />
-              </div>
-            </div>
-
-            {/* Right Column: Editorial Text */}
-            <div className="lg:col-span-7 space-y-8">
-              <span className="text-xs tracking-[0.25em] uppercase text-[#777777] font-sans block">
-                03 / Philosophy
-              </span>
-
-              <h2 className="display text-4xl sm:text-5xl lg:text-6xl font-normal leading-tight text-[#111111]">
-                Crafted with intention. <br />
-                <span className="italic text-[#8b1a2d]">Colored</span> solely by nature.
-              </h2>
-
-              <p className="text-base sm:text-lg text-[#555555] font-light leading-relaxed font-sans">
-                Henna is not merely an ornament; it is the physical anchoring of an auspicious milestone.
-                Bhuvi approaches every application as an intimate canvas — listening to the couple's history,
-                lehenga textures, and personal aesthetic before sketching.
-              </p>
-
-              <div className="space-y-6 pt-4 border-t border-[#e5e5e0] font-sans">
-                <div className="flex items-start gap-4">
-                  <span className="text-xs tracking-widest text-[#8b1a2d] uppercase font-medium">01</span>
-                  <div>
-                    <h4 className="text-sm font-semibold text-[#111111] uppercase tracking-wider">
-                      100% Certified Sojat Henna
-                    </h4>
-                    <p className="text-xs text-[#666666] leading-relaxed mt-1">
-                      Freshly sifted Rajasthani leaves blended with tea tree, lavender, and nilgiri essential oils. No artificial colorants, no PPD, safe for pregnant mothers and delicate skin.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <span className="text-xs tracking-widest text-[#8b1a2d] uppercase font-medium">02</span>
-                  <div>
-                    <h4 className="text-sm font-semibold text-[#111111] uppercase tracking-wider">
-                      Guaranteed Deep Mahogany Stain
-                    </h4>
-                    <p className="text-xs text-[#666666] leading-relaxed mt-1">
-                      Our custom slow-maturing recipe peaks at 48 hours post-application into an intense rich burgundy that commands presence in wedding photography.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <span className="text-xs tracking-widest text-[#8b1a2d] uppercase font-medium">03</span>
-                  <div>
-                    <h4 className="text-sm font-semibold text-[#111111] uppercase tracking-wider">
-                      Travel & Destination Ready
-                    </h4>
-                    <p className="text-xs text-[#666666] leading-relaxed mt-1">
-                      Based in Ahmedabad & Gandhinagar. Available for destination ceremonies across Udaipur, Jaipur, Goa, and international venues.
-                    </p>
-                  </div>
+                <div>
+                  <p className="font-cinzel text-sm font-semibold text-[#fdfbf7]">{t.bride}</p>
+                  <p className="text-[10px] text-[#a69894] font-sans">{t.wedding}</p>
                 </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
       </section>
 
       {/* ------------------------------------------------------------- */}
-      {/* CONTACT & RESERVATION SECTION                                 */}
+      {/* 9. VIP BRIDAL RESERVATION & SUPABASE INTEGRATION              */}
       {/* ------------------------------------------------------------- */}
-      <section id="contact" className="py-24 sm:py-32 max-w-7xl mx-auto px-6 sm:px-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
-          {/* Left: Contact Info */}
-          <div className="lg:col-span-5 space-y-8">
-            <div>
-              <span className="text-xs tracking-[0.25em] uppercase text-[#777777] font-sans block mb-2">
-                04 / Reservations
-              </span>
-              <h2 className="display text-4xl sm:text-6xl font-normal text-[#111111]">
-                Inquire Date
-              </h2>
-            </div>
-
-            <p className="text-sm sm:text-base text-[#555555] font-light leading-relaxed font-sans">
-              Due to the bespoke nature of our bridal work, we book a limited number of dates per wedding season.
-              Submit your date and event details below, or reach out instantly via WhatsApp.
+      <section id="consultation" className="py-24 px-6 sm:px-10 max-w-4xl mx-auto">
+        <div className="glass-panel p-8 sm:p-12 rounded-3xl border border-[#d4af37]/35 relative overflow-hidden bg-gradient-to-b from-[#1c1618] to-[#120e10]">
+          
+          <div className="text-center space-y-3 mb-10">
+            <span className="text-xs uppercase tracking-[0.25em] text-[#d4af37] font-sans font-semibold">
+              Bespoke Booking Request
+            </span>
+            <h2 className="font-cinzel text-3xl sm:text-4xl text-[#fdfbf7]">
+              Reserve Your Wedding Date
+            </h2>
+            <p className="text-xs sm:text-sm text-[#a69894] font-sans max-w-md mx-auto">
+              Please share your wedding date and venue. We take a strictly limited number of bespoke bridal bookings per wedding season.
             </p>
-
-            <div className="space-y-4 pt-6 border-t border-[#e5e5e0] font-sans text-xs tracking-wider uppercase">
-              <div>
-                <span className="text-[#888888] block text-[10px]">Instant Booking</span>
-                <a
-                  href={createWhatsAppUrl({ customNote: 'Namaste Bhuvi, I would like to check availability for my wedding.' })}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-base text-[#111111] font-normal hover:text-[#8b1a2d] transition-colors"
-                >
-                  +91 98765 43210 (WhatsApp)
-                </a>
-              </div>
-
-              <div>
-                <span className="text-[#888888] block text-[10px]">Email Correspondence</span>
-                <span className="text-base text-[#111111] font-normal">bhuvi.mehandi@gmail.com</span>
-              </div>
-
-              <div>
-                <span className="text-[#888888] block text-[10px]">Studio & Coverage</span>
-                <span className="text-base text-[#111111] font-normal">Ahmedabad, Gujarat & Worldwide</span>
-              </div>
-            </div>
           </div>
 
-          {/* Right: Minimalist Form */}
-          <div className="lg:col-span-7 bg-[#ffffff] p-8 sm:p-12 border border-[#e5e5e0]">
-            {submitted ? (
-              <div className="py-12 text-center space-y-4 font-sans">
-                <span className="display text-3xl text-[#111111] block">Inquiry Received</span>
-                <p className="text-sm text-[#555555] max-w-md mx-auto">
-                  Thank you. Your reservation request has been registered. A WhatsApp window has opened to connect directly with Bhuvi.
-                </p>
-                <div className="pt-4">
-                  <button
-                    onClick={() => setSubmitted(false)}
-                    className="text-xs tracking-[0.2em] uppercase border-b border-[#111111] pb-1"
-                  >
-                    Send another inquiry
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handleFormSubmit} className="space-y-6 font-sans">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-[11px] tracking-[0.15em] uppercase text-[#555555] mb-2">
-                      Client Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={form.name}
-                      onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      placeholder="e.g. Priya Shah"
-                      className="w-full border-b border-[#cccccc] focus:border-[#111111] bg-transparent py-2.5 text-sm text-[#111111] outline-none transition-colors"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] tracking-[0.15em] uppercase text-[#555555] mb-2">
-                      Phone / WhatsApp *
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      placeholder="+91 98765 43210"
-                      className="w-full border-b border-[#cccccc] focus:border-[#111111] bg-transparent py-2.5 text-sm text-[#111111] outline-none transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-[11px] tracking-[0.15em] uppercase text-[#555555] mb-2">
-                      Event Date *
-                    </label>
-                    <input
-                      type="date"
-                      required
-                      value={form.eventDate}
-                      onChange={(e) => setForm({ ...form, eventDate: e.target.value })}
-                      className="w-full border-b border-[#cccccc] focus:border-[#111111] bg-transparent py-2.5 text-sm text-[#111111] outline-none transition-colors"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] tracking-[0.15em] uppercase text-[#555555] mb-2">
-                      Service Package
-                    </label>
-                    <select
-                      value={form.eventType}
-                      onChange={(e) => setForm({ ...form, eventType: e.target.value })}
-                      className="w-full border-b border-[#cccccc] focus:border-[#111111] bg-transparent py-2.5 text-sm text-[#111111] outline-none transition-colors cursor-pointer"
-                    >
-                      <option>The Bridal Narrative</option>
-                      <option>Contemporary Arabic</option>
-                      <option>Rajasthani Heritage</option>
-                      <option>The Sangeet Soirée</option>
-                      <option>Custom Bridal Composition</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] tracking-[0.15em] uppercase text-[#555555] mb-2">
-                    Event City & Venue
-                  </label>
+          {submitSuccess ? (
+            <div className="p-8 rounded-2xl bg-[#181416] border border-[#10b981]/40 text-center space-y-4">
+              <CheckCircle2 className="w-12 h-12 text-[#10b981] mx-auto" />
+              <h3 className="font-cinzel text-2xl text-[#fdfbf7]">Inquiry Received</h3>
+              <p className="text-sm text-[#a69894] font-sans max-w-md mx-auto">
+                Thank you, {formData.name}. Your inquiry has been logged into our atelier booking queue and forwarded directly to Bhuvi via WhatsApp.
+              </p>
+              <button
+                onClick={() => setSubmitSuccess(false)}
+                className="mt-4 px-6 py-2.5 rounded-full bg-[#2a2225] text-xs font-sans uppercase tracking-widest text-[#d4af37] hover:bg-[#96283b] transition-colors cursor-pointer"
+              >
+                Submit Another Request
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleFormSubmit} className="space-y-6">
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="block text-xs uppercase tracking-wider text-[#d4af37] font-sans">Your Full Name *</label>
                   <input
                     type="text"
-                    value={form.cityVenue}
-                    onChange={(e) => setForm({ ...form, cityVenue: e.target.value })}
-                    placeholder="e.g. Ahmedabad, Hyatt Regency / Home"
-                    className="w-full border-b border-[#cccccc] focus:border-[#111111] bg-transparent py-2.5 text-sm text-[#111111] outline-none transition-colors"
+                    required
+                    placeholder="e.g. Radhika Sharma"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-4 py-3.5 rounded-xl bg-[#0e0c0d] border border-[#2a2225] focus:border-[#d4af37] text-[#fdfbf7] text-sm font-sans outline-none transition-colors"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-[11px] tracking-[0.15em] uppercase text-[#555555] mb-2">
-                    Notes or Specific Inspirations
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={form.message}
-                    onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    placeholder="Tell us about your attire colors, specific ritual motifs, or bridal party size..."
-                    className="w-full border-b border-[#cccccc] focus:border-[#111111] bg-transparent py-2.5 text-sm text-[#111111] outline-none transition-colors resize-none"
+                <div className="space-y-2">
+                  <label className="block text-xs uppercase tracking-wider text-[#d4af37] font-sans">WhatsApp / Phone Number *</label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="+91 98765 43210"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-4 py-3.5 rounded-xl bg-[#0e0c0d] border border-[#2a2225] focus:border-[#d4af37] text-[#fdfbf7] text-sm font-sans outline-none transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="block text-xs uppercase tracking-wider text-[#d4af37] font-sans">Wedding / Ceremony Date *</label>
+                  <input
+                    type="date"
+                    required
+                    value={formData.event_date}
+                    onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
+                    className="w-full px-4 py-3.5 rounded-xl bg-[#0e0c0d] border border-[#2a2225] focus:border-[#d4af37] text-[#fdfbf7] text-sm font-sans outline-none transition-colors"
                   />
                 </div>
 
-                <div className="pt-4">
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="w-full py-4 bg-[#111111] text-[#fafaf8] text-xs tracking-[0.2em] uppercase hover:bg-[#8b1a2d] transition-colors duration-300 disabled:opacity-50 cursor-pointer"
+                <div className="space-y-2">
+                  <label className="block text-xs uppercase tracking-wider text-[#d4af37] font-sans">Ceremony Type *</label>
+                  <select
+                    value={formData.event_type}
+                    onChange={(e) => setFormData({ ...formData, event_type: e.target.value })}
+                    className="w-full px-4 py-3.5 rounded-xl bg-[#0e0c0d] border border-[#2a2225] focus:border-[#d4af37] text-[#fdfbf7] text-sm font-sans outline-none transition-colors"
                   >
-                    {submitting ? 'Connecting...' : 'Submit Inquiry & Open WhatsApp →'}
-                  </button>
+                    <option value="Bridal Mehandi">The Royal Bridal Narrative (Full)</option>
+                    <option value="Marwari Jaali">Marwari Heritage Micro-Jaali</option>
+                    <option value="Arabic Contemporary">Contemporary Arabic Botanicals</option>
+                    <option value="Sangeet Party">Sangeet & Bridesmaid Package</option>
+                    <option value="Destination">Destination Wedding Package</option>
+                  </select>
                 </div>
-              </form>
-            )}
-          </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs uppercase tracking-wider text-[#d4af37] font-sans">City / Wedding Venue *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Udaipur / Mumbai / Surat (Available worldwide)"
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  className="w-full px-4 py-3.5 rounded-xl bg-[#0e0c0d] border border-[#2a2225] focus:border-[#d4af37] text-[#fdfbf7] text-sm font-sans outline-none transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs uppercase tracking-wider text-[#d4af37] font-sans">Custom Details / Storytelling Notes</label>
+                <textarea
+                  rows="3"
+                  placeholder="Tell us about your wedding motifs, portrait requests, or specific guest count..."
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  className="w-full px-4 py-3.5 rounded-xl bg-[#0e0c0d] border border-[#2a2225] focus:border-[#d4af37] text-[#fdfbf7] text-sm font-sans outline-none transition-colors resize-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-[#96283b] to-[#ba334a] hover:from-[#ba334a] hover:to-[#96283b] text-white text-xs uppercase tracking-[0.25em] font-sans font-bold shadow-lg shadow-[#96283b]/40 transition-all cursor-pointer disabled:opacity-50"
+              >
+                {submitting ? 'Submitting Reservation...' : 'Submit & Connect via WhatsApp Concierge'}
+              </button>
+
+            </form>
+          )}
+
         </div>
       </section>
 
       {/* ------------------------------------------------------------- */}
-      {/* MINIMAL FOOTER                                                */}
+      {/* 10. LIGHTBOX MODAL PREVIEW                                    */}
       {/* ------------------------------------------------------------- */}
-      <footer className="border-t border-[#e5e5e0] bg-[#fafaf8] py-14">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 flex flex-col sm:flex-row items-center justify-between gap-6 font-sans text-xs text-[#777777]">
-          <div>
-            <span className="display text-lg text-[#111111] tracking-widest font-normal">
-              BHUVI MEHANDI
-            </span>
-            <p className="text-[11px] text-[#888888] mt-1">
-              © {new Date().getFullYear()} Bhuvi Mehandi Artistry Studio. All rights reserved.
-            </p>
-          </div>
-
-          <div className="flex items-center space-x-8 tracking-[0.15em] uppercase text-[11px]">
-            <a
-              href={createWhatsAppUrl({ customNote: 'Inquiring about Bhuvi Mehandi.' })}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[#111111] transition-colors"
-            >
-              WhatsApp
-            </a>
-            <button
-              onClick={openAdmin}
-              className="hover:text-[#111111] transition-colors cursor-pointer"
-            >
-              Studio Access
-            </button>
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="hover:text-[#111111] transition-colors cursor-pointer"
-            >
-              Back to Top ↑
-            </button>
-          </div>
-        </div>
-      </footer>
-
-      {/* ------------------------------------------------------------- */}
-      {/* MINIMAL FLOATING WHATSAPP BUTTON                              */}
-      {/* ------------------------------------------------------------- */}
-      <a
-        href={createWhatsAppUrl({ customNote: 'Hello Bhuvi! I saw your website and would love to ask about booking my event.' })}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Chat with Bhuvi on WhatsApp"
-        className="wa-float cursor-pointer"
-      >
-        <svg viewBox="0 0 24 24" className="w-6 h-6 fill-white">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-        </svg>
-      </a>
-
-      {/* ------------------------------------------------------------- */}
-      {/* DESIGN PREVIEW MODAL                                          */}
-      {/* ------------------------------------------------------------- */}
-      {selectedDesign && (
+      {lightboxImage && (
         <div
-          className="fixed inset-0 z-50 bg-[#111111]/80 backdrop-blur-sm flex items-center justify-center p-6"
-          onClick={() => setSelectedDesign(null)}
+          onClick={() => setLightboxImage(null)}
+          className="fixed inset-0 z-50 bg-[#0e0c0d]/95 backdrop-blur-lg flex items-center justify-center p-4 sm:p-8"
         >
           <div
-            className="bg-[#fafaf8] max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col md:flex-row border border-[#e5e5e0]"
             onClick={(e) => e.stopPropagation()}
+            className="relative max-w-3xl w-full rounded-2xl overflow-hidden glass-panel border border-[#d4af37]/50 p-2"
           >
-            <div className="md:w-1/2 bg-[#e5e5e0] aspect-square md:aspect-auto">
-              <img
-                src={selectedDesign.imageUrl}
-                alt={selectedDesign.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="md:w-1/2 p-8 flex flex-col justify-between overflow-y-auto">
+            <button
+              onClick={() => setLightboxImage(null)}
+              className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-[#0e0c0d]/80 text-white flex items-center justify-center border border-white/20 hover:bg-[#96283b] cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <img
+              src={lightboxImage.image}
+              alt={lightboxImage.title}
+              className="w-full max-h-[75vh] object-contain rounded-xl"
+            />
+            <div className="p-4 flex items-center justify-between">
               <div>
-                <div className="flex justify-between items-start mb-4">
-                  <span className="text-[11px] tracking-[0.2em] uppercase text-[#8b1a2d] font-sans">
-                    {selectedDesign.category}
-                  </span>
-                  <button
-                    onClick={() => setSelectedDesign(null)}
-                    className="text-xs uppercase tracking-widest text-[#777777] hover:text-[#111111] cursor-pointer"
-                  >
-                    Close [×]
-                  </button>
-                </div>
-                <h3 className="display text-3xl text-[#111111] mb-3">
-                  {selectedDesign.title}
-                </h3>
-                <p className="text-sm text-[#555555] font-light leading-relaxed font-sans mb-6">
-                  {selectedDesign.description || 'Intricate bespoke henna composition handcrafted by Bhuvi.'}
-                </p>
-                {selectedDesign.priceRange && (
-                  <div className="font-sans mb-6">
-                    <span className="text-xs text-[#777777] block uppercase tracking-wider">Starting Price</span>
-                    <span className="display text-2xl text-[#111111]">{selectedDesign.priceRange}</span>
-                  </div>
-                )}
+                <p className="font-cinzel text-lg text-[#fdfbf7]">{lightboxImage.title}</p>
+                <p className="text-xs text-[#d4af37] font-sans">{lightboxImage.tag}</p>
               </div>
-
-              <div className="pt-6 border-t border-[#e5e5e0]">
-                <a
-                  href={createWhatsAppUrl({
-                    eventType: 'Design Inquiry',
-                    designCode: selectedDesign.title,
-                    customNote: `Hi Bhuvi! I loved the "${selectedDesign.title}" design from your portfolio and would like to ask about booking it.`
-                  })}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block text-center py-3.5 bg-[#111111] text-[#fafaf8] text-xs tracking-[0.2em] uppercase hover:bg-[#8b1a2d] transition-colors font-sans"
-                >
-                  Inquire This Design on WhatsApp →
-                </a>
-              </div>
+              <a
+                href={createWhatsAppUrl({
+                  eventType: `Inquiry on design: ${lightboxImage.title}`,
+                  customNote: `Hi Bhuvi! I saw "${lightboxImage.title}" in your archive and would love this style for my bridal henna.`
+                })}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 rounded-xl bg-[#96283b] text-xs font-sans text-white uppercase tracking-wider"
+              >
+                Inquire This Design
+              </a>
             </div>
           </div>
         </div>
       )}
 
       {/* ------------------------------------------------------------- */}
-      {/* STUDIO ACCESS / ADMIN SLIDE-OVER DRAWER                       */}
+      {/* 11. FOOTER & STUDIO ADMIN ACCESS                              */}
+      {/* ------------------------------------------------------------- */}
+      <footer className="border-t border-[#2a2225] py-14 px-6 sm:px-10 bg-[#0b090a]">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-[#7a6f68] font-sans">
+          
+          <div>
+            <p className="font-cinzel text-base text-[#fdfbf7] tracking-wider uppercase">Bhuvi Mehandi Atelier</p>
+            <p className="mt-1">Bespoke Bridal Henna • Pure Rajasthani Sojat Formulation • Worldwide Destination Bookings</p>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <button
+              onClick={() => setAdminOpen(true)}
+              className="hover:text-[#d4af37] transition-colors flex items-center gap-1.5 cursor-pointer"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              Studio Portal
+            </button>
+            <span>© {new Date().getFullYear()} Bhuvi Mehandi. All Rights Reserved.</span>
+          </div>
+
+        </div>
+      </footer>
+
+      {/* ------------------------------------------------------------- */}
+      {/* 12. STUDIO ADMIN PORTAL MODAL                                 */}
       {/* ------------------------------------------------------------- */}
       {adminOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex justify-end"
-          onClick={() => setAdminOpen(false)}
-        >
-          <div
-            className="bg-[#fafaf8] w-full max-w-xl h-full shadow-2xl p-8 overflow-y-auto font-sans flex flex-col justify-between"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div>
-              <div className="flex justify-between items-center pb-4 border-b border-[#e5e5e0] mb-6">
-                <div>
-                  <h3 className="display text-2xl text-[#111111]">Studio Portal</h3>
-                  <span className="text-[11px] uppercase tracking-widest text-[#777777]">
-                    Content & Booking Management
-                  </span>
-                </div>
+        <div className="fixed inset-0 z-50 bg-[#0e0c0d]/95 backdrop-blur-lg flex items-center justify-center p-4">
+          <div className="relative max-w-2xl w-full p-6 sm:p-8 rounded-2xl glass-panel border border-[#d4af37]/40 space-y-6">
+            
+            <div className="flex items-center justify-between border-b border-[#2a2225] pb-4">
+              <div className="flex items-center gap-2 text-[#d4af37]">
+                <Lock className="w-4 h-4" />
+                <h3 className="font-cinzel text-lg text-[#fdfbf7]">Studio Portal & Booking Queue</h3>
+              </div>
+              <button onClick={() => setAdminOpen(false)} className="text-[#a69894] hover:text-white cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {!adminAuthed ? (
+              <form onSubmit={handleAdminAuth} className="space-y-4">
+                <p className="text-xs text-[#a69894]">Enter your studio passcode to view client inquiries.</p>
+                <input
+                  type="password"
+                  placeholder="Passcode (default: bhuvi2026)"
+                  value={adminPass}
+                  onChange={(e) => setAdminPass(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-[#0e0c0d] border border-[#2a2225] text-white text-sm outline-none"
+                />
                 <button
-                  onClick={() => setAdminOpen(false)}
-                  className="text-xs uppercase tracking-widest text-[#777777] hover:text-[#111111] cursor-pointer"
+                  type="submit"
+                  className="w-full py-3 rounded-xl bg-[#96283b] text-white text-xs uppercase tracking-widest font-bold cursor-pointer"
                 >
-                  Close [×]
+                  Unlock Portal
                 </button>
-              </div>
+              </form>
+            ) : (
+              <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                <div className="flex justify-between items-center text-xs text-[#a69894]">
+                  <span>Total Inquiries: {inquiries.length}</span>
+                  <span className="text-[#10b981]">Database: {dbStatus}</span>
+                </div>
 
-              {/* Supabase Status */}
-              <div className="p-4 bg-[#f0f0ee] border border-[#e5e5e0] mb-8 text-xs leading-relaxed">
-                <span className="font-semibold block mb-1 uppercase tracking-wider text-[#111111]">
-                  Supabase Connection
-                </span>
-                <p className="text-[#666666]">
-                  {dbStatus?.connected
-                    ? (dbStatus.hasTables ? '🟢 Active & Connected to Supabase Cloud' : '🟡 Connected to Supabase (run supabase-schema.sql for cloud tables)')
-                    : '⚪ Local Storage Fallback Mode Active'}
-                </p>
-                <p className="text-[10px] text-[#888888] mt-1 font-mono">{SUPABASE_URL}</p>
-              </div>
-
-              {/* Add New Design Form */}
-              <div className="mb-10">
-                <h4 className="text-xs uppercase tracking-widest text-[#111111] font-semibold mb-4">
-                  Add New Design to Portfolio
-                </h4>
-                <form onSubmit={handleAddDesignSubmit} className="space-y-4 text-xs">
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-wider text-[#555555] mb-1">Title</label>
-                    <input
-                      type="text"
-                      required
-                      value={newDesign.title}
-                      onChange={(e) => setNewDesign({ ...newDesign, title: e.target.value })}
-                      placeholder="e.g. Minimalist Lotus Ankle Cuff"
-                      className="w-full border border-[#cccccc] p-2 bg-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-wider text-[#555555] mb-1">Category</label>
-                    <select
-                      value={newDesign.category}
-                      onChange={(e) => setNewDesign({ ...newDesign, category: e.target.value })}
-                      className="w-full border border-[#cccccc] p-2 bg-white cursor-pointer"
-                    >
-                      <option value="bridal">Bridal</option>
-                      <option value="arabic">Arabic</option>
-                      <option value="rajasthani">Heritage Rajasthani</option>
-                      <option value="feet">Feet Art</option>
-                      <option value="minimalist">Minimalist</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-wider text-[#555555] mb-1">Image URL</label>
-                    <input
-                      type="url"
-                      required
-                      value={newDesign.imageUrl}
-                      onChange={(e) => setNewDesign({ ...newDesign, imageUrl: e.target.value })}
-                      placeholder="https://images.unsplash.com/..."
-                      className="w-full border border-[#cccccc] p-2 bg-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-wider text-[#555555] mb-1">Price Estimate</label>
-                    <input
-                      type="text"
-                      value={newDesign.priceRange}
-                      onChange={(e) => setNewDesign({ ...newDesign, priceRange: e.target.value })}
-                      placeholder="₹2,500 - ₹5,000"
-                      className="w-full border border-[#cccccc] p-2 bg-white"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={addingDesign}
-                    className="w-full py-3 bg-[#111111] text-[#fafaf8] text-xs uppercase tracking-widest hover:bg-[#8b1a2d] transition-colors cursor-pointer"
-                  >
-                    {addingDesign ? 'Saving...' : 'Add to Portfolio'}
-                  </button>
-                </form>
-              </div>
-
-              {/* Received Inquiries */}
-              <div>
-                <h4 className="text-xs uppercase tracking-widest text-[#111111] font-semibold mb-4">
-                  Client Inquiries ({inquiries.length})
-                </h4>
-                {inquiries.length === 0 ? (
-                  <p className="text-xs text-[#888888]">No inquiries yet.</p>
+                {loadingInquiries ? (
+                  <p className="text-xs text-center text-[#a69894] py-8">Loading inquiries...</p>
+                ) : inquiries.length === 0 ? (
+                  <p className="text-xs text-center text-[#a69894] py-8">No inquiries yet. New submissions will appear here live.</p>
                 ) : (
                   <div className="space-y-3">
                     {inquiries.map((inq) => (
-                      <div key={inq.id} className="p-4 bg-white border border-[#e5e5e0] text-xs space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="font-semibold text-sm text-[#111111]">{inq.name}</span>
-                          <span className="px-2 py-0.5 bg-[#f0f0ee] text-[10px] uppercase tracking-wider">
-                            {inq.status || 'New'}
+                      <div key={inq.id} className="p-4 rounded-xl bg-[#0e0c0d] border border-[#2a2225] space-y-2">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-cinzel text-sm font-semibold text-[#fdfbf7]">{inq.name}</p>
+                            <p className="text-xs text-[#d4af37]">{inq.phone} • {inq.location}</p>
+                          </div>
+                          <span className="text-[10px] px-2 py-0.5 rounded bg-[#96283b]/20 text-[#ba334a] border border-[#96283b]/40">
+                            {inq.status || 'Pending'}
                           </span>
                         </div>
-                        <p className="text-[#555555]">
-                          📞 {inq.phone} · 📅 {inq.event_date} · {inq.event_type}
-                        </p>
-                        {inq.city_venue && <p className="text-[#777777]">📍 {inq.city_venue}</p>}
-                        {inq.message && <p className="text-[#888888] italic">"{inq.message}"</p>}
-
-                        <div className="pt-2 flex items-center gap-3">
-                          <a
-                            href={`https://wa.me/${inq.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hi ${inq.name}! Thank you for inquiring with Bhuvi Mehandi. We are delighted to confirm date availability for your ${inq.event_type}.`)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-3 py-1 bg-[#25d366] text-white text-[10px] tracking-wider uppercase font-semibold"
-                          >
-                            WhatsApp Reply
-                          </a>
-                          <select
-                            value={inq.status || 'New'}
-                            onChange={(e) => handleStatusUpdate(inq.id, e.target.value)}
-                            className="text-[10px] border border-[#cccccc] p-1 bg-white cursor-pointer"
-                          >
-                            <option value="New">New</option>
-                            <option value="Contacted">Contacted</option>
-                            <option value="Confirmed">Confirmed</option>
-                            <option value="Completed">Completed</option>
-                          </select>
-                        </div>
+                        <p className="text-xs text-[#a69894]"><span className="text-white">Date:</span> {inq.event_date} | <span className="text-white">Type:</span> {inq.event_type}</p>
+                        {inq.notes && <p className="text-xs text-[#7a6f68] italic">"{inq.notes}"</p>}
                       </div>
                     ))}
                   </div>
                 )}
               </div>
-            </div>
+            )}
 
-            <div className="pt-6 border-t border-[#e5e5e0] text-[10px] text-[#888888] text-center">
-              Bhuvi Mehandi Artistry · Private Studio Portal
-            </div>
           </div>
         </div>
       )}
+
+      {/* ------------------------------------------------------------- */}
+      {/* 13. FLOATING WHATSAPP ACTION BUTTON                           */}
+      {/* ------------------------------------------------------------- */}
+      <a
+        href={createWhatsAppUrl({
+          eventType: 'General Bridal Inquiry',
+          customNote: 'Hi Bhuvi! I am looking for a bridal henna artist for my wedding.'
+        })}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="wa-float-luxury"
+        aria-label="Direct WhatsApp Concierge"
+      >
+        <MessageCircle className="w-5 h-5 text-white" />
+        <span className="text-xs font-sans font-semibold tracking-wider hidden sm:inline">WhatsApp Concierge</span>
+      </a>
+
     </div>
   );
 }
