@@ -1,157 +1,116 @@
 @import "tailwindcss";
 
 @theme {
-  --font-cinzel: 'Cinzel', serif;
-  --font-cinzel-dec: 'Cinzel Decorative', serif;
   --font-italiana: 'Italiana', serif;
+  --font-syne: 'Syne', sans-serif;
   --font-playfair: 'Playfair Display', Georgia, serif;
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-outfit: 'Outfit', sans-serif;
   
-  --color-noir: #0e0c0d;
-  --color-velvet: #181416;
-  --color-card-dark: #221c1f;
-  --color-alabaster: #fdfbf7;
-  --color-silk: #f6f0e6;
-  --color-henna: #96283b;
-  --color-henna-dark: #6e1a29;
-  --color-henna-light: #ba334a;
-  --color-gold: #d4af37;
-  --color-gold-light: #f5df88;
-  --color-gold-dark: #a07d1c;
-  --color-taupe: #8a7e7b;
-  --color-border-dark: rgba(212, 175, 55, 0.18);
-  --color-border-light: rgba(150, 40, 59, 0.12);
+  --color-void: #140e0c;
+  --color-espresso: #1d1614;
+  --color-espresso-light: #2a201d;
+  --color-clay: #c46851;
+  --color-copper: #d9795d;
+  --color-sand: #e5d3c1;
+  --color-linen: #f5efe6;
+  --color-earth: #8f817b;
+  --color-henna-deep: #802e1b;
 }
 
 :root {
-  --bg-primary: #0e0c0d;
-  --bg-secondary: #181416;
-  --text-primary: #fdfbf7;
-  --text-muted: #a69894;
-  --accent-gold: #d4af37;
-  --accent-henna: #96283b;
+  --bg-void: #140e0c;
+  --bg-card: #1d1614;
+  --text-linen: #f5efe6;
+  --text-sand: #e5d3c1;
+  --accent-clay: #c46851;
+  --accent-copper: #d9795d;
 }
 
-html {
-  scroll-behavior: smooth;
-  background-color: #0e0c0d;
-  color: #fdfbf7;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-
-body {
-  background-color: #0e0c0d;
-  color: #fdfbf7;
+html, body {
+  background-color: #140e0c;
+  color: #f5efe6;
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Typography Helpers */
-.font-cinzel {
-  font-family: 'Cinzel', serif;
-}
-
-.font-cinzel-dec {
-  font-family: 'Cinzel Decorative', serif;
-}
-
+/* Haute Typography */
 .font-italiana {
   font-family: 'Italiana', serif;
+}
+
+.font-syne {
+  font-family: 'Syne', sans-serif;
 }
 
 .font-playfair {
   font-family: 'Playfair Display', Georgia, serif;
 }
 
-/* Gold Gradient Shimmer Text */
-.gold-gradient-text {
-  background: linear-gradient(135deg, #f5df88 0%, #d4af37 50%, #aa8012 100%);
+.font-outfit {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Clay Gradient Shimmer */
+.clay-gradient-text {
+  background: linear-gradient(135deg, #f5efe6 0%, #d9795d 50%, #c46851 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.henna-gradient-text {
-  background: linear-gradient(135deg, #fdfbf7 0%, #ba334a 60%, #96283b 100%);
+.sand-gradient-text {
+  background: linear-gradient(135deg, #f5efe6 0%, #e5d3c1 70%, #8f817b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Luxury Glassmorphism & Borders */
-.glass-panel {
-  background: rgba(24, 20, 22, 0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(212, 175, 55, 0.2);
+/* Slide Deck Transitions */
+.slide-active {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  transition: all 0.75s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.glass-panel-hover {
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
-  will-change: transform;
+.slide-inactive-left {
+  opacity: 0;
+  transform: translateX(-100px) scale(0.96);
+  pointer-events: none;
+  transition: all 0.75s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .glass-panel-hover:hover {
-    transform: translateY(-4px);
-    border-color: rgba(212, 175, 55, 0.45);
-    box-shadow: 0 16px 40px -10px rgba(150, 40, 59, 0.35);
-  }
+.slide-inactive-right {
+  opacity: 0;
+  transform: translateX(100px) scale(0.96);
+  pointer-events: none;
+  transition: all 0.75s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Subtle Gold Glow */
-.gold-glow {
-  box-shadow: 0 0 35px -5px rgba(212, 175, 55, 0.25);
+/* Soundwave Animation */
+@keyframes soundwave {
+  0%, 100% { height: 4px; }
+  50% { height: 18px; }
 }
 
-.henna-glow {
-  box-shadow: 0 0 35px -5px rgba(150, 40, 59, 0.35);
+.soundwave-bar {
+  animation: soundwave 1.2s ease-in-out infinite;
 }
 
-/* Mobile Touch-First Button Feedback */
-button:active, a:active {
-  transform: scale(0.98);
-  transition: transform 0.08s ease;
-}
-
-/* Floating Luxury WhatsApp Button */
-.wa-float-luxury {
-  position: fixed;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
-  right: calc(env(safe-area-inset-right, 0px) + 20px);
-  z-index: 99;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 20px;
-  border-radius: 9999px;
-  background: linear-gradient(135deg, #1f9d55 0%, #15733d 100%);
-  color: #ffffff;
-  box-shadow: 0 10px 25px -3px rgba(31, 157, 85, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.2);
-  transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease;
-  cursor: pointer;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .wa-float-luxury:hover {
-    transform: scale(1.05) translateY(-2px);
-    box-shadow: 0 14px 32px -2px rgba(31, 157, 85, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.4);
-  }
-}
-
-/* Custom Luxury Scrollbar */
+/* Custom Sand Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #0e0c0d;
+  background: #140e0c;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2a2225;
-  border-radius: 3px;
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  background: #2a201d;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #96283b;
+  background: #c46851;
 }
