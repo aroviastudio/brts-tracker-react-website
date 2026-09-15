@@ -235,10 +235,12 @@ export default function App() {
   };
 
   const handleTouchStart = (e) => {
+    if (menuOpen) return;
     touchStartX.current = e.targetTouches[0].clientX;
   };
 
   const handleTouchEnd = (e) => {
+    if (menuOpen) return;
     touchEndX.current = e.changedTouches[0].clientX;
     const diff = touchStartX.current - touchEndX.current;
     if (diff > 50) {
@@ -250,6 +252,18 @@ export default function App() {
       prevChapter();
     }
   };
+
+  // Lock background scroll when Index modal is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [menuOpen]);
 
   const nextChapter = () => {
     markInteracted();
@@ -271,6 +285,10 @@ export default function App() {
   const lastScrollTime = useRef(0);
   useEffect(() => {
     const handleKeyDown = (e) => {
+      if (menuOpen) {
+        if (e.key === 'Escape') setMenuOpen(false);
+        return;
+      }
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextChapter();
       if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prevChapter();
     };
@@ -427,7 +445,12 @@ Custom Notes: ${form.notes || 'None'}`;
 
       {/* Chapter Dropdown Index Modal */}
       {menuOpen && (
-        <div className="fixed inset-0 top-20 z-40 bg-[#140e0c]/98 backdrop-blur-2xl p-6 sm:p-16 flex flex-col justify-between overflow-y-auto">
+        <div
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchEnd={(e) => e.stopPropagation()}
+          onWheel={(e) => e.stopPropagation()}
+          className="fixed inset-0 top-20 z-40 bg-[#140e0c]/98 backdrop-blur-2xl p-6 sm:p-16 flex flex-col justify-between overflow-y-auto overscroll-contain h-[calc(100vh-80px)]"
+        >
           <div className="max-w-4xl mx-auto w-full space-y-8">
             <span className="text-xs uppercase tracking-[0.3em] text-[#c46851] font-syne font-semibold">
               The Journey Index
