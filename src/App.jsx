@@ -498,91 +498,77 @@ Custom Notes: ${form.notes || 'None'}`;
       )}
 
       {/* ─── 2. FULL-SCREEN CHAPTER ENGINE ───────────────────────── */}
-      <main className="flex-1 flex flex-col justify-center px-6 sm:px-12 py-10 max-w-7xl mx-auto w-full">
-        
+      <main className={`flex-1 flex flex-col ${currentChapter === 0 ? '' : 'justify-center px-6 sm:px-12 py-10 max-w-7xl mx-auto w-full'}`}>
+
         {/* ======================================================== */}
-        {/* CHAPTER 00: PROLOGUE — THE GENESIS                       */}
+        {/* CHAPTER 00: PROLOGUE — full-bleed image hero             */}
         {/* ======================================================== */}
         {currentChapter === 0 && (
-          <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-12 items-center py-6 animate-fadeIn rounded-3xl overflow-hidden">
+          <div className="relative flex-1 flex items-center animate-fadeIn overflow-hidden min-h-0">
 
-            {/* Full-section flatlay background */}
-            <div className="absolute inset-0 -z-10">
-              <img
-                src="/images/hero_flatlay_bg.webp"
-                alt=""
-                aria-hidden="true"
-                className="w-full h-full object-cover object-center"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#140e0c]/92 via-[#140e0c]/75 to-[#140e0c]/40" />
-            </div>
-            
-            <div className="lg:col-span-7 space-y-8 relative z-10 px-2 sm:px-4">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1d1614]/80 border border-[#2a201d] text-xs text-[#c46851] uppercase tracking-[0.25em] font-syne backdrop-blur-sm">
-                <Sparkles className="w-3.5 h-3.5" />
-                Prologue • The Philosophy
-              </div>
+            {/* ── Full-bleed background image ── */}
+            <img
+              src="/images/hero_hand_olive.webp"
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover object-center"
+            />
+            {/* Dark gradient — heavier on left so text is legible */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#140e0c]/90 via-[#140e0c]/60 to-[#140e0c]/15" />
+            {/* Bottom fade to blend into footer */}
+            <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-[#140e0c] to-transparent" />
 
-              <h1 className="font-italiana text-5xl sm:text-7xl lg:text-8xl leading-[0.98] text-[#f5efe6]">
-                The Sacred <br />
-                <span className="clay-gradient-text italic">Ephemeral</span> Art.
-              </h1>
+            {/* ── Text content ── */}
+            <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 py-16 sm:py-20">
+              <div className="max-w-2xl space-y-8">
 
-              <p className="text-base sm:text-lg text-[#e5d3c1] font-sans leading-relaxed max-w-xl">
-                Henna is not decoration; it is a living ritual of devotion. We harvest premier organic Sojat leaves, cold-blend them with Bulgarian lavender essences, and execute bespoke bridal storytelling with mathematical symmetry.
-              </p>
-
-              {/* Action Buttons */}
-              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-                <button
-                  onClick={nextChapter}
-                  className="px-8 py-4 rounded-xl bg-[#c46851] hover:bg-[#d9795d] text-[#140e0c] font-syne font-bold text-xs uppercase tracking-[0.25em] transition-all flex items-center justify-center gap-3 cursor-pointer shadow-lg shadow-[#c46851]/20"
-                >
-                  Begin Journey (Act I)
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-
-                <button
-                  onClick={() => setCurrentChapter(5)}
-                  className="px-8 py-4 rounded-xl border border-[#2a201d] hover:border-[#c46851] text-[#e5d3c1] font-syne text-xs uppercase tracking-[0.25em] transition-colors cursor-pointer backdrop-blur-sm"
-                >
-                  Direct VIP Booking
-                </button>
-              </div>
-
-              {/* Minimalist Metrics */}
-              <div className="pt-8 border-t border-[#2a201d]/60 grid grid-cols-3 gap-6 max-w-lg">
-                <div>
-                  <span className="font-syne text-3xl font-bold text-[#c46851]">850+</span>
-                  <span className="text-[10px] uppercase tracking-wider text-[#8f817b] block mt-0.5">Bespoke Brides</span>
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#140e0c]/60 border border-[#c46851]/50 text-xs text-[#c46851] uppercase tracking-[0.25em] font-syne backdrop-blur-sm">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Prologue • The Philosophy
                 </div>
-                <div>
-                  <span className="font-syne text-3xl font-bold text-[#d9795d]">0.2mm</span>
-                  <span className="text-[10px] uppercase tracking-wider text-[#8f817b] block mt-0.5">Micro-Cone Precision</span>
-                </div>
-                <div>
-                  <span className="font-syne text-3xl font-bold text-[#e5d3c1]">100%</span>
-                  <span className="text-[10px] uppercase tracking-wider text-[#8f817b] block mt-0.5">Organic Sojat</span>
-                </div>
-              </div>
-            </div>
 
-            {/* Right column — olive hand portrait */}
-            <div className="lg:col-span-5 relative z-10">
-              {/* Mobile: show as centered card; Desktop: full portrait card */}
-              <div className="relative aspect-[3/4] sm:aspect-[4/5] rounded-3xl overflow-hidden border border-[#c46851]/25 shadow-2xl shadow-[#140e0c]/60 mx-auto max-w-xs lg:max-w-none">
-                <img
-                  src="/images/hero_hand_olive.webp"
-                  alt="Elegant Bridal Mehndi — Olive Tones"
-                  className="w-full h-full object-cover object-top"
-                />
-                {/* Subtle vignette at bottom */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#140e0c]/80 via-transparent to-transparent" />
-                {/* Caption card */}
-                <div className="absolute bottom-4 left-4 right-4 p-3.5 rounded-2xl bg-[#140e0c]/85 backdrop-blur-md border border-[#2a201d]">
-                  <p className="font-syne text-[10px] uppercase tracking-widest text-[#c46851]">Heirloom Standard</p>
-                  <p className="font-italiana text-base text-[#f5efe6] mt-0.5">Natural 48-Hour Deep Mahogany Stain</p>
+                <h1 className="font-italiana text-5xl sm:text-7xl lg:text-8xl leading-[0.95] text-[#f5efe6] drop-shadow-2xl">
+                  The Sacred <br />
+                  <span className="clay-gradient-text italic">Ephemeral</span> Art.
+                </h1>
+
+                <p className="text-base sm:text-lg text-[#e5d3c1] font-sans leading-relaxed max-w-lg">
+                  Henna is not decoration — it is a living ritual of devotion. We harvest premier organic Sojat leaves, cold-blend them with Bulgarian lavender essences, and execute bespoke bridal storytelling with mathematical symmetry.
+                </p>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                  <button
+                    onClick={nextChapter}
+                    className="px-8 py-4 rounded-xl bg-[#c46851] hover:bg-[#d9795d] text-[#140e0c] font-syne font-bold text-xs uppercase tracking-[0.25em] transition-all flex items-center justify-center gap-3 cursor-pointer shadow-xl shadow-[#c46851]/30"
+                  >
+                    Begin Journey (Act I)
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setCurrentChapter(5)}
+                    className="px-8 py-4 rounded-xl border border-[#f5efe6]/20 hover:border-[#c46851] text-[#e5d3c1] font-syne text-xs uppercase tracking-[0.25em] transition-colors cursor-pointer backdrop-blur-sm"
+                  >
+                    Direct VIP Booking
+                  </button>
                 </div>
+
+                {/* Minimalist Metrics */}
+                <div className="pt-6 border-t border-[#f5efe6]/10 grid grid-cols-3 gap-6 max-w-md">
+                  <div>
+                    <span className="font-syne text-3xl font-bold text-[#c46851]">850+</span>
+                    <span className="text-[10px] uppercase tracking-wider text-[#8f817b] block mt-0.5">Bespoke Brides</span>
+                  </div>
+                  <div>
+                    <span className="font-syne text-3xl font-bold text-[#d9795d]">0.2mm</span>
+                    <span className="text-[10px] uppercase tracking-wider text-[#8f817b] block mt-0.5">Micro-Cone Precision</span>
+                  </div>
+                  <div>
+                    <span className="font-syne text-3xl font-bold text-[#e5d3c1]">100%</span>
+                    <span className="text-[10px] uppercase tracking-wider text-[#8f817b] block mt-0.5">Organic Sojat</span>
+                  </div>
+                </div>
+
               </div>
             </div>
 
