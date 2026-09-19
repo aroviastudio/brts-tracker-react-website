@@ -1,53 +1,56 @@
 @import "tailwindcss";
 
 @theme {
-  --font-italiana: 'Italiana', serif;
-  --font-syne: 'Syne', sans-serif;
-  --font-playfair: 'Playfair Display', Georgia, serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-italiana: 'Italiana', 'Playfair Display', Georgia, serif;
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-outfit: 'Outfit', sans-serif;
+  --font-outfit: 'Outfit', 'Plus Jakarta Sans', sans-serif;
   
-  --color-void: #140e0c;
-  --color-espresso: #1d1614;
-  --color-espresso-light: #2a201d;
-  --color-clay: #c46851;
-  --color-copper: #d9795d;
-  --color-sand: #e5d3c1;
-  --color-linen: #f5efe6;
-  --color-earth: #8f817b;
-  --color-henna-deep: #802e1b;
+  --color-obsidian: #0f0d0c;
+  --color-charcoal: #171412;
+  --color-espresso: #241d1a;
+  --color-sand: #f5efe6;
+  --color-linen: #faf7f2;
+  --color-champagne: #c5a880;
+  --color-gold: #d4af37;
+  --color-wine: #721c24;
+  --color-henna: #8b2635;
+  --color-terracotta: #c86d51;
 }
 
 :root {
-  --bg-void: #140e0c;
-  --bg-card: #1d1614;
-  --text-linen: #f5efe6;
-  --text-sand: #e5d3c1;
-  --accent-clay: #c46851;
-  --accent-copper: #d9795d;
+  --bg-primary: #0f0d0c;
+  --bg-surface: #171412;
+  --bg-card: #201a17;
+  --text-main: #faf7f2;
+  --text-muted: #a3958c;
+  --accent-gold: #c5a880;
+  --accent-wine: #8b2635;
+  --border-subtle: #2d2420;
 }
 
-html, body {
-  background-color: #140e0c;
-  color: #f5efe6;
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+html {
+  scroll-behavior: smooth;
+  background-color: #0f0d0c;
+  color: #faf7f2;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0f0d0c;
+  color: #faf7f2;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
 }
 
-/* Haute Typography */
 .font-italiana {
-  font-family: 'Italiana', serif;
+  font-family: 'Italiana', 'Playfair Display', serif;
 }
 
-.font-syne {
-  font-family: 'Syne', sans-serif;
-}
-
-.font-playfair {
+.font-serif-luxury {
   font-family: 'Playfair Display', Georgia, serif;
 }
 
@@ -55,62 +58,60 @@ html, body {
   font-family: 'Outfit', sans-serif;
 }
 
-/* Clay Gradient Shimmer */
-.clay-gradient-text {
-  background: linear-gradient(135deg, #f5efe6 0%, #d9795d 50%, #c46851 100%);
+/* Subtle Shimmer & Gradients */
+.gold-gradient-text {
+  background: linear-gradient(135deg, #ffffff 0%, #e6d5b8 40%, #c5a880 75%, #a48255 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.sand-gradient-text {
-  background: linear-gradient(135deg, #f5efe6 0%, #e5d3c1 70%, #8f817b 100%);
+.wine-gradient-text {
+  background: linear-gradient(135deg, #ffffff 0%, #f5efe6 30%, #d9795d 70%, #8b2635 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Slide Deck Transitions */
-.slide-active {
-  opacity: 1;
-  transform: translateX(0) scale(1);
-  transition: all 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+.gold-glow {
+  box-shadow: 0 0 35px rgba(197, 168, 128, 0.18);
 }
 
-.slide-inactive-left {
-  opacity: 0;
-  transform: translateX(-100px) scale(0.96);
-  pointer-events: none;
-  transition: all 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+.wine-glow {
+  box-shadow: 0 10px 35px -10px rgba(139, 38, 53, 0.35);
 }
 
-.slide-inactive-right {
-  opacity: 0;
-  transform: translateX(100px) scale(0.96);
-  pointer-events: none;
-  transition: all 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+/* Subtle Floating Animation */
+@keyframes floatGentle {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(0.5deg); }
 }
 
-/* Soundwave Animation */
-@keyframes soundwave {
-  0%, 100% { height: 4px; }
-  50% { height: 18px; }
+.animate-float-gentle {
+  animation: floatGentle 5s ease-in-out infinite;
 }
 
-.soundwave-bar {
-  animation: soundwave 1.2s ease-in-out infinite;
+/* Pulse Ring Animation */
+@keyframes pulseGlow {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 0.3; }
+  100% { transform: scale(1.25); opacity: 0; }
 }
 
-/* Custom Sand Scrollbar */
+.animate-pulse-glow {
+  animation: pulseGlow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #140e0c;
+  background: #0f0d0c;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2a201d;
+  background: #2d2420;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #c46851;
+  background: #c5a880;
 }
