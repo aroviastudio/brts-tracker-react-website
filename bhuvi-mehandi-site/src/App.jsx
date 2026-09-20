@@ -17,14 +17,16 @@ import {
   Edit2,
   Trash2,
   Lock,
-  Unlock,
+  LogOut,
+  Upload,
+  Image as ImageIcon,
   Settings,
-  Image,
   Users,
   MessageCircle,
   Database,
   Calendar,
-  Check
+  Check,
+  AlertCircle
 } from 'lucide-react';
 import {
   createWhatsAppUrl,
@@ -32,7 +34,6 @@ import {
   updateSettings,
   fetchServices,
   createService,
-  updateService,
   deleteService,
   fetchDesigns,
   createDesign,
@@ -47,6 +48,13 @@ import {
   deleteInquiry,
   testSupabaseConnection,
   getOrCreateAuthorToken,
+  uploadImageFile,
+  signInWithGoogle,
+  signInWithEmail,
+  signUpWithEmail,
+  signOutAdmin,
+  getCurrentAdminUser,
+  supabase,
   SUPABASE_URL,
   DEFAULT_SETTINGS
 } from './lib/supabase';
@@ -140,15 +148,25 @@ export default function App() {
   });
   const [submittingReview, setSubmittingReview] = useState(false);
 
-  // ─── ADMIN DASHBOARD & PIN AUTH STATES ──────────────────────────
-  const [pinModalOpen, setPinModalOpen] = useState(false);
-  const [enteredPin, setEnteredPin] = useState('');
-  const [pinError, setPinError] = useState(false);
+  // ─── ADMIN AUTH & DASHBOARD STATES ──────────────────────────────
+  const [adminUser, setAdminUser] = useState(null);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState('signin'); // 'signin' or 'signup'
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+
   const [adminOpen, setAdminOpen] = useState(false);
   const [adminTab, setAdminTab] = useState('settings'); // 'settings', 'services', 'designs', 'reviews', 'inquiries', 'supabase'
   const [dbStatus, setDbStatus] = useState(null);
 
-  // Admin New Service Form
+  // Admin File Upload States
+  const [uploadingHero, setUploadingHero] = useState(false);
+  const [uploadingService, setUploadingService] = useState(false);
+  const [uploadingDesign, setUploadingDesign] = useState(false);
+
+  // Admin Forms
   const [newServiceForm, setNewServiceForm] = useState({
     name: '',
     category: 'Bridal',
@@ -161,7 +179,6 @@ export default function App() {
     includes: 'Full hands to elbows, Feet jaali work, Organic Sojat cones'
   });
 
-  // Admin New Design Form
   const [newDesignForm, setNewDesignForm] = useState({
     title: '',
     category: 'bridal',
@@ -171,10 +188,71 @@ export default function App() {
     tag: 'Signature'
   });
 
-  // Admin Settings Edit Form
   const [editSettingsForm, setEditSettingsForm] = useState(DEFAULT_SETTINGS);
 
-  // Load all Supabase data on mount
+  // Check URL hash (#admin) or hotkey on load & listen to auth changes
+  useEffect(() => {
+    const checkAdminRoute = async () => {
+      const user = await getCurrentAdminUser();
+      setAdminUser(user);
+
+      if (window.location.hash === '#admin') {
+        if (user) {
+          setAdminOpen(true);
+          loadAdminInquiries();
+        } else {
+          setAuthModalOpen(true);
+        }
+      }
+    };
+
+    checkAdminRoute();
+
+    // Listen to hash changes in URL
+    const handleHashChange = () => {
+      if (window.location.hash === '#admin') {
+        if (adminUser) {
+          setAdminOpen(true);
+          loadAdminInquiries();
+        } else {
+          setAuthModalOpen(true);
+        }
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+
+    // Secret Admin Keyboard Shortcut: Ctrl+Shift+A (or Cmd+Shift+A)
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        window.location.hash = '#admin';
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Supabase auth listener
+    let authListener = null;
+    if (supabase) {
+      const { data } = supabase.auth.onAuthStateChange((event, session) => {
+        const currentUser = session?.user || null;
+        setAdminUser(currentUser);
+        if (currentUser && window.location.hash === '#admin') {
+          setAuthModalOpen(false);
+          setAdminOpen(true);
+          loadAdminInquiries();
+        }
+      });
+      authListener = data?.subscription;
+    }
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('keydown', handleKeyDown);
+      if (authListener) authListener.unsubscribe();
+    };
+  }, [adminUser]);
+
+  // Load site data on mount
   useEffect(() => {
     loadAllSiteData();
   }, []);
@@ -213,17 +291,99 @@ export default function App() {
     }
   };
 
-  // ─── ADMIN PIN VERIFICATION ─────────────────────────────────────
-  const handlePinSubmit = (e) => {
+  // ─── AUTH HANDLERS ──────────────────────────────────────────────
+  const handleGoogleSignIn = async () => {
+    setAuthLoading(true);
+    setAuthError('');
+    try {
+      const { error } = await signInWithGoogle();
+      if (error) setAuthError(error.message);
+    } catch (err) {
+      setAuthError(err.message);
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleEmailAuth = async (e) => {
     e.preventDefault();
-    if (enteredPin === (settings.admin_pin || '1234')) {
-      setPinModalOpen(false);
-      setPinError(false);
-      setEnteredPin('');
-      setAdminOpen(true);
-      loadAdminInquiries();
-    } else {
-      setPinError(true);
+    if (!authEmail || !authPassword) return;
+    setAuthLoading(true);
+    setAuthError('');
+    try {
+      if (authMode === 'signup') {
+        const { data, error } = await signUpWithEmail(authEmail, authPassword);
+        if (error) throw error;
+        alert('Account created! Please check your email for confirmation or sign in.');
+        setAuthMode('signin');
+      } else {
+        const { data, error } = await signInWithEmail(authEmail, authPassword);
+        if (error) throw error;
+        setAdminUser(data.user);
+        setAuthModalOpen(false);
+        setAdminOpen(true);
+        loadAdminInquiries();
+      }
+    } catch (err) {
+      setAuthError(err.message || 'Authentication error');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await signOutAdmin();
+    setAdminUser(null);
+    setAdminOpen(false);
+    window.location.hash = '';
+  };
+
+  // ─── REAL FILE UPLOAD HANDLERS ──────────────────────────────────
+  const handleHeroImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingHero(true);
+    try {
+      const url = await uploadImageFile(file, 'hero');
+      if (url) {
+        setEditSettingsForm(prev => ({ ...prev, hero_image_url: url }));
+      }
+    } catch (err) {
+      alert('Upload failed: ' + err.message);
+    } finally {
+      setUploadingHero(false);
+    }
+  };
+
+  const handleServiceImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingService(true);
+    try {
+      const url = await uploadImageFile(file, 'services');
+      if (url) {
+        setNewServiceForm(prev => ({ ...prev, image_url: url }));
+      }
+    } catch (err) {
+      alert('Upload failed: ' + err.message);
+    } finally {
+      setUploadingService(false);
+    }
+  };
+
+  const handleDesignImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingDesign(true);
+    try {
+      const url = await uploadImageFile(file, 'designs');
+      if (url) {
+        setNewDesignForm(prev => ({ ...prev, imageUrl: url }));
+      }
+    } catch (err) {
+      alert('Upload failed: ' + err.message);
+    } finally {
+      setUploadingDesign(false);
     }
   };
 
@@ -384,6 +544,7 @@ export default function App() {
 
   const handleDeleteInquiry = async (id) => {
     if (!confirm('Delete this inquiry?')) return;
+    await deleteInquiry(id);
     setInquiries(prev => prev.filter(i => i.id !== id));
   };
 
@@ -406,7 +567,7 @@ export default function App() {
     <div className="min-h-screen bg-[#F5EFEB] text-[#241E1A] antialiased selection:bg-[#A64B38] selection:text-[#FAF7F2]">
       
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 1. TOP HAUTE NAVIGATION BAR                                 */}
+      {/* 1. TOP HAUTE NAVIGATION BAR (No Admin Button)               */}
       {/* ─────────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-40 bg-[#F5EFEB]/90 backdrop-blur-xl border-b border-[#D9CEC5] transition-colors">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 h-20 flex items-center justify-between">
@@ -455,7 +616,7 @@ export default function App() {
             </button>
           </nav>
 
-          {/* WhatsApp Direct Concierge CTA */}
+          {/* WhatsApp Direct Concierge CTA (Clean Public Action) */}
           <div className="hidden sm:flex items-center gap-3 font-sans">
             <a
               href={createWhatsAppUrl({
@@ -533,7 +694,6 @@ export default function App() {
             alt="Bhuvi Mehandi Bridal Background"
             className="w-full h-full object-cover object-center transform scale-105 transition-transform duration-1000"
           />
-          {/* Multi-layer warm dark contrast overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#241E1A] via-[#241E1A]/65 to-[#241E1A]/40" />
         </div>
 
@@ -1506,54 +1666,91 @@ export default function App() {
       )}
 
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 11. ADMIN PIN UNLOCK MODAL                                  */}
+      {/* 11. SUPABASE AUTH MODAL (Google OAuth + Email)              */}
       {/* ─────────────────────────────────────────────────────────── */}
-      {pinModalOpen && (
+      {authModalOpen && (
         <div
           className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-6"
-          onClick={() => setPinModalOpen(false)}
+          onClick={() => { setAuthModalOpen(false); window.location.hash = ''; }}
         >
           <div
-            className="bg-[#FFFFFF] border border-[#D9CEC5] rounded-3xl max-w-sm w-full p-8 font-sans shadow-2xl text-center space-y-5"
+            className="bg-[#FFFFFF] border border-[#D9CEC5] rounded-3xl max-w-md w-full p-8 font-sans shadow-2xl space-y-6"
             onClick={e => e.stopPropagation()}
           >
-            <div className="w-12 h-12 rounded-full bg-[#EDE4DC] flex items-center justify-center mx-auto text-[#A64B38]">
-              <Lock className="w-6 h-6" />
+            <div className="text-center space-y-2">
+              <div className="w-12 h-12 rounded-full bg-[#EDE4DC] flex items-center justify-center mx-auto text-[#A64B38]">
+                <Lock className="w-6 h-6" />
+              </div>
+              <h3 className="font-editorial text-3xl text-[#241E1A]">Studio Admin Access</h3>
+              <p className="text-xs text-[#6E645D]">Sign in with your Google or Admin account to manage content</p>
             </div>
 
-            <div>
-              <h3 className="font-editorial text-2xl text-[#241E1A]">Studio Admin Access</h3>
-              <p className="text-xs text-[#6E645D] mt-1">Enter your 4-digit Studio Passcode (Default: 1234)</p>
+            {/* Google OAuth Button */}
+            <button
+              onClick={handleGoogleSignIn}
+              disabled={authLoading}
+              className="w-full py-3 rounded-xl border border-[#D9CEC5] bg-[#FFFFFF] hover:bg-[#F5EFEB] text-[#241E1A] text-xs font-bold flex items-center justify-center gap-3 transition-all cursor-pointer shadow-sm"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+              </svg>
+              <span>Continue with Google Account</span>
+            </button>
+
+            <div className="flex items-center gap-3 text-xs text-[#6E645D]">
+              <div className="flex-1 h-px bg-[#D9CEC5]" />
+              <span>or email</span>
+              <div className="flex-1 h-px bg-[#D9CEC5]" />
             </div>
 
-            <form onSubmit={handlePinSubmit} className="space-y-4">
-              <input
-                type="password"
-                maxLength={6}
-                autoFocus
-                value={enteredPin}
-                onChange={e => setEnteredPin(e.target.value)}
-                placeholder="• • • •"
-                className="num-lining w-full text-center tracking-[0.5em] text-2xl p-3 rounded-xl bg-[#F5EFEB] border border-[#D9CEC5] text-[#241E1A] outline-none focus:border-[#A64B38]"
-              />
+            {/* Email Form */}
+            <form onSubmit={handleEmailAuth} className="space-y-4 text-xs">
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={authEmail}
+                  onChange={e => setAuthEmail(e.target.value)}
+                  placeholder="admin@bhuvi.com"
+                  className="w-full p-2.5 rounded-lg bg-[#F5EFEB] border border-[#D9CEC5] text-sm text-[#241E1A]"
+                />
+              </div>
 
-              {pinError && (
-                <p className="text-xs text-red-600 font-semibold">Incorrect Passcode. Try 1234</p>
+              <div>
+                <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Password</label>
+                <input
+                  type="password"
+                  required
+                  value={authPassword}
+                  onChange={e => setAuthPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full p-2.5 rounded-lg bg-[#F5EFEB] border border-[#D9CEC5] text-sm text-[#241E1A]"
+                />
+              </div>
+
+              {authError && (
+                <p className="text-xs text-red-600 font-semibold">{authError}</p>
               )}
 
-              <div className="flex gap-2 pt-2">
+              <button
+                type="submit"
+                disabled={authLoading}
+                className="w-full py-3 rounded-full bg-[#A64B38] hover:bg-[#8A3B2A] text-[#FAF7F2] font-bold text-xs uppercase tracking-widest shadow-md cursor-pointer disabled:opacity-50"
+              >
+                {authLoading ? 'Signing In...' : (authMode === 'signin' ? 'Sign In as Admin' : 'Create Admin Account')}
+              </button>
+
+              <div className="text-center pt-1">
                 <button
                   type="button"
-                  onClick={() => setPinModalOpen(false)}
-                  className="w-1/2 py-2.5 rounded-full border border-[#D9CEC5] text-xs font-semibold text-[#6E645D]"
+                  onClick={() => { setAuthMode(authMode === 'signin' ? 'signup' : 'signin'); setAuthError(''); }}
+                  className="text-xs text-[#A64B38] hover:underline font-semibold"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="w-1/2 py-2.5 rounded-full bg-[#A64B38] text-[#FAF7F2] text-xs font-bold uppercase tracking-wider"
-                >
-                  Unlock
+                  {authMode === 'signin' ? 'Need an account? Register here' : 'Already have an account? Sign in'}
                 </button>
               </div>
             </form>
@@ -1562,12 +1759,12 @@ export default function App() {
       )}
 
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 12. NON-TECHNICAL STUDIO ADMIN DRAWER                       */}
+      {/* 12. NON-TECHNICAL STUDIO ADMIN DRAWER (With File Uploads)   */}
       {/* ─────────────────────────────────────────────────────────── */}
       {adminOpen && (
         <div
           className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex justify-end"
-          onClick={() => setAdminOpen(false)}
+          onClick={() => { setAdminOpen(false); window.location.hash = ''; }}
         >
           <div
             className="bg-[#FFFFFF] border-l border-[#D9CEC5] w-full max-w-2xl h-full p-6 sm:p-8 overflow-y-auto font-sans flex flex-col justify-between"
@@ -1578,23 +1775,32 @@ export default function App() {
               <div className="flex justify-between items-center pb-4 border-b border-[#D9CEC5] mb-6">
                 <div>
                   <h3 className="font-editorial text-3xl text-[#241E1A]">Studio Control Dashboard</h3>
-                  <span className="text-[10px] uppercase tracking-widest text-[#A64B38] font-bold">
-                    Easy Content & Booking Management
-                  </span>
+                  <p className="text-xs text-[#6E645D]">
+                    Logged in as <strong className="text-[#A64B38]">{adminUser?.email || 'Admin'}</strong>
+                  </p>
                 </div>
-                <button
-                  onClick={() => setAdminOpen(false)}
-                  className="text-xs uppercase tracking-widest text-[#6E645D] hover:text-[#241E1A] cursor-pointer"
-                >
-                  Close [×]
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleSignOut}
+                    className="text-xs text-red-600 hover:underline flex items-center gap-1 cursor-pointer font-bold"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out</span>
+                  </button>
+                  <button
+                    onClick={() => { setAdminOpen(false); window.location.hash = ''; }}
+                    className="text-xs uppercase tracking-widest text-[#6E645D] hover:text-[#241E1A] cursor-pointer"
+                  >
+                    Close [×]
+                  </button>
+                </div>
               </div>
 
               {/* Navigation Tabs in Admin */}
               <div className="flex flex-wrap gap-2 mb-6 border-b border-[#D9CEC5] pb-3 text-xs uppercase tracking-wider font-semibold">
                 {[
                   { id: 'settings', label: 'Site & Hero', icon: Settings },
-                  { id: 'services', label: 'Services', icon: Image },
+                  { id: 'services', label: 'Services', icon: ImageIcon },
                   { id: 'designs', label: 'Portfolio', icon: Sparkles },
                   { id: 'reviews', label: 'Reviews', icon: Star },
                   { id: 'inquiries', label: `Bookings (${inquiries.length})`, icon: Calendar },
@@ -1615,23 +1821,37 @@ export default function App() {
                 ))}
               </div>
 
-              {/* ── TAB 1: HERO & SITE SETTINGS ── */}
+              {/* ── TAB 1: HERO & SITE SETTINGS (WITH REAL FILE UPLOAD) ── */}
               {adminTab === 'settings' && (
-                <form onSubmit={handleSaveSettings} className="space-y-4 text-xs">
-                  <div className="p-4 rounded-xl bg-[#EDE4DC] space-y-3">
+                <form onSubmit={handleSaveSettings} className="space-y-5 text-xs">
+                  <div className="p-5 rounded-2xl bg-[#EDE4DC] space-y-4">
                     <h4 className="font-bold text-sm text-[#241E1A]">Hero Background Image & Headings</h4>
                     
+                    {/* Real File Upload for Hero Image */}
                     <div>
-                      <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Hero Image URL</label>
-                      <input
-                        type="url"
-                        value={editSettingsForm.hero_image_url}
-                        onChange={e => setEditSettingsForm({ ...editSettingsForm, hero_image_url: e.target.value })}
-                        className="w-full p-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9CEC5]"
-                      />
+                      <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1.5">
+                        Upload Hero Photo (Select from Phone / Computer)
+                      </label>
+                      <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-[#C4B6AA] rounded-xl bg-[#FFFFFF] hover:border-[#A64B38] transition-colors cursor-pointer relative">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleHeroImageUpload}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                        />
+                        <Upload className="w-6 h-6 text-[#A64B38] mb-1" />
+                        <span className="font-semibold text-xs text-[#241E1A]">
+                          {uploadingHero ? 'Uploading file...' : 'Click to choose image file from device'}
+                        </span>
+                        <span className="text-[10px] text-[#6E645D]">PNG, JPG, WebP supported</span>
+                      </div>
+
                       {editSettingsForm.hero_image_url && (
-                        <div className="mt-2 h-28 rounded-lg overflow-hidden border border-[#D9CEC5]">
-                          <img src={editSettingsForm.hero_image_url} alt="Preview" className="w-full h-full object-cover" />
+                        <div className="mt-3 h-32 rounded-xl overflow-hidden border border-[#D9CEC5] relative group">
+                          <img src={editSettingsForm.hero_image_url} alt="Hero Preview" className="w-full h-full object-cover" />
+                          <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/70 text-[9px] text-white">
+                            Current Hero Image Preview
+                          </span>
                         </div>
                       )}
                     </div>
@@ -1642,7 +1862,7 @@ export default function App() {
                         type="text"
                         value={editSettingsForm.headline}
                         onChange={e => setEditSettingsForm({ ...editSettingsForm, headline: e.target.value })}
-                        className="w-full p-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9CEC5]"
+                        className="w-full p-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9CEC5] text-sm text-[#241E1A]"
                       />
                     </div>
 
@@ -1652,13 +1872,13 @@ export default function App() {
                         rows={2}
                         value={editSettingsForm.subheadline}
                         onChange={e => setEditSettingsForm({ ...editSettingsForm, subheadline: e.target.value })}
-                        className="w-full p-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9CEC5]"
+                        className="w-full p-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9CEC5] text-sm text-[#241E1A]"
                       />
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-[#EDE4DC] space-y-3">
-                    <h4 className="font-bold text-sm text-[#241E1A]">Business Contact & Security</h4>
+                  <div className="p-5 rounded-2xl bg-[#EDE4DC] space-y-4">
+                    <h4 className="font-bold text-sm text-[#241E1A]">Contact & Studio Details</h4>
                     
                     <div>
                       <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">WhatsApp Phone Number</label>
@@ -1666,7 +1886,7 @@ export default function App() {
                         type="text"
                         value={editSettingsForm.whatsapp_phone}
                         onChange={e => setEditSettingsForm({ ...editSettingsForm, whatsapp_phone: e.target.value })}
-                        className="num-lining w-full p-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9CEC5]"
+                        className="num-lining w-full p-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9CEC5] text-sm"
                       />
                     </div>
 
@@ -1676,34 +1896,24 @@ export default function App() {
                         type="text"
                         value={editSettingsForm.studio_location}
                         onChange={e => setEditSettingsForm({ ...editSettingsForm, studio_location: e.target.value })}
-                        className="w-full p-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9CEC5]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Admin Passcode / PIN</label>
-                      <input
-                        type="text"
-                        value={editSettingsForm.admin_pin}
-                        onChange={e => setEditSettingsForm({ ...editSettingsForm, admin_pin: e.target.value })}
-                        className="num-lining w-full p-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9CEC5]"
+                        className="w-full p-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9CEC5] text-sm"
                       />
                     </div>
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full py-3 rounded-full bg-[#A64B38] text-[#FAF7F2] font-bold text-xs uppercase tracking-wider cursor-pointer shadow-md hover:bg-[#8A3B2A]"
+                    className="w-full py-3.5 rounded-full bg-[#A64B38] hover:bg-[#8A3B2A] text-[#FAF7F2] font-bold text-xs uppercase tracking-wider cursor-pointer shadow-md"
                   >
-                    Save All Settings to Supabase
+                    Save Changes to Live Website
                   </button>
                 </form>
               )}
 
-              {/* ── TAB 2: SERVICES MANAGER ── */}
+              {/* ── TAB 2: SERVICES MANAGER (WITH REAL FILE UPLOAD) ── */}
               {adminTab === 'services' && (
                 <div className="space-y-6 text-xs">
-                  <div className="p-4 rounded-xl bg-[#EDE4DC] space-y-3">
+                  <div className="p-5 rounded-2xl bg-[#EDE4DC] space-y-3">
                     <h4 className="font-bold text-sm text-[#241E1A]">Add New Celebration Package</h4>
                     <form onSubmit={handleCreateService} className="space-y-3">
                       <div>
@@ -1746,15 +1956,25 @@ export default function App() {
                         </div>
                       </div>
 
+                      {/* Real File Upload for Service Cover Photo */}
                       <div>
-                        <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Cover Image URL</label>
-                        <input
-                          type="url"
-                          required
-                          value={newServiceForm.image_url}
-                          onChange={e => setNewServiceForm({ ...newServiceForm, image_url: e.target.value })}
-                          className="w-full p-2 rounded bg-[#FFFFFF] border border-[#D9CEC5]"
-                        />
+                        <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">
+                          Select Cover Photo (From Phone / Computer)
+                        </label>
+                        <div className="flex items-center gap-3 p-3 bg-[#FFFFFF] border border-[#D9CEC5] rounded-lg">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleServiceImageUpload}
+                            className="text-xs cursor-pointer"
+                          />
+                          {uploadingService && <span className="text-[10px] text-[#A64B38] font-bold">Uploading...</span>}
+                        </div>
+                        {newServiceForm.image_url && (
+                          <div className="mt-2 h-20 w-32 rounded overflow-hidden border border-[#D9CEC5]">
+                            <img src={newServiceForm.image_url} alt="Preview" className="w-full h-full object-cover" />
+                          </div>
+                        )}
                       </div>
 
                       <div>
@@ -1769,7 +1989,7 @@ export default function App() {
 
                       <button
                         type="submit"
-                        className="w-full py-2.5 rounded-full bg-[#A64B38] text-[#FAF7F2] font-bold uppercase tracking-wider"
+                        className="w-full py-2.5 rounded-full bg-[#A64B38] text-[#FAF7F2] font-bold uppercase tracking-wider shadow-md"
                       >
                         Add Service to Website
                       </button>
@@ -1786,7 +2006,7 @@ export default function App() {
                             <img src={s.image_url} alt={s.name} className="w-10 h-10 rounded object-cover" />
                             <div>
                               <p className="font-bold text-[#241E1A]">{s.name}</p>
-                              <p className="text-[10px] text-[#6E645D]">{s.price_starting} • {s.duration}</p>
+                              <p className="num-lining text-[10px] text-[#6E645D]">{s.price_starting} • {s.duration}</p>
                             </div>
                           </div>
                           <button
@@ -1802,11 +2022,11 @@ export default function App() {
                 </div>
               )}
 
-              {/* ── TAB 3: PORTFOLIO DESIGNS ── */}
+              {/* ── TAB 3: PORTFOLIO DESIGNS (WITH REAL FILE UPLOAD) ── */}
               {adminTab === 'designs' && (
                 <div className="space-y-6 text-xs">
-                  <form onSubmit={handleCreateDesign} className="p-4 rounded-xl bg-[#EDE4DC] space-y-3">
-                    <h4 className="font-bold text-sm text-[#241E1A]">Upload Design to Portfolio</h4>
+                  <form onSubmit={handleCreateDesign} className="p-5 rounded-2xl bg-[#EDE4DC] space-y-3">
+                    <h4 className="font-bold text-sm text-[#241E1A]">Upload New Design to Gallery</h4>
                     <div>
                       <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Title</label>
                       <input
@@ -1814,6 +2034,7 @@ export default function App() {
                         required
                         value={newDesignForm.title}
                         onChange={e => setNewDesignForm({ ...newDesignForm, title: e.target.value })}
+                        placeholder="e.g. Royal Lotus Bridal Sleeve"
                         className="w-full p-2 rounded bg-[#FFFFFF] border border-[#D9CEC5]"
                       />
                     </div>
@@ -1843,19 +2064,32 @@ export default function App() {
                         />
                       </div>
                     </div>
+
+                    {/* Real File Upload for Design Photo */}
                     <div>
-                      <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Image URL</label>
-                      <input
-                        type="url"
-                        required
-                        value={newDesignForm.imageUrl}
-                        onChange={e => setNewDesignForm({ ...newDesignForm, imageUrl: e.target.value })}
-                        className="w-full p-2 rounded bg-[#FFFFFF] border border-[#D9CEC5]"
-                      />
+                      <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">
+                        Select Photo (From Phone / Computer)
+                      </label>
+                      <div className="flex items-center gap-3 p-3 bg-[#FFFFFF] border border-[#D9CEC5] rounded-lg">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleDesignImageUpload}
+                          className="text-xs cursor-pointer"
+                        />
+                        {uploadingDesign && <span className="text-[10px] text-[#A64B38] font-bold">Uploading...</span>}
+                      </div>
+                      {newDesignForm.imageUrl && (
+                        <div className="mt-2 h-24 w-24 rounded-lg overflow-hidden border border-[#D9CEC5]">
+                          <img src={newDesignForm.imageUrl} alt="Design Preview" className="w-full h-full object-cover" />
+                        </div>
+                      )}
                     </div>
+
                     <button
                       type="submit"
-                      className="w-full py-2.5 rounded-full bg-[#A64B38] text-[#FAF7F2] font-bold uppercase tracking-wider"
+                      disabled={uploadingDesign || !newDesignForm.imageUrl}
+                      className="w-full py-2.5 rounded-full bg-[#A64B38] text-[#FAF7F2] font-bold uppercase tracking-wider shadow-md disabled:opacity-50"
                     >
                       Add Photo to Gallery
                     </button>
@@ -1980,7 +2214,7 @@ export default function App() {
                     <span className="font-bold text-sm text-[#241E1A] block">Supabase Connection</span>
                     <p className="text-[#6E645D]">
                       {dbStatus?.connected
-                        ? (dbStatus.hasTables ? '🟢 Connected to live Supabase cloud database' : '🟡 Connected (run supabase-schema.sql for cloud tables)')
+                        ? (dbStatus.hasTables ? '🟢 Connected to live Supabase cloud database & storage' : '🟡 Connected (run supabase-schema.sql for cloud tables)')
                         : '⚪ Local Storage Fallback Mode Active'}
                     </p>
                     <p className="text-[9px] font-mono text-[#6E645D]">{SUPABASE_URL}</p>
@@ -2010,7 +2244,7 @@ export default function App() {
       )}
 
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 13. LUXURY FOOTER                                           */}
+      {/* 13. LUXURY FOOTER (Clean & Public - No Admin Button)       */}
       {/* ─────────────────────────────────────────────────────────── */}
       <footer className="border-t border-[#D9CEC5] bg-[#F5EFEB] py-16 font-sans">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-[#6E645D]">
@@ -2032,13 +2266,6 @@ export default function App() {
             >
               WhatsApp
             </a>
-            <button
-              onClick={() => setPinModalOpen(true)}
-              className="text-[#A64B38] font-bold cursor-pointer hover:underline flex items-center gap-1"
-            >
-              <Lock className="w-3 h-3" />
-              <span>Studio Access</span>
-            </button>
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="hover:text-[#241E1A] transition-colors cursor-pointer"

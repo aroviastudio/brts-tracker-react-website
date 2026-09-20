@@ -1,5 +1,5 @@
 -- ==============================================================================
--- BHUVI MEHANDI ATELIER — FULL SUPABASE DATABASE SCHEMA
+-- BHUVI MEHANDI ATELIER — FULL SUPABASE DATABASE & STORAGE SCHEMA
 -- ==============================================================================
 -- Run this script in your Supabase project SQL Editor (https://supabase.com/dashboard)
 
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS public.mehandi_settings (
     hero_image_url TEXT NOT NULL DEFAULT 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1920&q=85',
     whatsapp_phone TEXT NOT NULL DEFAULT '919876543210',
     studio_location TEXT NOT NULL DEFAULT 'Ahmedabad & Gandhinagar (Pan-India & Destination Travel)',
-    admin_pin TEXT NOT NULL DEFAULT '1234',
+    admin_email TEXT DEFAULT 'bhuvi.mehandi@gmail.com',
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
@@ -74,7 +74,19 @@ CREATE TABLE IF NOT EXISTS public.mehandi_inquiries (
 );
 
 -- ==============================================================================
--- ROW LEVEL SECURITY (RLS) POLICIES — Read-Access for Public, Write for App
+-- STORAGE BUCKET FOR MEHANDI PHOTOS
+-- ==============================================================================
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('mehandi-images', 'mehandi-images', true)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+-- Storage policies
+CREATE POLICY "Public Access" ON storage.objects FOR SELECT USING (bucket_id = 'mehandi-images');
+CREATE POLICY "Public Upload Access" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'mehandi-images');
+CREATE POLICY "Allow Delete" ON storage.objects FOR DELETE USING (bucket_id = 'mehandi-images');
+
+-- ==============================================================================
+-- ROW LEVEL SECURITY (RLS) POLICIES
 -- ==============================================================================
 ALTER TABLE public.mehandi_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.mehandi_services ENABLE ROW LEVEL SECURITY;
@@ -100,20 +112,16 @@ CREATE POLICY "Allow read/modify on inquiries" ON public.mehandi_inquiries FOR A
 -- ==============================================================================
 -- INITIAL SEED DATA
 -- ==============================================================================
-
--- Seed Settings
-INSERT INTO public.mehandi_settings (id, headline, subheadline, hero_image_url, whatsapp_phone, studio_location, admin_pin)
+INSERT INTO public.mehandi_settings (id, headline, subheadline, hero_image_url, whatsapp_phone, studio_location)
 VALUES (
     'bhuvi-main-config',
     'Pure Sojat Henna. Handcrafted for Life''s Sacred Vows.',
     '100% Organic Sojat Leaf • Chemical-Free • Guaranteed 48-Hour Deep Mahogany Stain',
     'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1920&q=85',
     '919876543210',
-    'Ahmedabad & Gandhinagar (Pan-India & Destination Travel)',
-    '1234'
+    'Ahmedabad & Gandhinagar (Pan-India & Destination Travel)'
 ) ON CONFLICT (id) DO NOTHING;
 
--- Seed Services
 INSERT INTO public.mehandi_services (name, category, event_type, price_starting, duration, description, includes, image_url, badge)
 VALUES
 (
@@ -184,7 +192,6 @@ VALUES
 )
 ON CONFLICT DO NOTHING;
 
--- Seed Designs
 INSERT INTO public.mehandi_designs (title, category, image_url, description, price_range, tag)
 VALUES
 ('Royal Dulha-Dulhan Storyline', 'bridal', 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80', 'Elbow-length bridal story with custom portraiture, temple jharokhas, and lotus motifs.', '₹7,500 - ₹12,000', 'Signature'),
@@ -195,7 +202,6 @@ VALUES
 ('Sangeet Bridesmaids Floral Grid', 'engagement', 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80', 'Geometric checkered net with shading and dainty rose accents.', '₹2,000 - ₹3,500', 'Party')
 ON CONFLICT DO NOTHING;
 
--- Seed Reviews
 INSERT INTO public.mehandi_reviews (client_name, rating, event_type, location, comment, author_token)
 VALUES
 ('Radhika Patel', 5, 'Bridal Mehandi', 'The Leela, Gandhinagar', 'Bhuvi made my wedding henna unforgettable! The portrait of my husband and our puppy was so detailed, and the stain became dark maroon by wedding day.', 'seed-token-1'),

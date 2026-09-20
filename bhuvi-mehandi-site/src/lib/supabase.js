@@ -19,7 +19,7 @@ try {
 
 export const supabase = supabaseClient;
 
-// Local storage storage keys for offline/fallback mode
+// Local storage keys
 const STORAGE_KEY_SETTINGS = 'bhuvi_mehandi_settings_v3';
 const STORAGE_KEY_SERVICES = 'bhuvi_mehandi_services_v3';
 const STORAGE_KEY_DESIGNS = 'bhuvi_mehandi_designs_v3';
@@ -27,7 +27,7 @@ const STORAGE_KEY_REVIEWS = 'bhuvi_mehandi_reviews_v3';
 const STORAGE_KEY_INQUIRIES = 'bhuvi_mehandi_inquiries_v3';
 const STORAGE_KEY_AUTHOR_TOKEN = 'bhuvi_mehandi_author_token';
 
-// Unique client device token so only review creators can edit/delete their own reviews
+// Unique device token for review author edit/delete
 export function getOrCreateAuthorToken() {
   try {
     let token = localStorage.getItem(STORAGE_KEY_AUTHOR_TOKEN);
@@ -41,7 +41,80 @@ export function getOrCreateAuthorToken() {
   }
 }
 
-// ─── 1. SETTINGS CRUD ─────────────────────────────────────────────
+// ─── 1. REAL FILE UPLOAD (SUPABASE STORAGE + BASE64 FALLBACK) ─────
+export async function uploadImageFile(file, folder = 'portfolio') {
+  if (!file) return null;
+  const fileExt = file.name.split('.').pop() || 'jpg';
+  const cleanName = `${folder}/${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.storage
+        .from('mehandi-images')
+        .upload(cleanName, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (!error && data) {
+        const { data: publicUrlData } = supabase.storage
+          .from('mehandi-images')
+          .getPublicUrl(cleanName);
+        if (publicUrlData?.publicUrl) {
+          return publicUrlData.publicUrl;
+        }
+      }
+    } catch (e) {
+      console.warn('Supabase Storage upload warning, converting to Base64:', e);
+    }
+  }
+
+  // Fallback: Convert file directly to high-quality Base64 Data URL
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(file);
+  });
+}
+
+// ─── 2. AUTHENTICATION (GOOGLE OAUTH + EMAIL LOGIN) ───────────────
+export async function signInWithGoogle() {
+  if (!supabase) return { error: { message: 'Supabase client not initialized' } };
+  return await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin + window.location.pathname + '#admin'
+    }
+  });
+}
+
+export async function signInWithEmail(email, password) {
+  if (!supabase) return { error: { message: 'Supabase client not initialized' } };
+  return await supabase.auth.signInWithPassword({ email, password });
+}
+
+export async function signUpWithEmail(email, password) {
+  if (!supabase) return { error: { message: 'Supabase client not initialized' } };
+  return await supabase.auth.signUp({ email, password });
+}
+
+export async function signOutAdmin() {
+  if (!supabase) return;
+  return await supabase.auth.signOut();
+}
+
+export async function getCurrentAdminUser() {
+  if (!supabase) return null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    return data?.user || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// ─── 3. SITE SETTINGS CRUD ────────────────────────────────────────
 export const DEFAULT_SETTINGS = {
   id: 'bhuvi-main-config',
   headline: "Pure Sojat Henna. Handcrafted for Life's Sacred Vows.",
@@ -49,7 +122,7 @@ export const DEFAULT_SETTINGS = {
   hero_image_url: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1920&q=85',
   whatsapp_phone: '919876543210',
   studio_location: 'Ahmedabad & Gandhinagar (Pan-India & Destination Travel)',
-  admin_pin: '1234'
+  admin_email: 'bhuvi.mehandi@gmail.com'
 };
 
 export async function fetchSettings() {
@@ -65,7 +138,6 @@ export async function fetchSettings() {
       console.warn('Supabase settings query error:', e);
     }
   }
-  // Local fallback
   try {
     const saved = localStorage.getItem(STORAGE_KEY_SETTINGS);
     if (saved) return JSON.parse(saved);
@@ -94,7 +166,7 @@ export async function updateSettings(newSettings) {
   return payload;
 }
 
-// ─── 2. SERVICES CRUD ─────────────────────────────────────────────
+// ─── 4. SERVICES CRUD ─────────────────────────────────────────────
 export async function fetchServices() {
   if (supabase) {
     try {
@@ -174,7 +246,7 @@ export async function deleteService(id) {
   return true;
 }
 
-// ─── 3. PORTFOLIO DESIGNS CRUD ────────────────────────────────────
+// ─── 5. PORTFOLIO DESIGNS CRUD ────────────────────────────────────
 export async function fetchDesigns(category = 'all') {
   if (supabase) {
     try {
@@ -241,7 +313,7 @@ export async function deleteDesign(id) {
   return true;
 }
 
-// ─── 4. REVIEWS CRUD (WITH USER AUTHOR-TOKEN SECURITY) ───────────
+// ─── 6. REVIEWS CRUD (WITH USER AUTHOR-TOKEN SECURITY) ───────────
 export async function fetchReviews() {
   if (supabase) {
     try {
@@ -333,7 +405,7 @@ export async function deleteReview(id, isAdmin = false) {
   return true;
 }
 
-// ─── 5. INQUIRIES / BOOKINGS CRUD ────────────────────────────────
+// ─── 7. INQUIRIES / BOOKINGS CRUD ────────────────────────────────
 export async function fetchInquiries() {
   if (supabase) {
     try {
@@ -409,7 +481,7 @@ export async function deleteInquiry(id) {
   return true;
 }
 
-// ─── 6. CLOUD CONNECTION HEALTH CHECK ─────────────────────────────
+// ─── 8. CLOUD CONNECTION HEALTH CHECK ─────────────────────────────
 export async function testSupabaseConnection() {
   if (!supabase) {
     return { connected: false, hasTables: false, error: 'Supabase client not initialized' };
@@ -425,7 +497,7 @@ export async function testSupabaseConnection() {
   }
 }
 
-// ─── 7. WHATSAPP LINK GENERATOR ───────────────────────────────────
+// ─── 9. WHATSAPP LINK GENERATOR ───────────────────────────────────
 export function createWhatsAppUrl(options = {}) {
   const phone = (options.phone || DEFAULT_WHATSAPP_PHONE).replace(/\D/g, '');
   let message = `Namaste Bhuvi!\n\nI am contacting you from the Bhuvi Mehandi website.`;
