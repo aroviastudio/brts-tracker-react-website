@@ -1,122 +1,99 @@
 @import "tailwindcss";
 
 @theme {
-  --font-serif: var(--font-heading, 'Playfair Display', Georgia, serif);
-  --font-italiana: 'Italiana', 'Playfair Display', Georgia, serif;
-  --font-sans: var(--font-body, 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif);
-  --font-outfit: 'Outfit', 'Plus Jakarta Sans', sans-serif;
-  --font-cormorant: 'Cormorant Garamond', Georgia, serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  
+  --color-linen: #F5EFEB;
+  --color-sand: #EDE4DC;
+  --color-terracotta: #A64B38;
+  --color-terracotta-dark: #8A3B2A;
+  --color-olive: #4A5D4E;
+  --color-brunette: #241E1A;
+  --color-ash: #6E645D;
+  --color-border: #D9CEC5;
 }
 
 :root {
-  /* Default Theme (Cashmere & Raw Henna) */
-  --bg-canvas: #FAF7F2;
-  --bg-surface: #FFFFFF;
-  --bg-subtle: #F4EFE6;
-  --border-subtle: #E8E2D9;
-  --text-main: #1C1917;
-  --text-muted: #78716A;
-  --accent-primary: #7A2021;
-  --accent-hover: #611617;
-  --accent-secondary: #C5A880;
-  --font-heading: 'Italiana', 'Playfair Display', serif;
-  --font-body: 'Plus Jakarta Sans', sans-serif;
-}
-
-/* Theme 1: Cashmere & Raw Henna */
-[data-theme="cashmere"] {
-  --bg-canvas: #FAF7F2;
-  --bg-surface: #FFFFFF;
-  --bg-subtle: #F4EFE6;
-  --border-subtle: #E8E2D9;
-  --text-main: #1C1917;
-  --text-muted: #78716A;
-  --accent-primary: #7A2021;
-  --accent-hover: #611617;
-  --accent-secondary: #C5A880;
-  --font-heading: 'Italiana', 'Playfair Display', serif;
-  --font-body: 'Plus Jakarta Sans', sans-serif;
-}
-
-/* Theme 2: Obsidian & Antique Gold */
-[data-theme="obsidian"] {
-  --bg-canvas: #0F0D0C;
-  --bg-surface: #171412;
-  --bg-subtle: #201A17;
-  --border-subtle: #2D2420;
-  --text-main: #FAF7F2;
-  --text-muted: #A3958C;
-  --accent-primary: #C5A880;
-  --accent-hover: #E6D5B8;
-  --accent-secondary: #8B2635;
-  --font-heading: 'Playfair Display', Georgia, serif;
-  --font-body: 'Outfit', sans-serif;
-}
-
-/* Theme 3: Sojat Earth & Terracotta */
-[data-theme="terracotta"] {
   --bg-canvas: #F5EFEB;
-  --bg-surface: #EDE4DC;
-  --bg-subtle: #E4D8CE;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #EDE4DC;
   --border-subtle: #D9CEC5;
+  --border-strong: #C4B6AA;
   --text-main: #241E1A;
   --text-muted: #6E645D;
-  --accent-primary: #A64B38;
+  --accent-terracotta: #A64B38;
   --accent-hover: #8A3B2A;
-  --accent-secondary: #4A5D4E;
-  --font-heading: 'Cormorant Garamond', Georgia, serif;
-  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --accent-olive: #4A5D4E;
+  --accent-gold: #C5A880;
 }
 
 html {
   scroll-behavior: smooth;
-  background-color: var(--bg-canvas);
-  color: var(--text-main);
-  transition: background-color 0.4s ease, color 0.4s ease;
+  background-color: #F5EFEB;
+  color: #241E1A;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--bg-canvas);
-  color: var(--text-main);
-  font-family: var(--font-body);
+  background-color: #F5EFEB;
+  color: #241E1A;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-variant-numeric: lining-nums tabular-nums;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-.font-heading {
-  font-family: var(--font-heading);
+/* Editorial Headline Serif */
+.font-editorial {
+  font-family: 'Cormorant Garamond', Georgia, serif;
 }
 
-.font-body {
-  font-family: var(--font-body);
+/* Enforce flat lining numerals on all numbers, prices, hours and stats */
+.num-lining, [data-num], .font-mono-nums {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-variant-numeric: lining-nums tabular-nums !important;
+  font-feature-settings: "lnum" 1, "tnum" 1 !important;
 }
 
-/* Custom Scrollbar */
+/* Image zoom on hover */
+.img-zoom {
+  overflow: hidden;
+}
+
+.img-zoom img {
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.img-zoom:hover img {
+  transform: scale(1.04);
+}
+
+/* Custom Sand Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-canvas);
+  background: #F5EFEB;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-subtle);
+  background: #D9CEC5;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-primary);
+  background: #A64B38;
 }
 
 /* Floating animation */
-@keyframes floatSlow {
+@keyframes softFloat {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-5px); }
 }
 
-.animate-float-slow {
-  animation: floatSlow 4s ease-in-out infinite;
+.animate-soft-float {
+  animation: softFloat 4s ease-in-out infinite;
 }
