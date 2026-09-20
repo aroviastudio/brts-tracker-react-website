@@ -567,24 +567,24 @@ export default function App() {
     <div className="min-h-screen bg-[#F5EFEB] text-[#241E1A] antialiased selection:bg-[#A64B38] selection:text-[#FAF7F2]">
       
       {/* ─────────────────────────────────────────────────────────── */}
-      {/* 1. TOP HAUTE NAVIGATION BAR (No Admin Button)               */}
+      {/* 1. TOP HAUTE NAVIGATION BAR (Responsive & Sleek)           */}
       {/* ─────────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-[#F5EFEB]/90 backdrop-blur-xl border-b border-[#D9CEC5] transition-colors">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 h-20 flex items-center justify-between">
+      <header className="sticky top-0 z-40 bg-[#F5EFEB]/95 backdrop-blur-xl border-b border-[#D9CEC5] transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 h-16 sm:h-20 flex items-center justify-between gap-2">
           
           {/* Brand Monogram & Title */}
           <button
             onClick={() => scrollTo('hero')}
-            className="flex items-center gap-3 text-left group cursor-pointer"
+            className="flex items-center gap-2.5 sm:gap-3 text-left group cursor-pointer min-w-0"
           >
-            <div className="w-10 h-10 rounded-full border border-[#A64B38]/40 bg-[#EDE4DC] flex items-center justify-center group-hover:border-[#A64B38] transition-colors shadow-sm">
-              <span className="font-editorial text-xl font-bold text-[#A64B38]">BM</span>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-[#A64B38]/40 bg-[#EDE4DC] flex items-center justify-center group-hover:border-[#A64B38] transition-colors shadow-sm flex-shrink-0">
+              <span className="font-editorial text-base sm:text-xl font-bold text-[#A64B38]">BM</span>
             </div>
-            <div>
-              <span className="font-editorial text-2xl tracking-[0.14em] font-normal text-[#241E1A] block leading-tight">
+            <div className="min-w-0">
+              <span className="font-editorial text-lg sm:text-2xl tracking-[0.06em] sm:tracking-[0.14em] font-normal text-[#241E1A] block leading-tight truncate">
                 BHUVI MEHANDI
               </span>
-              <span className="text-[9px] uppercase tracking-[0.25em] text-[#6E645D] font-sans block">
+              <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.14em] sm:tracking-[0.25em] text-[#6E645D] font-sans block truncate">
                 Artisanal Sojat Atelier
               </span>
             </div>
@@ -617,7 +617,7 @@ export default function App() {
           </nav>
 
           {/* WhatsApp Direct Concierge CTA (Clean Public Action) */}
-          <div className="hidden sm:flex items-center gap-3 font-sans">
+          <div className="hidden sm:flex items-center gap-3 font-sans flex-shrink-0">
             <a
               href={createWhatsAppUrl({
                 phone: settings.whatsapp_phone,
@@ -636,17 +636,17 @@ export default function App() {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-[#241E1A] cursor-pointer"
+            className="lg:hidden p-2 text-[#241E1A] hover:text-[#A64B38] cursor-pointer flex-shrink-0 rounded-lg bg-[#EDE4DC]/80"
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-[#EDE4DC] border-b border-[#D9CEC5] px-6 py-8 space-y-4 text-sm uppercase tracking-[0.18em] font-sans">
-            <button onClick={() => scrollTo('services')} className="block w-full text-left py-1.5 text-[#241E1A]">
+          <div className="lg:hidden bg-[#EDE4DC] border-b border-[#D9CEC5] px-5 py-6 space-y-3.5 text-xs uppercase tracking-[0.16em] font-sans shadow-lg animate-in slide-in-from-top duration-200">
+            <button onClick={() => scrollTo('services')} className="block w-full text-left py-1.5 text-[#241E1A] hover:text-[#A64B38] font-medium">
               Event Services
             </button>
             <button
@@ -656,24 +656,24 @@ export default function App() {
               <span>Bespoke Henna Calculator</span>
               <Sparkles className="w-4 h-4" />
             </button>
-            <button onClick={() => scrollTo('portfolio')} className="block w-full text-left py-1.5 text-[#241E1A]">
+            <button onClick={() => scrollTo('portfolio')} className="block w-full text-left py-1.5 text-[#241E1A] hover:text-[#A64B38] font-medium">
               Archive Gallery
             </button>
-            <button onClick={() => scrollTo('stain')} className="block w-full text-left py-1.5 text-[#241E1A]">
+            <button onClick={() => scrollTo('stain')} className="block w-full text-left py-1.5 text-[#241E1A] hover:text-[#A64B38] font-medium">
               48h Stain Alchemy
             </button>
-            <button onClick={() => scrollTo('reviews')} className="block w-full text-left py-1.5 text-[#241E1A]">
+            <button onClick={() => scrollTo('reviews')} className="block w-full text-left py-1.5 text-[#241E1A] hover:text-[#A64B38] font-medium">
               Bride Reviews
             </button>
-            <button onClick={() => scrollTo('inquire')} className="block w-full text-left py-1.5 text-[#241E1A]">
+            <button onClick={() => scrollTo('inquire')} className="block w-full text-left py-1.5 text-[#241E1A] hover:text-[#A64B38] font-medium">
               Book Your Date
             </button>
-            <div className="pt-4 border-t border-[#D9CEC5]">
+            <div className="pt-3 border-t border-[#D9CEC5]">
               <a
                 href={createWhatsAppUrl({ phone: settings.whatsapp_phone, customNote: 'Hi Bhuvi! Reaching out from website mobile menu.' })}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full text-center py-3 bg-[#A64B38] text-[#FAF7F2] font-semibold text-xs tracking-[0.18em] rounded-full inline-block shadow-md"
+                className="w-full text-center py-2.5 bg-[#A64B38] text-[#FAF7F2] font-semibold text-xs tracking-[0.16em] rounded-full inline-block shadow-md"
               >
                 Chat on WhatsApp
               </a>
