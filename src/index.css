@@ -1,103 +1,98 @@
 @import "tailwindcss";
 
 @theme {
-  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-serif: var(--font-heading, 'Playfair Display', Georgia, serif);
   --font-italiana: 'Italiana', 'Playfair Display', Georgia, serif;
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-body, 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif);
   --font-outfit: 'Outfit', 'Plus Jakarta Sans', sans-serif;
-  
-  --color-obsidian: #0f0d0c;
-  --color-charcoal: #171412;
-  --color-espresso: #241d1a;
-  --color-sand: #f5efe6;
-  --color-linen: #faf7f2;
-  --color-champagne: #c5a880;
-  --color-gold: #d4af37;
-  --color-wine: #721c24;
-  --color-henna: #8b2635;
-  --color-terracotta: #c86d51;
+  --font-cormorant: 'Cormorant Garamond', Georgia, serif;
 }
 
 :root {
-  --bg-primary: #0f0d0c;
+  /* Default Theme (Cashmere & Raw Henna) */
+  --bg-canvas: #FAF7F2;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #F4EFE6;
+  --border-subtle: #E8E2D9;
+  --text-main: #1C1917;
+  --text-muted: #78716A;
+  --accent-primary: #7A2021;
+  --accent-hover: #611617;
+  --accent-secondary: #C5A880;
+  --font-heading: 'Italiana', 'Playfair Display', serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Theme 1: Cashmere & Raw Henna */
+[data-theme="cashmere"] {
+  --bg-canvas: #FAF7F2;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #F4EFE6;
+  --border-subtle: #E8E2D9;
+  --text-main: #1C1917;
+  --text-muted: #78716A;
+  --accent-primary: #7A2021;
+  --accent-hover: #611617;
+  --accent-secondary: #C5A880;
+  --font-heading: 'Italiana', 'Playfair Display', serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Theme 2: Obsidian & Antique Gold */
+[data-theme="obsidian"] {
+  --bg-canvas: #0F0D0C;
   --bg-surface: #171412;
-  --bg-card: #201a17;
-  --text-main: #faf7f2;
-  --text-muted: #a3958c;
-  --accent-gold: #c5a880;
-  --accent-wine: #8b2635;
-  --border-subtle: #2d2420;
+  --bg-subtle: #201A17;
+  --border-subtle: #2D2420;
+  --text-main: #FAF7F2;
+  --text-muted: #A3958C;
+  --accent-primary: #C5A880;
+  --accent-hover: #E6D5B8;
+  --accent-secondary: #8B2635;
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-body: 'Outfit', sans-serif;
+}
+
+/* Theme 3: Sojat Earth & Terracotta */
+[data-theme="terracotta"] {
+  --bg-canvas: #F5EFEB;
+  --bg-surface: #EDE4DC;
+  --bg-subtle: #E4D8CE;
+  --border-subtle: #D9CEC5;
+  --text-main: #241E1A;
+  --text-muted: #6E645D;
+  --accent-primary: #A64B38;
+  --accent-hover: #8A3B2A;
+  --accent-secondary: #4A5D4E;
+  --font-heading: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
 }
 
 html {
   scroll-behavior: smooth;
-  background-color: #0f0d0c;
-  color: #faf7f2;
+  background-color: var(--bg-canvas);
+  color: var(--text-main);
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #0f0d0c;
-  color: #faf7f2;
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-canvas);
+  color: var(--text-main);
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-.font-italiana {
-  font-family: 'Italiana', 'Playfair Display', serif;
+.font-heading {
+  font-family: var(--font-heading);
 }
 
-.font-serif-luxury {
-  font-family: 'Playfair Display', Georgia, serif;
-}
-
-.font-outfit {
-  font-family: 'Outfit', sans-serif;
-}
-
-/* Subtle Shimmer & Gradients */
-.gold-gradient-text {
-  background: linear-gradient(135deg, #ffffff 0%, #e6d5b8 40%, #c5a880 75%, #a48255 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.wine-gradient-text {
-  background: linear-gradient(135deg, #ffffff 0%, #f5efe6 30%, #d9795d 70%, #8b2635 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.gold-glow {
-  box-shadow: 0 0 35px rgba(197, 168, 128, 0.18);
-}
-
-.wine-glow {
-  box-shadow: 0 10px 35px -10px rgba(139, 38, 53, 0.35);
-}
-
-/* Subtle Floating Animation */
-@keyframes floatGentle {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-6px) rotate(0.5deg); }
-}
-
-.animate-float-gentle {
-  animation: floatGentle 5s ease-in-out infinite;
-}
-
-/* Pulse Ring Animation */
-@keyframes pulseGlow {
-  0% { transform: scale(0.95); opacity: 0.8; }
-  50% { transform: scale(1.1); opacity: 0.3; }
-  100% { transform: scale(1.25); opacity: 0; }
-}
-
-.animate-pulse-glow {
-  animation: pulseGlow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.font-body {
+  font-family: var(--font-body);
 }
 
 /* Custom Scrollbar */
@@ -106,12 +101,22 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0f0d0c;
+  background: var(--bg-canvas);
 }
 ::-webkit-scrollbar-thumb {
-  background: #2d2420;
+  background: var(--border-subtle);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #c5a880;
+  background: var(--accent-primary);
+}
+
+/* Floating animation */
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+.animate-float-slow {
+  animation: floatSlow 4s ease-in-out infinite;
 }
