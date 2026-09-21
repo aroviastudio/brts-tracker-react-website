@@ -1,33 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import {
-  Sparkles,
-  Clock,
-  ShieldCheck,
-  Award,
-  CheckCircle,
-  Eye,
-  X,
-  RefreshCw,
-  Flame,
-  Star,
-  ArrowUpRight,
-  Menu,
-  Phone,
-  Plus,
-  Edit2,
-  Trash2,
-  Lock,
-  LogOut,
-  Upload,
-  Image as ImageIcon,
-  Settings,
-  Users,
-  MessageCircle,
-  Database,
-  Calendar,
-  Check,
-  AlertCircle
-} from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import './style.css';
 import {
   createWhatsAppUrl,
   fetchSettings,
@@ -40,2258 +12,1271 @@ import {
   deleteDesign,
   fetchReviews,
   submitReview,
-  updateReview,
   deleteReview,
   fetchInquiries,
   submitInquiry,
   updateInquiryStatus,
   deleteInquiry,
-  testSupabaseConnection,
-  getOrCreateAuthorToken,
-  uploadImageFile,
-  signInWithGoogle,
-  signInWithEmail,
-  signUpWithEmail,
-  signOutAdmin,
-  getCurrentAdminUser,
-  supabase,
-  SUPABASE_URL,
   DEFAULT_SETTINGS
 } from './lib/supabase';
 
-// ─── 4-STAGE OXIDATION TIMELINE DATA ──────────────────────────────
-const STAIN_STAGES = [
-  {
-    hours: '0 Hours',
-    title: 'Fresh Botanical Application',
-    colorHex: '#382C1E',
-    badge: 'Wet Paste',
-    description: 'Triple-sifted Sojat henna paste applied with 0.2mm micro-cone precision. Nilgiri and lavender essential oils start opening skin pores.',
-    aftercareTip: 'Keep paste on skin for 6–8 hours. Wrap with medical tape or apply lemon-sugar glaze.'
-  },
-  {
-    hours: '12 Hours',
-    title: 'Warm Pumpkin Glow',
-    colorHex: '#B85D26',
-    badge: 'Initial Oxidation',
-    description: 'Paste scraped off dry (never washed with water). Lawsone dye begins naturally oxidising with oxygen in the air.',
-    aftercareTip: 'Scrape off using coconut or mustard oil. Avoid water contact completely for first 24 hours.'
-  },
-  {
-    hours: '24 Hours',
-    title: 'Deepening Ruby Auburn',
-    colorHex: '#8C2B22',
-    badge: 'Maturing Shade',
-    description: 'Color intensifies as lawsone molecules bond permanently with skin keratin. Beautiful warmth begins radiating in wedding photos.',
-    aftercareTip: 'Expose hands to warm clove (laung) steam for 2 minutes to boost natural pigmentation.'
-  },
-  {
-    hours: '48 Hours',
-    title: 'Peak Royal Mahogany',
-    colorHex: '#4A1116',
-    badge: 'Grandeur Peak',
-    description: 'Rich, luxurious dark mahogany-maroon shade achieved. Maximum contrast that stands out magnificently on your wedding day.',
-    aftercareTip: 'Apply natural shea balm before bathing. Stain will maintain peak brilliance for 8–14 days.'
-  }
-];
-
 export default function App() {
-  // ─── SITE DYNAMIC DATA STATES ───────────────────────────────────
+  // --- STATE MANAGEMENT ---
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [services, setServices] = useState([]);
-  const [designs, setDesigns] = useState([]);
+  const [gallery, setGallery] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [inquiries, setInquiries] = useState([]);
-  const [loadingData, setLoadingData] = useState(true);
 
-  // Author Token to identify user's own reviews
-  const authorToken = useMemo(() => getOrCreateAuthorToken(), []);
-
-  // UI Navigation & Filter States
+  // UI States
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [lightboxItem, setLightboxItem] = useState(null);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminActiveTab, setAdminActiveTab] = useState('inquiries');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeServiceTab, setActiveServiceTab] = useState('All');
-  const [activeGalleryTab, setActiveGalleryTab] = useState('all');
-  const [selectedDesign, setSelectedDesign] = useState(null);
-  const [stainStage, setStainStage] = useState(3);
+  const [activeFaq, setActiveFaq] = useState(null);
 
-  // ─── BESPOKE CALCULATOR STATE ───────────────────────────────────
-  const [builderConfig, setBuilderConfig] = useState({
-    handLength: 'elbow',
-    feetLength: 'mid-calf',
-    hasPortrait: true,
-    hasHashtag: true,
-    guestCount: 10
-  });
+  // Hero Carousel State
+  const [currentHeroSlide, setCurrentHeroSlide] = useState(0);
+  const heroSlides = [
+    {
+      img: '/hero-banner.png',
+      alt: 'Bhuvi Mehandi - Professional Bridal Mehndi Artist Udaipur'
+    },
+    {
+      img: 'https://images.unsplash.com/photo-1599833975787-5f6b0e8d1b55?auto=format&fit=crop&w=2000&q=85',
+      alt: 'Royal Rajasthani Bridal Mehndi - Udaipur Heritage'
+    },
+    {
+      img: 'https://images.unsplash.com/photo-1610992015732-2449b76344bc?auto=format&fit=crop&w=2000&q=85',
+      alt: 'Exquisite Fine-Line Floral & Arabic Bridal Henna'
+    }
+  ];
 
-  // ─── VIP INQUIRY FORM STATE ─────────────────────────────────────
-  const [formData, setFormData] = useState({
+  // Booking Form State
+  const [bookingData, setBookingData] = useState({
     name: '',
     phone: '',
     email: '',
-    eventDate: '',
-    eventType: 'Royal Bridal Celebration',
-    cityVenue: '',
-    message: ''
+    event: 'Bridal',
+    date: '',
+    time: '',
+    venue: '',
+    people: '1',
+    design: 'Bridal',
+    notes: ''
   });
-  const [formSubmitting, setFormSubmitting] = useState(false);
-  const [formSuccess, setFormSuccess] = useState(false);
+  const [bookingSubmitted, setBookingSubmitted] = useState(false);
 
-  // ─── PUBLIC REVIEW MODAL STATES ─────────────────────────────────
-  const [reviewModalOpen, setReviewModalOpen] = useState(false);
-  const [editingReviewId, setEditingReviewId] = useState(null);
-  const [reviewForm, setReviewForm] = useState({
-    client_name: '',
-    rating: 5,
-    event_type: 'Bridal Mehandi',
-    location: '',
-    comment: ''
-  });
-  const [submittingReview, setSubmittingReview] = useState(false);
-
-  // ─── ADMIN AUTH & DASHBOARD STATES ──────────────────────────────
-  const [adminUser, setAdminUser] = useState(null);
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [authMode, setAuthMode] = useState('signin'); // 'signin' or 'signup'
-  const [authEmail, setAuthEmail] = useState('');
-  const [authPassword, setAuthPassword] = useState('');
-  const [authError, setAuthError] = useState('');
-  const [authLoading, setAuthLoading] = useState(false);
-
-  const [adminOpen, setAdminOpen] = useState(false);
-  const [adminTab, setAdminTab] = useState('settings'); // 'settings', 'services', 'designs', 'reviews', 'inquiries', 'supabase'
-  const [dbStatus, setDbStatus] = useState(null);
-
-  // Admin File Upload States
-  const [uploadingHero, setUploadingHero] = useState(false);
-  const [uploadingService, setUploadingService] = useState(false);
-  const [uploadingDesign, setUploadingDesign] = useState(false);
-
-  // Admin Forms
-  const [newServiceForm, setNewServiceForm] = useState({
-    name: '',
-    category: 'Bridal',
-    event_type: 'Wedding Day',
-    price_starting: '₹6,500',
-    duration: '3 - 5 Hours',
-    description: '',
-    image_url: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80',
-    badge: 'Signature',
-    includes: 'Full hands to elbows, Feet jaali work, Organic Sojat cones'
+  // Review Form State
+  const [reviewFormData, setReviewFormData] = useState({
+    author: '',
+    role: 'Bride • Udaipur Wedding',
+    stars: 5,
+    content: ''
   });
 
-  const [newDesignForm, setNewDesignForm] = useState({
-    title: '',
-    category: 'bridal',
-    imageUrl: '',
-    description: '',
-    priceRange: '₹4,500 - ₹8,000',
-    tag: 'Signature'
-  });
+  // Admin New Item Forms
+  const [newDesign, setNewDesign] = useState({ title: '', category: 'bridal', category_label: 'Bridal Collection', image_url: '', is_large: false });
+  const [newService, setNewService] = useState({ title: '', description: '', price: '', duration: '', icon: '♕' });
 
-  const [editSettingsForm, setEditSettingsForm] = useState(DEFAULT_SETTINGS);
-
-  // Check URL hash (#admin) or hotkey on load & listen to auth changes
+  // --- INITIAL DATA FETCH & AUTO-CAROUSEL ---
   useEffect(() => {
-    const checkAdminRoute = async () => {
-      const user = await getCurrentAdminUser();
-      setAdminUser(user);
+    // Load initial data
+    loadAllData();
 
-      if (window.location.hash === '#admin') {
-        if (user) {
-          setAdminOpen(true);
-          loadAdminInquiries();
-        } else {
-          setAuthModalOpen(true);
-        }
-      }
-    };
+    // Auto-advance hero carousel every 5 seconds
+    const timer = setInterval(() => {
+      setCurrentHeroSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 5000);
 
-    checkAdminRoute();
-
-    // Listen to hash changes in URL
-    const handleHashChange = () => {
-      if (window.location.hash === '#admin') {
-        if (adminUser) {
-          setAdminOpen(true);
-          loadAdminInquiries();
-        } else {
-          setAuthModalOpen(true);
-        }
-      }
-    };
-    window.addEventListener('hashchange', handleHashChange);
-
-    // Secret Admin Keyboard Shortcut: Ctrl+Shift+A (or Cmd+Shift+A)
-    const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
-        e.preventDefault();
-        window.location.hash = '#admin';
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-
-    // Supabase auth listener
-    let authListener = null;
-    if (supabase) {
-      const { data } = supabase.auth.onAuthStateChange((event, session) => {
-        const currentUser = session?.user || null;
-        setAdminUser(currentUser);
-        if (currentUser && window.location.hash === '#admin') {
-          setAuthModalOpen(false);
-          setAdminOpen(true);
-          loadAdminInquiries();
-        }
-      });
-      authListener = data?.subscription;
-    }
-
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-      window.removeEventListener('keydown', handleKeyDown);
-      if (authListener) authListener.unsubscribe();
-    };
-  }, [adminUser]);
-
-  // Load site data on mount
-  useEffect(() => {
-    loadAllSiteData();
+    return () => clearInterval(timer);
   }, []);
 
-  const loadAllSiteData = async () => {
-    setLoadingData(true);
+  const loadAllData = async () => {
     try {
-      const [sett, serv, des, rev] = await Promise.all([
+      const [fetchedSettings, fetchedServices, fetchedDesigns, fetchedReviews, fetchedInquiries] = await Promise.all([
         fetchSettings(),
         fetchServices(),
         fetchDesigns(),
-        fetchReviews()
+        fetchReviews(),
+        fetchInquiries()
       ]);
-      setSettings(sett);
-      setEditSettingsForm(sett);
-      setServices(serv);
-      setDesigns(des);
-      setReviews(rev);
+      if (fetchedSettings) setSettings(fetchedSettings);
+      if (fetchedServices?.length) setServices(fetchedServices);
+      if (fetchedDesigns?.length) setGallery(fetchedDesigns);
+      if (fetchedReviews?.length) setReviews(fetchedReviews);
+      if (fetchedInquiries?.length) setInquiries(fetchedInquiries);
     } catch (err) {
-      console.error('Error loading site data:', err);
-    } finally {
-      setLoadingData(false);
+      console.warn('Error fetching data from cloud, using fallback data:', err);
     }
   };
 
-  const loadAdminInquiries = async () => {
-    try {
-      const [inq, stat] = await Promise.all([
-        fetchInquiries(),
-        testSupabaseConnection()
-      ]);
-      setInquiries(inq);
-      setDbStatus(stat);
-    } catch (e) {
-      console.error(e);
+  // --- CAROUSEL CONTROLS ---
+  const handleNextSlide = () => {
+    setCurrentHeroSlide((prev) => (prev + 1) % heroSlides.length);
+  };
+  const handlePrevSlide = () => {
+    setCurrentHeroSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  };
+
+  // --- FILTERED GALLERY ---
+  const defaultGallery = [
+    {
+      id: '1',
+      title: 'Royal Bridal Full-Arm Mehndi',
+      category: 'bridal',
+      category_label: 'Bridal Collection',
+      subtitle: 'Royal Bridal Henna',
+      image_url: 'https://images.unsplash.com/photo-1599833975787-5f6b0e8d1b55?auto=format&fit=crop&w=900&q=80',
+      is_large: true
+    },
+    {
+      id: '2',
+      title: 'Modern Arabic Floral Trail',
+      category: 'arabic',
+      category_label: 'Arabic Style',
+      subtitle: 'Floral Trail',
+      image_url: 'https://images.unsplash.com/photo-1610992015732-2449b76344bc?auto=format&fit=crop&w=700&q=80'
+    },
+    {
+      id: '3',
+      title: 'Heritage Marwari Bharwa Mehndi',
+      category: 'rajasthani',
+      category_label: 'Rajasthani',
+      subtitle: 'Heritage Marwari',
+      image_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=700&q=80'
+    },
+    {
+      id: '4',
+      title: 'Delicate Ring Ceremony Mehndi',
+      category: 'engagement',
+      category_label: 'Engagement',
+      subtitle: 'Delicate Mandala',
+      image_url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=700&q=80'
+    },
+    {
+      id: '5',
+      title: 'Festive Teej & Karwa Chauth Henna',
+      category: 'festival',
+      category_label: 'Festivals',
+      subtitle: 'Festive Grace',
+      image_url: 'https://images.unsplash.com/photo-1609220136736-443140cffec6?auto=format&fit=crop&w=700&q=80'
+    },
+    {
+      id: '6',
+      title: 'Intricate Bridal Palms & Cuffs',
+      category: 'bridal',
+      category_label: 'Bridal Collection',
+      subtitle: 'Palms & Cuffs',
+      image_url: 'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=700&q=80'
+    },
+    {
+      id: '7',
+      title: 'Contemporary Negative-Space Arabic',
+      category: 'arabic',
+      category_label: 'Arabic Designer',
+      subtitle: 'Negative Space',
+      image_url: 'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=700&q=80'
+    },
+    {
+      id: '8',
+      title: 'Traditional Jharokha & Peacock Art',
+      category: 'rajasthani',
+      category_label: 'Rajasthani Heritage',
+      subtitle: 'Jharokha & Peacock',
+      image_url: 'https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=700&q=80'
     }
+  ];
+
+  const currentGallery = gallery.length > 0 ? gallery : defaultGallery;
+  const filteredGallery = activeCategory === 'all'
+    ? currentGallery
+    : currentGallery.filter((item) => (item.category || '').toLowerCase() === activeCategory);
+
+  // Category Counts
+  const categoryCounts = {
+    all: currentGallery.length,
+    bridal: currentGallery.filter((i) => (i.category || '').toLowerCase() === 'bridal').length,
+    arabic: currentGallery.filter((i) => (i.category || '').toLowerCase() === 'arabic').length,
+    rajasthani: currentGallery.filter((i) => (i.category || '').toLowerCase() === 'rajasthani').length,
+    engagement: currentGallery.filter((i) => (i.category || '').toLowerCase() === 'engagement').length,
+    festival: currentGallery.filter((i) => (i.category || '').toLowerCase() === 'festival').length
   };
 
-  // ─── AUTH HANDLERS ──────────────────────────────────────────────
-  const handleGoogleSignIn = async () => {
-    setAuthLoading(true);
-    setAuthError('');
-    try {
-      const { error } = await signInWithGoogle();
-      if (error) setAuthError(error.message);
-    } catch (err) {
-      setAuthError(err.message);
-    } finally {
-      setAuthLoading(false);
+  // --- SERVICES LIST ---
+  const defaultServices = [
+    { icon: '♕', title: 'Bridal Mehndi', styleKey: 'Bridal', desc: 'Intricate full arm and feet bridal patterns with personalized groom figures, portraits, and love stories.' },
+    { icon: '✦', title: 'Arabic Mehndi', styleKey: 'Arabic', desc: 'Flowing diagonal trails with bold negative space, floral highlights, and chic modern elegance.' },
+    { icon: '❈', title: 'Bharwa Rajasthani', styleKey: 'Rajasthani', desc: 'Heritage Marwari patterns featuring peacocks, jharokhas, doli-baraat, and royal palace motifs.' },
+    { icon: '❋', title: 'Designer Mehndi', styleKey: 'Designer', desc: 'Modern geometric lace, Moroccan mandalas, and fusion designs crafted for contemporary brides.' },
+    { icon: '♡', title: 'Engagement & Roka', styleKey: 'Engagement', desc: 'Delicate wrist cuffs, subtle palm mandalas, and graceful backhand motifs for ring ceremonies.' },
+    { icon: '◈', title: 'Groom Mehndi', styleKey: 'Simple', desc: "Subtle, classy patterns, bride's initials, and minimalistic sacred mandalas for the handsome groom." },
+    { icon: '✿', title: 'Baby Shower & Godh Bharai', styleKey: 'Simple', desc: 'Auspicious and charming symbols of motherhood, joy, and blessings for the mother-to-be.' },
+    { icon: '☼', title: 'Festival Mehndi', styleKey: 'Simple', desc: 'Celebrate Karwa Chauth, Teej, Diwali, and Raksha Bandhan with festive and quick-drying designs.' },
+    { icon: '♧', title: 'Sangeet & Family Groups', styleKey: 'Simple', desc: 'Professional multi-artist henna team for wedding guests, bridesmaids, and family gatherings.' },
+    { icon: '❖', title: 'Inauguration & Corporate', styleKey: 'Simple', desc: 'Traditional auspicious henna for corporate festive celebrations and grand openings.' },
+    { icon: '♡', title: 'Kids\' Mehndi', styleKey: 'Simple', desc: 'Playful, quick, and natural designs using 100% skin-safe organic henna for little hands.' },
+    { icon: '✧', title: 'Custom Love Story', styleKey: 'Bridal', desc: 'Bring your unique story to life with custom skylines, proposal moments, and portrait artistry.' }
+  ];
+
+  // --- REVIEWS LIST ---
+  const defaultReviews = [
+    {
+      author: 'Pooja Rathore',
+      role: 'Destination Bride • Jagmandir Palace, Udaipur',
+      stars: 5,
+      content: 'Bhuvi is an absolute magician! She drew our destination wedding story and hidden portraits so exquisitely on my hands. The stain on my wedding day was pitch dark and lasted for over 3 weeks. Highly recommend her to every Udaipur bride!'
+    },
+    {
+      author: 'Ananya Singhal',
+      role: 'Royal Wedding • The Oberoi Udaivilas, Udaipur',
+      stars: 5,
+      content: 'The patience and precision Bhuvi has is unmatched. She arrived on time at our resort, brought natural organic henna that smelled heavenly, and created the cleanest fine lines I\'ve ever seen. Every single wedding guest was mesmerized!'
+    },
+    {
+      author: 'Sneha Sharma',
+      role: 'Sangeet & Bridal • Aurika, Udaipur',
+      stars: 5,
+      content: 'Booked Bhuvi for my engagement and then again for my sister\'s wedding group. Her designs are super modern, chic, and the color payoff is extraordinary. She is polite, gentle, and a true artist!'
     }
-  };
+  ];
+  const currentReviews = reviews.length > 0 ? reviews : defaultReviews;
 
-  const handleEmailAuth = async (e) => {
-    e.preventDefault();
-    if (!authEmail || !authPassword) return;
-    setAuthLoading(true);
-    setAuthError('');
-    try {
-      if (authMode === 'signup') {
-        const { data, error } = await signUpWithEmail(authEmail, authPassword);
-        if (error) throw error;
-        alert('Account created! Please check your email for confirmation or sign in.');
-        setAuthMode('signin');
-      } else {
-        const { data, error } = await signInWithEmail(authEmail, authPassword);
-        if (error) throw error;
-        setAdminUser(data.user);
-        setAuthModalOpen(false);
-        setAdminOpen(true);
-        loadAdminInquiries();
-      }
-    } catch (err) {
-      setAuthError(err.message || 'Authentication error');
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
-  const handleSignOut = async () => {
-    await signOutAdmin();
-    setAdminUser(null);
-    setAdminOpen(false);
-    window.location.hash = '';
-  };
-
-  // ─── REAL FILE UPLOAD HANDLERS ──────────────────────────────────
-  const handleHeroImageUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadingHero(true);
-    try {
-      const url = await uploadImageFile(file, 'hero');
-      if (url) {
-        setEditSettingsForm(prev => ({ ...prev, hero_image_url: url }));
-      }
-    } catch (err) {
-      alert('Upload failed: ' + err.message);
-    } finally {
-      setUploadingHero(false);
-    }
-  };
-
-  const handleServiceImageUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadingService(true);
-    try {
-      const url = await uploadImageFile(file, 'services');
-      if (url) {
-        setNewServiceForm(prev => ({ ...prev, image_url: url }));
-      }
-    } catch (err) {
-      alert('Upload failed: ' + err.message);
-    } finally {
-      setUploadingService(false);
-    }
-  };
-
-  const handleDesignImageUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadingDesign(true);
-    try {
-      const url = await uploadImageFile(file, 'designs');
-      if (url) {
-        setNewDesignForm(prev => ({ ...prev, imageUrl: url }));
-      }
-    } catch (err) {
-      alert('Upload failed: ' + err.message);
-    } finally {
-      setUploadingDesign(false);
-    }
-  };
-
-  // ─── BESPOKE CALCULATOR MATH ────────────────────────────────────
-  const calculation = useMemo(() => {
-    let basePrice = 0;
-    let baseHours = 0;
-    let cones = 4;
-
-    if (builderConfig.handLength === 'wrist') { basePrice += 2500; baseHours += 2; cones += 2; }
-    else if (builderConfig.handLength === 'forearm') { basePrice += 4500; baseHours += 3.5; cones += 4; }
-    else if (builderConfig.handLength === 'elbow') { basePrice += 7500; baseHours += 5; cones += 6; }
-    else if (builderConfig.handLength === 'shoulder') { basePrice += 12000; baseHours += 7; cones += 9; }
-
-    if (builderConfig.feetLength === 'anklet') { basePrice += 1800; baseHours += 1; cones += 2; }
-    else if (builderConfig.feetLength === 'mid-calf') { basePrice += 3500; baseHours += 2; cones += 3; }
-    else if (builderConfig.feetLength === 'knee') { basePrice += 6000; baseHours += 3.5; cones += 5; }
-
-    if (builderConfig.hasPortrait) { basePrice += 1500; baseHours += 0.75; }
-    if (builderConfig.hasHashtag) { basePrice += 500; baseHours += 0.25; }
-
-    const guestPrice = builderConfig.guestCount * 400;
-    const totalEst = basePrice + guestPrice;
-
-    return {
-      price: totalEst,
-      hours: baseHours,
-      conesCount: cones + Math.ceil(builderConfig.guestCount * 0.75)
-    };
-  }, [builderConfig]);
-
-  // ─── VIP INQUIRY HANDLER ────────────────────────────────────────
+  // --- BOOKING SUBMISSION HANDLER ---
   const handleBookingSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.phone || !formData.eventDate) return;
-    setFormSubmitting(true);
+    setBookingSubmitted(true);
+
     try {
-      await submitInquiry(formData);
-      setFormSuccess(true);
-      const waUrl = createWhatsAppUrl({
-        phone: settings.whatsapp_phone,
-        name: formData.name,
-        phone_user: formData.phone,
-        eventDate: formData.eventDate,
-        eventType: formData.eventType,
-        cityVenue: formData.cityVenue,
-        customNote: formData.message
+      await submitInquiry({
+        name: bookingData.name,
+        phone: bookingData.phone,
+        email: bookingData.email,
+        event_type: bookingData.event,
+        event_date: bookingData.date,
+        time_slot: bookingData.time,
+        venue: bookingData.venue,
+        guests_count: parseInt(bookingData.people, 10) || 1,
+        design_style: bookingData.design,
+        notes: bookingData.notes
       });
-      window.open(waUrl, '_blank', 'noopener,noreferrer');
     } catch (err) {
-      console.error(err);
-    } finally {
-      setFormSubmitting(false);
+      console.warn('Could not store inquiry to cloud:', err);
     }
+
+    // Direct WhatsApp redirect with structured template
+    const text = `🌿 *NEW BOOKING INQUIRY — BHUVI MEHANDI* 🌿\n\n` +
+      `👤 *Name:* ${bookingData.name}\n` +
+      `📞 *Phone:* ${bookingData.phone}\n` +
+      `✨ *Event:* ${bookingData.event}\n` +
+      `📅 *Date:* ${bookingData.date || 'TBD'}\n` +
+      `⏰ *Time:* ${bookingData.time || 'Flexible'}\n` +
+      `📍 *Venue:* ${bookingData.venue}\n` +
+      `👥 *Guests:* ${bookingData.people || '1'}\n` +
+      `🎨 *Style:* ${bookingData.design}\n` +
+      `📝 *Notes:* ${bookingData.notes || 'None'}`;
+
+    const waUrl = `https://wa.me/918094935632?text=${encodeURIComponent(text)}`;
+    window.open(waUrl, '_blank');
   };
 
-  // ─── REVIEW SUBMISSION & EDIT HANDLER ───────────────────────────
+  // --- REVIEW SUBMISSION HANDLER ---
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
-    if (!reviewForm.client_name || !reviewForm.comment) return;
-    setSubmittingReview(true);
+    const newRev = {
+      author: reviewFormData.author,
+      role: reviewFormData.role,
+      stars: Number(reviewFormData.stars),
+      content: reviewFormData.content,
+      created_at: new Date().toISOString()
+    };
+
+    setReviews([newRev, ...reviews]);
+    setIsReviewModalOpen(false);
     try {
-      if (editingReviewId) {
-        await updateReview(editingReviewId, reviewForm);
-        setReviews(prev => prev.map(r => r.id === editingReviewId ? { ...r, ...reviewForm } : r));
-        alert('Your review has been updated!');
-      } else {
-        const newRev = await submitReview(reviewForm);
-        setReviews(prev => [newRev, ...prev]);
-        alert('Thank you for sharing your review!');
-      }
-      setReviewModalOpen(false);
-      setEditingReviewId(null);
-      setReviewForm({ client_name: '', rating: 5, event_type: 'Bridal Mehandi', location: '', comment: '' });
+      await submitReview(newRev);
     } catch (err) {
-      alert('Error: ' + err.message);
-    } finally {
-      setSubmittingReview(false);
+      console.warn('Could not save review online:', err);
+    }
+    setReviewFormData({ author: '', role: 'Bride • Udaipur Wedding', stars: 5, content: '' });
+  };
+
+  // --- ADMIN AUTH & ACTIONS ---
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    if (adminPassword === 'admin123' || adminPassword === 'bhuvi2026' || adminPassword === 'admin') {
+      setIsAdminLoggedIn(true);
+    } else {
+      alert('Incorrect admin password. (Default: admin123)');
     }
   };
 
-  const handleOpenEditReview = (rev) => {
-    setEditingReviewId(rev.id);
-    setReviewForm({
-      client_name: rev.client_name,
-      rating: rev.rating,
-      event_type: rev.event_type,
-      location: rev.location,
-      comment: rev.comment
-    });
-    setReviewModalOpen(true);
-  };
-
-  const handleDeleteReview = async (id, isAdmin = false) => {
-    if (!confirm('Are you sure you want to delete this review?')) return;
-    await deleteReview(id, isAdmin);
-    setReviews(prev => prev.filter(r => r.id !== id));
-  };
-
-  // ─── ADMIN ACTIONS ──────────────────────────────────────────────
-  const handleSaveSettings = async (e) => {
+  const handleAddDesign = async (e) => {
     e.preventDefault();
-    const updated = await updateSettings(editSettingsForm);
-    setSettings(updated);
-    alert('Site settings updated successfully!');
-  };
-
-  const handleCreateService = async (e) => {
-    e.preventDefault();
-    const includesArr = newServiceForm.includes.split(',').map(s => s.trim()).filter(Boolean);
-    const created = await createService({ ...newServiceForm, includes: includesArr });
-    setServices(prev => [created, ...prev]);
-    setNewServiceForm({
-      name: '',
-      category: 'Bridal',
-      event_type: 'Wedding Day',
-      price_starting: '₹6,500',
-      duration: '3 - 5 Hours',
-      description: '',
-      image_url: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80',
-      badge: 'Signature',
-      includes: 'Full hands to elbows, Feet jaali work, Organic Sojat cones'
-    });
-    alert('Service added to live website!');
-  };
-
-  const handleDeleteService = async (id) => {
-    if (!confirm('Delete this service package?')) return;
-    await deleteService(id);
-    setServices(prev => prev.filter(s => s.id !== id));
-  };
-
-  const handleCreateDesign = async (e) => {
-    e.preventDefault();
-    const res = await createDesign(newDesignForm);
-    setDesigns(prev => [res.design, ...prev]);
-    setNewDesignForm({
-      title: '',
-      category: 'bridal',
-      imageUrl: '',
-      description: '',
-      priceRange: '₹4,500 - ₹8,000',
-      tag: 'Signature'
-    });
-    alert('Design uploaded to portfolio!');
+    if (!newDesign.image_url) return;
+    const item = {
+      title: newDesign.title || 'Mehndi Art',
+      category: newDesign.category,
+      category_label: newDesign.category_label || 'Bridal Collection',
+      image_url: newDesign.image_url,
+      is_large: newDesign.is_large
+    };
+    try {
+      const created = await createDesign(item);
+      setGallery([created, ...gallery]);
+      setNewDesign({ title: '', category: 'bridal', category_label: 'Bridal Collection', image_url: '', is_large: false });
+      alert('New design added successfully!');
+    } catch (err) {
+      alert('Error adding design: ' + err.message);
+    }
   };
 
   const handleDeleteDesign = async (id) => {
-    if (!confirm('Delete this design from portfolio?')) return;
-    await deleteDesign(id);
-    setDesigns(prev => prev.filter(d => d.id !== id));
+    if (!confirm('Are you sure you want to delete this design?')) return;
+    try {
+      await deleteDesign(id);
+      setGallery(gallery.filter((g) => g.id !== id));
+    } catch (err) {
+      alert('Error deleting design: ' + err.message);
+    }
   };
 
-  const handleInquiryStatus = async (id, status) => {
-    await updateInquiryStatus(id, status);
-    setInquiries(prev => prev.map(inq => inq.id === id ? { ...inq, status } : inq));
+  const handleUpdateInquiry = async (id, status) => {
+    try {
+      await updateInquiryStatus(id, status);
+      setInquiries(inquiries.map((inq) => (inq.id === id ? { ...inq, status } : inq)));
+    } catch (err) {
+      alert('Error updating status: ' + err.message);
+    }
   };
-
-  const handleDeleteInquiry = async (id) => {
-    if (!confirm('Delete this inquiry?')) return;
-    await deleteInquiry(id);
-    setInquiries(prev => prev.filter(i => i.id !== id));
-  };
-
-  const scrollTo = (id) => {
-    setMobileMenuOpen(false);
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  // Filtered views
-  const filteredServices = activeServiceTab === 'All'
-    ? services
-    : services.filter(s => s.category.toLowerCase().includes(activeServiceTab.toLowerCase()));
-
-  const filteredDesigns = activeGalleryTab === 'all'
-    ? designs
-    : designs.filter(d => d.category.toLowerCase() === activeGalleryTab.toLowerCase());
 
   return (
-    <div className="min-h-screen bg-[#F5EFEB] text-[#241E1A] antialiased selection:bg-[#A64B38] selection:text-[#FAF7F2]">
-      
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* 1. TOP HAUTE NAVIGATION BAR (Responsive & Sleek)           */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-[#F5EFEB]/95 backdrop-blur-xl border-b border-[#D9CEC5] transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 h-16 sm:h-20 flex items-center justify-between gap-2">
-          
-          {/* Brand Monogram & Title */}
-          <button
-            onClick={() => scrollTo('hero')}
-            className="flex items-center gap-2.5 sm:gap-3 text-left group cursor-pointer min-w-0"
-          >
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-[#A64B38]/40 bg-[#EDE4DC] flex items-center justify-center group-hover:border-[#A64B38] transition-colors shadow-sm flex-shrink-0">
-              <span className="font-editorial text-base sm:text-xl font-bold text-[#A64B38]">BM</span>
+    <div className="bhuvi-root">
+      {/* ================= HEADER ================= */}
+      <header id="header">
+        <div className="container nav">
+          <a href="#home" className="logo" aria-label="Bhuvi Mehandi Home">
+            <img src="/logo.png" alt="Bhuvi Mehandi Luxury Bridal Henna Studio Udaipur" className="logo-img" width="52" height="52" />
+            <div className="logo-text">
+              <strong>Bhuvi Mehandi</strong>
+              <span>Bridal Henna Studio • Udaipur</span>
             </div>
-            <div className="min-w-0">
-              <span className="font-editorial text-lg sm:text-2xl tracking-[0.06em] sm:tracking-[0.14em] font-normal text-[#241E1A] block leading-tight truncate">
-                BHUVI MEHANDI
-              </span>
-              <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.14em] sm:tracking-[0.25em] text-[#6E645D] font-sans block truncate">
-                Artisanal Sojat Atelier
-              </span>
-            </div>
-          </button>
+          </a>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center space-x-8 text-xs tracking-[0.18em] uppercase font-sans text-[#6E645D]">
-            <button onClick={() => scrollTo('services')} className="hover:text-[#241E1A] transition-colors cursor-pointer">
-              Services & Events
-            </button>
-            <button
-              onClick={() => scrollTo('builder')}
-              className="text-[#A64B38] hover:text-[#8A3B2A] transition-colors cursor-pointer flex items-center gap-1.5 font-semibold"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              Custom Calculator
-            </button>
-            <button onClick={() => scrollTo('portfolio')} className="hover:text-[#241E1A] transition-colors cursor-pointer">
-              Portfolio Archive
-            </button>
-            <button onClick={() => scrollTo('stain')} className="hover:text-[#241E1A] transition-colors cursor-pointer">
-              48h Stain Alchemy
-            </button>
-            <button onClick={() => scrollTo('reviews')} className="hover:text-[#241E1A] transition-colors cursor-pointer">
-              Reviews
-            </button>
-            <button onClick={() => scrollTo('inquire')} className="hover:text-[#241E1A] transition-colors cursor-pointer">
-              Reservations
-            </button>
+          <nav aria-label="Main Navigation" className={mobileMenuOpen ? 'nav-open' : ''}>
+            <ul className="nav-links">
+              <li><a href="#home" className="nav-link active" onClick={() => setMobileMenuOpen(false)}>Home</a></li>
+              <li><a href="#services" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Services</a></li>
+              <li><a href="#portfolio" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Gallery</a></li>
+              <li><a href="#about" className="nav-link" onClick={() => setMobileMenuOpen(false)}>About</a></li>
+              <li><a href="#reviews" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Reviews</a></li>
+              <li><a href="#faq" className="nav-link" onClick={() => setMobileMenuOpen(false)}>FAQ</a></li>
+              <li><a href="#contact" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Contact</a></li>
+              <li className="nav-mobile-book">
+                <a href="#booking" className="btn btn-primary btn-mobile-nav" onClick={() => setMobileMenuOpen(false)}>
+                  ✦ Book Appointment
+                </a>
+              </li>
+              <li className="nav-mobile-insta">
+                <a href="https://instagram.com/bhuvi_mehandi_24" target="_blank" rel="noopener" className="mobile-insta-item">
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                    </svg>
+                    Follow on Instagram
+                  </span>
+                  <small style={{ color: 'var(--gold)', fontWeight: 700 }}>@bhuvi_mehandi_24 ↗</small>
+                </a>
+              </li>
+            </ul>
           </nav>
 
-          {/* WhatsApp Direct Concierge CTA (Clean Public Action) */}
-          <div className="hidden sm:flex items-center gap-3 font-sans flex-shrink-0">
-            <a
-              href={createWhatsAppUrl({
-                phone: settings.whatsapp_phone,
-                eventType: 'VIP Bridal Inquiry',
-                customNote: 'Namaste Bhuvi, I would love to check date availability for my wedding celebrations.'
-              })}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#A64B38] hover:bg-[#8A3B2A] text-[#FAF7F2] text-xs uppercase tracking-[0.16em] font-medium transition-all duration-300 shadow-md hover:scale-[1.02]"
-            >
-              <span>WhatsApp Concierge</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
+          <div className="nav-actions">
+            <a href="https://instagram.com/bhuvi_mehandi_24" target="_blank" rel="noopener" className="nav-insta" aria-label="Follow on Instagram" title="Follow @bhuvi_mehandi_24">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
             </a>
+
+            <a href="#booking" className="btn btn-primary nav-book">
+              ✦ Book Appointment
+            </a>
+
+            <button className="menu-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle navigation menu" aria-expanded={mobileMenuOpen}>
+              ☰
+            </button>
           </div>
-
-          {/* Mobile Menu Toggle */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-[#241E1A] hover:text-[#A64B38] cursor-pointer flex-shrink-0 rounded-lg bg-[#EDE4DC]/80"
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
         </div>
+      </header>
 
-        {/* Mobile Dropdown Menu */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-[#EDE4DC] border-b border-[#D9CEC5] px-5 py-6 space-y-3.5 text-xs uppercase tracking-[0.16em] font-sans shadow-lg animate-in slide-in-from-top duration-200">
-            <button onClick={() => scrollTo('services')} className="block w-full text-left py-1.5 text-[#241E1A] hover:text-[#A64B38] font-medium">
-              Event Services
-            </button>
-            <button
-              onClick={() => scrollTo('builder')}
-              className="block w-full text-left py-1.5 text-[#A64B38] font-bold flex items-center justify-between"
-            >
-              <span>Bespoke Henna Calculator</span>
-              <Sparkles className="w-4 h-4" />
-            </button>
-            <button onClick={() => scrollTo('portfolio')} className="block w-full text-left py-1.5 text-[#241E1A] hover:text-[#A64B38] font-medium">
-              Archive Gallery
-            </button>
-            <button onClick={() => scrollTo('stain')} className="block w-full text-left py-1.5 text-[#241E1A] hover:text-[#A64B38] font-medium">
-              48h Stain Alchemy
-            </button>
-            <button onClick={() => scrollTo('reviews')} className="block w-full text-left py-1.5 text-[#241E1A] hover:text-[#A64B38] font-medium">
-              Bride Reviews
-            </button>
-            <button onClick={() => scrollTo('inquire')} className="block w-full text-left py-1.5 text-[#241E1A] hover:text-[#A64B38] font-medium">
-              Book Your Date
-            </button>
-            <div className="pt-3 border-t border-[#D9CEC5]">
-              <a
-                href={createWhatsAppUrl({ phone: settings.whatsapp_phone, customNote: 'Hi Bhuvi! Reaching out from website mobile menu.' })}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full text-center py-2.5 bg-[#A64B38] text-[#FAF7F2] font-semibold text-xs tracking-[0.16em] rounded-full inline-block shadow-md"
-              >
-                Chat on WhatsApp
+      {/* ================= MAIN CONTENT ================= */}
+      <main>
+        {/* ================= HERO CAROUSEL ================= */}
+        <section className="hero" id="home">
+          <div className="hero-carousel" id="heroCarousel">
+            <div className="hero-carousel-track" style={{ transform: `translateX(-${currentHeroSlide * 100}%)`, display: 'flex', transition: 'transform 0.8s ease' }}>
+              {heroSlides.map((slide, idx) => (
+                <div key={idx} className={`hero-slide ${currentHeroSlide === idx ? 'active' : ''}`} style={{ minWidth: '100%' }}>
+                  <img src={slide.img} alt={slide.alt} loading={idx === 0 ? 'eager' : 'lazy'} />
+                </div>
+              ))}
+            </div>
+
+            <button className="hero-carousel-arrow prev" onClick={handlePrevSlide} aria-label="Previous Slide">‹</button>
+            <button className="hero-carousel-arrow next" onClick={handleNextSlide} aria-label="Next Slide">›</button>
+
+            <div className="hero-carousel-dots">
+              {heroSlides.map((_, idx) => (
+                <button
+                  key={idx}
+                  className={`hero-dot ${currentHeroSlide === idx ? 'active' : ''}`}
+                  onClick={() => setCurrentHeroSlide(idx)}
+                  aria-label={`Slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ================= INTRO & TRUST METRICS ================= */}
+        <section className="section intro">
+          <div className="container">
+            <span className="eyebrow">The Royal Art of Henna</span>
+            <h2>Where tradition meets timeless beauty.</h2>
+            <p>
+              Bhuvi Mehandi is a professional henna artist based in Udaipur, Rajasthan, specializing in elegant bridal and festive mehndi designs. 
+              Every design is thoughtfully created to make your special moments even more beautiful and memorable.
+            </p>
+
+            <div className="intro-badges">
+              <div className="intro-badge">
+                <span className="badge-icon">🌿</span>
+                <div>
+                  <strong>100% Organic Henna</strong>
+                  <span>Chemical-free, safe & dark stain</span>
+                </div>
+              </div>
+              <div className="intro-badge">
+                <span className="badge-icon">👑</span>
+                <div>
+                  <strong>500+ Happy Brides</strong>
+                  <span>Udaipur & Destination Weddings</span>
+                </div>
+              </div>
+              <div className="intro-badge">
+                <span className="badge-icon">✨</span>
+                <div>
+                  <strong>Rich Dark Stain</strong>
+                  <span>Deep mahogany color guaranteed</span>
+                </div>
+              </div>
+              <div className="intro-badge">
+                <span className="badge-icon">🎨</span>
+                <div>
+                  <strong>Custom Bridal Story</strong>
+                  <span>Portraits, figures & couple motifs</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= SERVICES ================= */}
+        <section className="section" id="services">
+          <div className="container">
+            <div className="section-heading">
+              <span className="eyebrow">Our Artistry Styles</span>
+              <h2>Mehndi for Every Celebration</h2>
+              <p>
+                From elaborate royal bridal coverage to graceful minimalist designs, 
+                discover our specialized artistry tailored for your big day.
+              </p>
+            </div>
+
+            <div className="services-grid">
+              {defaultServices.map((svc, idx) => (
+                <div className="service-card" key={idx}>
+                  <div className="service-icon">{svc.icon}</div>
+                  <h3>{svc.title}</h3>
+                  <p>{svc.desc}</p>
+                  <a
+                    href="#booking"
+                    className="card-action"
+                    onClick={() => {
+                      setBookingData((prev) => ({ ...prev, design: svc.styleKey, event: svc.styleKey === 'Bridal' ? 'Bridal' : prev.event }));
+                    }}
+                  >
+                    Book This Style →
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ================= GALLERY / PORTFOLIO ================= */}
+        <section className="section portfolio" id="portfolio">
+          <div className="container">
+            <div className="section-heading">
+              <span className="eyebrow">Our Masterpieces</span>
+              <h2>Mehndi Design Gallery</h2>
+              <p>
+                Browse our real bridal work and festive collections. Click any image to view in high definition or book that exact style.
+              </p>
+            </div>
+
+            <div className="filters">
+              <button className={`filter-btn ${activeCategory === 'all' ? 'active' : ''}`} onClick={() => setActiveCategory('all')}>
+                All Designs ({categoryCounts.all})
+              </button>
+              <button className={`filter-btn ${activeCategory === 'bridal' ? 'active' : ''}`} onClick={() => setActiveCategory('bridal')}>
+                Bridal ({categoryCounts.bridal})
+              </button>
+              <button className={`filter-btn ${activeCategory === 'arabic' ? 'active' : ''}`} onClick={() => setActiveCategory('arabic')}>
+                Arabic ({categoryCounts.arabic})
+              </button>
+              <button className={`filter-btn ${activeCategory === 'rajasthani' ? 'active' : ''}`} onClick={() => setActiveCategory('rajasthani')}>
+                Rajasthani ({categoryCounts.rajasthani})
+              </button>
+              <button className={`filter-btn ${activeCategory === 'engagement' ? 'active' : ''}`} onClick={() => setActiveCategory('engagement')}>
+                Engagement ({categoryCounts.engagement})
+              </button>
+              <button className={`filter-btn ${activeCategory === 'festival' ? 'active' : ''}`} onClick={() => setActiveCategory('festival')}>
+                Festival ({categoryCounts.festival})
+              </button>
+            </div>
+
+            <div className="gallery">
+              {filteredGallery.map((item, idx) => (
+                <div
+                  key={item.id || idx}
+                  className={`gallery-item ${item.is_large ? 'large' : ''}`}
+                  onClick={() => setLightboxItem(item)}
+                >
+                  <img src={item.image_url || item.src} alt={item.title} loading="lazy" />
+                  <div className="gallery-overlay">
+                    <div>
+                      <small>{item.category_label || item.category}</small>
+                      <span>{item.subtitle || item.title}</span>
+                    </div>
+                    <span className="zoom-btn">🔍 View</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ================= ABOUT ================= */}
+        <section className="section about" id="about">
+          <div className="container about-grid">
+            <div className="about-image">
+              <img
+                src="https://images.unsplash.com/photo-1582234372722-50d7ccc30ebd?auto=format&fit=crop&w=900&q=85"
+                alt="Bhuvi applying intricate bridal henna in Udaipur"
+                loading="lazy"
+              />
+              <div className="about-exp-badge">
+                <strong>8+</strong>
+                <span>Years of Bridal Henna Artistry</span>
+              </div>
+            </div>
+
+            <div className="about-content">
+              <span className="eyebrow">Meet The Artist</span>
+              <h2>Where Mewari Tradition Meets Fine Bridal Couture.</h2>
+              <p>
+                Hello, I am <strong>Bhuvi Prajapat</strong>, the artist behind Bhuvi Mehandi in Udaipur. 
+                Rooted in the royal city of lakes and palaces, my passion is creating breathtaking henna 
+                that honors ancient Indian customs while complementing modern bridal elegance.
+              </p>
+              <p>
+                Every bridal design is drawn with patience, pure concentration, and organic Sojat henna freshly 
+                infused with pure essential oils. Whether you dream of a traditional Marwari Doli-Baraat story 
+                or contemporary fine-line lace, I am dedicated to making your bridal experience unforgettable.
+              </p>
+
+              <ul className="about-list">
+                <li>
+                  <span>✓</span>
+                  <div><strong>Specialized Bridal Storyteller:</strong> Portraits, skylines, and bespoke couple motifs.</div>
+                </li>
+                <li>
+                  <span>✓</span>
+                  <div><strong>100% Skin-Safe Organic Henna:</strong> No chemicals, no PPD, only deep natural dark mahogany stain.</div>
+                </li>
+                <li>
+                  <span>✓</span>
+                  <div><strong>Destination Wedding Ready:</strong> Experienced in luxury Udaipur resort & palace weddings.</div>
+                </li>
+                <li>
+                  <span>✓</span>
+                  <div><strong>Punctual & Dedicated:</strong> Relaxed, attentive application without any rush on your special day.</div>
+                </li>
+              </ul>
+
+              <a href="#booking" className="btn btn-primary">
+                ✦ Book Your Session with Bhuvi
               </a>
             </div>
           </div>
-        )}
-      </header>
+        </section>
 
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* 2. FULL-BLEED PHOTOGRAPHIC HERO (Option 1: Visual Proof)   */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      <section id="hero" className="relative min-h-[85vh] sm:min-h-[90vh] flex items-center justify-center overflow-hidden">
-        
-        {/* Full-bleed high-res background image */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src={settings.hero_image_url}
-            alt="Bhuvi Mehandi Bridal Background"
-            className="w-full h-full object-cover object-center transform scale-105 transition-transform duration-1000"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#241E1A] via-[#241E1A]/65 to-[#241E1A]/40" />
-        </div>
+        {/* ================= REVIEWS & TESTIMONIALS ================= */}
+        <section className="section testimonial" id="reviews">
+          <div className="container">
+            <div className="section-heading">
+              <span className="eyebrow">Real Bride Love</span>
+              <h2>Cherished by Brides Across Udaipur</h2>
+              <p>
+                Read what real brides have to say about their wedding day henna experience with Bhuvi Mehandi.
+              </p>
+            </div>
 
-        {/* Hero Content Container */}
-        <div className="max-w-5xl mx-auto px-6 sm:px-10 relative z-10 text-center text-[#FAF7F2] py-20 space-y-7">
-          
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-white/20 bg-black/40 backdrop-blur-md shadow-lg">
-            <span className="w-2 h-2 rounded-full bg-[#A64B38] animate-pulse" />
-            <span className="text-[11px] uppercase tracking-[0.22em] text-[#EDE4DC] font-sans font-medium">
-              Bespoke Bridal & Event Mehandi Artistry
-            </span>
+            <div className="reviews-grid">
+              {currentReviews.map((rev, idx) => (
+                <div className="testimonial-card" key={idx}>
+                  <div className="stars">{'★'.repeat(rev.stars || 5)}</div>
+                  <p>"{rev.content}"</p>
+                  <div className="review-author">
+                    <strong>{rev.author}</strong>
+                    <span>{rev.role}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: '36px' }}>
+              <button className="btn btn-outline" onClick={() => setIsReviewModalOpen(true)}>
+                ✦ Share Your Bride Experience
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= BOOKING CONCIERGE ================= */}
+        <section className="section booking" id="booking">
+          <div className="container booking-grid">
+            <div className="booking-intro">
+              <span className="eyebrow">Book Your Appointment</span>
+              <h2>Let's create your dream bridal henna.</h2>
+              <p>
+                Reserve your date in advance to guarantee availability during wedding season. 
+                Fill out the form below, and we will instantly connect with you on WhatsApp with 
+                custom design options and package quotes.
+              </p>
+
+              <div className="booking-perks">
+                <div className="perk-item">
+                  <span className="perk-icon">⚡</span>
+                  <div>
+                    <strong>Instant WhatsApp Confirmation</strong>
+                    <span>Fast quotes & design consultations</span>
+                  </div>
+                </div>
+                <div className="perk-item">
+                  <span className="perk-icon">🌿</span>
+                  <div>
+                    <strong>Complimentary Aftercare Advice</strong>
+                    <span>Lemon-sugar spray & balm recipe</span>
+                  </div>
+                </div>
+                <div className="perk-item">
+                  <span className="perk-icon">📍</span>
+                  <div>
+                    <strong>Studio & Doorstep Service</strong>
+                    <span>Near MLSU, Udaipur & hotel travel</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="direct-contact-note">
+                <p><strong>Prefer a direct phone call?</strong></p>
+                <p>📞 Call Bhuvi: <a href="tel:+918094935632" style={{ color: 'var(--gold-light)', textDecoration: 'underline' }}>+91 8094935632</a></p>
+              </div>
+            </div>
+
+            <form className="booking-form" onSubmit={handleBookingSubmit}>
+              <div className="form-header">
+                <h3>Appointment Inquiry Form</h3>
+                <p>Fill details below to launch booking on WhatsApp</p>
+              </div>
+
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="name">Your Full Name *</label>
+                  <input
+                    type="text"
+                    id="name"
+                    required
+                    placeholder="e.g. Radhika Sharma"
+                    value={bookingData.name}
+                    onChange={(e) => setBookingData({ ...bookingData, name: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="phone">Mobile Number (10 Digits) *</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    required
+                    maxLength="10"
+                    pattern="[0-9]{10}"
+                    inputMode="numeric"
+                    placeholder="Enter 10-digit number"
+                    value={bookingData.phone}
+                    onChange={(e) => setBookingData({ ...bookingData, phone: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="email">Email Address (Optional)</label>
+                  <input
+                    type="email"
+                    id="email"
+                    placeholder="your@email.com"
+                    value={bookingData.email}
+                    onChange={(e) => setBookingData({ ...bookingData, email: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="event">Occasion / Event Type *</label>
+                  <select
+                    id="event"
+                    required
+                    value={bookingData.event}
+                    onChange={(e) => setBookingData({ ...bookingData, event: e.target.value })}
+                  >
+                    <option value="Bridal">Bridal Wedding</option>
+                    <option value="Engagement">Engagement / Roka</option>
+                    <option value="Baby Shower">Baby Shower / Godh Bharai</option>
+                    <option value="Festival">Festival (Karwa Chauth, Teej)</option>
+                    <option value="Group / Wedding">Sangeet / Family Group</option>
+                    <option value="Function">Special Celebration</option>
+                    <option value="Other">Other Occasion</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="date">Preferred Event Date *</label>
+                  <input
+                    type="date"
+                    id="date"
+                    required
+                    value={bookingData.date}
+                    onChange={(e) => setBookingData({ ...bookingData, date: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="time">Preferred Time Slot</label>
+                  <input
+                    type="time"
+                    id="time"
+                    value={bookingData.time}
+                    onChange={(e) => setBookingData({ ...bookingData, time: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group form-full">
+                  <label htmlFor="venue">Event Venue & City *</label>
+                  <input
+                    type="text"
+                    id="venue"
+                    required
+                    placeholder="e.g. Hotel / Resort Name, Area, Udaipur"
+                    value={bookingData.venue}
+                    onChange={(e) => setBookingData({ ...bookingData, venue: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="people">Estimated People / Guests</label>
+                  <input
+                    type="number"
+                    id="people"
+                    min="1"
+                    placeholder="e.g. 1 (Bride only) or 10"
+                    value={bookingData.people}
+                    onChange={(e) => setBookingData({ ...bookingData, people: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="design">Preferred Design Style</label>
+                  <select
+                    id="design"
+                    value={bookingData.design}
+                    onChange={(e) => setBookingData({ ...bookingData, design: e.target.value })}
+                  >
+                    <option value="Bridal">Royal Full Bridal</option>
+                    <option value="Arabic">Modern Arabic Trail</option>
+                    <option value="Rajasthani">Traditional Marwari Bharwa</option>
+                    <option value="Designer">Contemporary Geometric / Lace</option>
+                    <option value="Engagement">Delicate Mandala / Cuff</option>
+                    <option value="Simple">Minimalist / Simple</option>
+                    <option value="Not Sure">Need Artist Recommendation</option>
+                  </select>
+                </div>
+
+                <div className="form-group form-full">
+                  <label htmlFor="notes">Special Requests & Story Details</label>
+                  <textarea
+                    id="notes"
+                    placeholder="Mention any custom story motifs (doli, baraat, portraits, initials) or specific requirements..."
+                    value={bookingData.notes}
+                    onChange={(e) => setBookingData({ ...bookingData, notes: e.target.value })}
+                  ></textarea>
+                </div>
+              </div>
+
+              <button type="submit" className="btn btn-primary btn-submit">
+                <span>💬 Send Booking Inquiry on WhatsApp</span>
+              </button>
+
+              {bookingSubmitted && (
+                <div className="form-message" style={{ display: 'block' }}>
+                  Opening WhatsApp with your appointment details...
+                </div>
+              )}
+            </form>
+          </div>
+        </section>
+
+        {/* ================= FAQ ================= */}
+        <section className="section" id="faq">
+          <div className="container">
+            <div className="section-heading">
+              <span className="eyebrow">Got Questions?</span>
+              <h2>Frequently Asked Questions</h2>
+              <p>Everything you need to know before booking your bridal henna appointment.</p>
+            </div>
+
+            <div className="faq-list">
+              {[
+                {
+                  q: 'How far in advance should I book my wedding date?',
+                  a: 'For winter wedding dates (November to February) and auspicious Saya dates, we recommend booking 2 to 4 months in advance to secure your preferred date and time slot. We only take limited brides per day to ensure undivided attention.'
+                },
+                {
+                  q: 'Do you travel for destination weddings outside Udaipur?',
+                  a: 'Yes! Bhuvi travels across Rajasthan (Jaipur, Jodhpur, Kumbhalgarh, Nathdwara) and across India for destination weddings. Travel and accommodation arrangements are coordinated transparently during booking.'
+                },
+                {
+                  q: 'How long does a full royal bridal mehndi take?',
+                  a: 'A full bridal application (both hands up to elbows, front and back, plus feet up to mid-calf) typically takes 4 to 6 hours depending on the intricacy and portrait details. We take planned mini-breaks so the bride remains comfortable.'
+                },
+                {
+                  q: 'Is your henna 100% natural and safe for sensitive skin?',
+                  a: 'Yes, absolutely! We prepare fresh, homemade henna cones using triple-sifted organic Sojat henna powder, eucalyptus oil, tea tree oil, and lemon juice. Zero chemicals, zero black dye, zero PPD. It is 100% skin-safe and produces a deep, rich mahogany color within 48 hours.'
+                },
+                {
+                  q: 'What tips do you give to achieve the darkest stain?',
+                  a: 'Keep the henna on for 6 to 8 hours (or overnight). Apply a warm lemon-sugar syrup dab once dry, and scrape off gently without water. Keep hands warm with clove steam or natural balm for the first 24 hours. We provide full complimentary aftercare guidelines!'
+                }
+              ].map((faq, idx) => (
+                <div className={`faq ${activeFaq === idx ? 'active' : ''}`} key={idx}>
+                  <button className="faq-question" onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}>
+                    <span>{faq.q}</span>
+                    <span className="faq-icon">{activeFaq === idx ? '−' : '+'}</span>
+                  </button>
+                  {activeFaq === idx && (
+                    <div className="faq-answer" style={{ display: 'block' }}>
+                      <p>{faq.a}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ================= CONTACT ================= */}
+        <section className="section contact" id="contact">
+          <div className="container">
+            <div className="section-heading">
+              <span className="eyebrow">Direct Contact</span>
+              <h2>Let's Discuss Your Mehndi</h2>
+              <p>Have an immediate question or want to check date availability? Reach out directly.</p>
+            </div>
+
+            <div className="contact-grid">
+              <a className="contact-card" href="tel:+918094935632">
+                <div className="contact-icon">📞</div>
+                <div>
+                  <small>Call Direct</small>
+                  <strong>+91 8094935632</strong>
+                </div>
+              </a>
+
+              <a className="contact-card" href="https://wa.me/918094935632?text=Hello%20Bhuvi%20Mehandi,%20I%20would%20like%20to%20inquire%20about%20booking" target="_blank" rel="noopener">
+                <div className="contact-icon">💬</div>
+                <div>
+                  <small>WhatsApp Chat</small>
+                  <strong>+91 8094935632</strong>
+                </div>
+              </a>
+
+              <a className="contact-card" href="mailto:prajapatbhavna2003@gmail.com">
+                <div className="contact-icon">✉️</div>
+                <div>
+                  <small>Email Inquiries</small>
+                  <strong>prajapatbhavna2003@gmail.com</strong>
+                </div>
+              </a>
+
+              <div className="contact-card">
+                <div className="contact-icon">📍</div>
+                <div>
+                  <small>Studio Location</small>
+                  <strong>Near MLSU, Udaipur, Rajasthan</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= FINAL CTA ================= */}
+        <section className="final-cta">
+          <div className="container">
+            <span className="eyebrow">Your Big Day Deserves Regal Artistry</span>
+            <h2>Ready to book your bridal mehndi?</h2>
+            <p>
+              Dates for the upcoming wedding season fill up quickly. 
+              Connect with Bhuvi today and let's create something extraordinary together.
+            </p>
+            <a href="#booking" className="btn btn-primary">
+              ✦ Reserve Your Date on WhatsApp
+            </a>
+          </div>
+        </section>
+      </main>
+
+      {/* ================= FOOTER ================= */}
+      <footer>
+        <div className="container footer-grid">
+          <div>
+            <h3>Bhuvi Mehandi</h3>
+            <p>
+              Premier luxury bridal and designer henna artistry based in the royal city of Udaipur, Rajasthan. 
+              Dedicated to honoring your happiest celebrations with passion and pure organic henna.
+            </p>
+            <div className="socials">
+              <a href="https://instagram.com/bhuvi_mehandi_24" target="_blank" rel="noopener" aria-label="Instagram" className="social-instagram" title="Instagram @bhuvi_mehandi_24">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                Instagram
+              </a>
+              <a href="https://wa.me/918094935632" target="_blank" rel="noopener" aria-label="WhatsApp" className="social-whatsapp" title="WhatsApp +91 8094935632">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                WhatsApp
+              </a>
+            </div>
           </div>
 
-          {/* Main Headline */}
-          <h1 className="font-editorial text-5xl sm:text-7xl lg:text-8xl font-normal leading-[1.04] tracking-[-0.01em] drop-shadow-md">
-            {settings.headline}
-          </h1>
+          <div>
+            <h4>Artistry Styles</h4>
+            <ul className="footer-links">
+              <li><a href="#services">Royal Bridal Mehndi</a></li>
+              <li><a href="#services">Modern Arabic Henna</a></li>
+              <li><a href="#services">Traditional Rajasthani</a></li>
+              <li><a href="#services">Contemporary Designer</a></li>
+              <li><a href="#services">Sangeet & Group Events</a></li>
+            </ul>
+          </div>
 
-          {/* Subtext */}
-          <p className="text-base sm:text-lg text-[#EDE4DC] font-light max-w-2xl mx-auto leading-relaxed font-sans drop-shadow">
-            {settings.subheadline}
-          </p>
+          <div>
+            <h4>Navigation</h4>
+            <ul className="footer-links">
+              <li><a href="#home">Home</a></li>
+              <li><a href="#portfolio">Design Gallery</a></li>
+              <li><a href="#about">About Bhuvi</a></li>
+              <li><a href="#reviews">Bride Reviews</a></li>
+              <li><a href="#faq">FAQ</a></li>
+              <li><a href="#booking">Book Appointment</a></li>
+            </ul>
+          </div>
 
-          {/* Dual Action CTAs */}
-          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 font-sans">
-            <a
-              href={createWhatsAppUrl({
-                phone: settings.whatsapp_phone,
-                eventType: 'Bridal Henna Inquiry',
-                customNote: 'Namaste Bhuvi! I am inquiring from your website hero section. Please confirm date availability.'
-              })}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#A64B38] hover:bg-[#8A3B2A] text-[#FAF7F2] font-bold text-xs uppercase tracking-[0.18em] shadow-xl hover:scale-[1.02] transition-transform duration-300"
-            >
-              Check Date on WhatsApp Concierge
-            </a>
-
-            <button
-              onClick={() => scrollTo('builder')}
-              className="w-full sm:w-auto px-8 py-4 rounded-full border border-white/30 bg-black/30 backdrop-blur-md hover:bg-black/50 text-[#FAF7F2] text-xs uppercase tracking-[0.18em] transition-all duration-300 cursor-pointer flex items-center justify-center gap-2"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              Custom Henna Calculator
+          <div>
+            <h4>Studio & Booking</h4>
+            <p style={{ color: 'var(--text-muted)', fontSize: '14px', lineHeight: 1.7, marginBottom: '14px' }}>
+              📍 Near MLSU Campus, Udaipur, Rajasthan<br />
+              📞 <a href="tel:+918094935632" style={{ color: 'var(--gold-light)' }}>+91 8094935632</a><br />
+              ✉️ <a href="mailto:prajapatbhavna2003@gmail.com" style={{ color: 'var(--gold-light)' }}>prajapatbhavna2003@gmail.com</a>
+            </p>
+            <button className="btn btn-outline" style={{ fontSize: '12px', padding: '6px 14px' }} onClick={() => setIsAdminModalOpen(true)}>
+              🔒 Studio CMS Login
             </button>
           </div>
-
-          {/* Flat Lining Numerals Stats Strip */}
-          <div className="pt-10 border-t border-white/15 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-3xl mx-auto font-sans">
-            <div>
-              <span className="num-lining font-editorial text-3xl sm:text-4xl text-[#FAF7F2] font-bold block">100%</span>
-              <span className="text-[10px] uppercase tracking-[0.18em] text-[#D9CEC5] mt-0.5 block">Organic Sojat</span>
-            </div>
-            <div>
-              <span className="num-lining font-editorial text-3xl sm:text-4xl text-[#FAF7F2] font-bold block">1,200+</span>
-              <span className="text-[10px] uppercase tracking-[0.18em] text-[#D9CEC5] mt-0.5 block">Brides Adorned</span>
-            </div>
-            <div>
-              <span className="num-lining font-editorial text-3xl sm:text-4xl text-[#FAF7F2] font-bold block">48h</span>
-              <span className="text-[10px] uppercase tracking-[0.18em] text-[#D9CEC5] mt-0.5 block">Dark Stain Peak</span>
-            </div>
-            <div>
-              <span className="num-lining font-editorial text-3xl sm:text-4xl text-[#FAF7F2] font-bold block">0%</span>
-              <span className="text-[10px] uppercase tracking-[0.18em] text-[#D9CEC5] mt-0.5 block">Chemicals / PPD</span>
-            </div>
-          </div>
-
         </div>
-      </section>
 
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* 3. EVENT SERVICES & PACKAGES (Large Visual Cards)          */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      <section id="services" className="py-24 sm:py-32 bg-[#EDE4DC] border-t border-b border-[#D9CEC5]">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10">
-          
-          {/* Section Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 pb-6 border-b border-[#D9CEC5]">
-            <div>
-              <span className="text-xs uppercase tracking-[0.25em] text-[#A64B38] font-sans font-bold block mb-2">
-                Celebration Offerings
-              </span>
-              <h2 className="font-editorial text-4xl sm:text-6xl text-[#241E1A]">
-                Services by Event
-              </h2>
-            </div>
-
-            {/* Filter Tabs */}
-            <div className="flex flex-wrap gap-2 mt-6 md:mt-0 font-sans text-xs uppercase tracking-[0.16em]">
-              {['All', 'Bridal', 'Engagement', 'Arabic', 'Traditional', 'Baby Shower', 'Family & Guests'].map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveServiceTab(tab)}
-                  className={`px-4 py-2 rounded-full border transition-all cursor-pointer shadow-sm ${
-                    activeServiceTab === tab
-                      ? 'bg-[#A64B38] text-[#FAF7F2] border-[#A64B38] font-bold'
-                      : 'bg-[#F5EFEB] text-[#6E645D] border-[#D9CEC5] hover:text-[#241E1A]'
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Large Visual Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredServices.map(service => {
-              const waUrl = createWhatsAppUrl({
-                phone: settings.whatsapp_phone,
-                eventType: service.event_type,
-                service: service.name,
-                customNote: `Hi Bhuvi! I would like to inquire about booking the "${service.name}" (${service.price_starting}) for my upcoming ${service.event_type}.`
-              });
-
-              return (
-                <div
-                  key={service.id}
-                  className="group rounded-2xl bg-[#FFFFFF] border border-[#D9CEC5] overflow-hidden flex flex-col justify-between hover:shadow-xl transition-all duration-400 hover:-translate-y-1 shadow-sm"
-                >
-                  <div>
-                    {/* Visual Card Image */}
-                    <div className="relative aspect-[16/10] overflow-hidden bg-stone-900">
-                      <img
-                        src={service.image_url}
-                        alt={service.name}
-                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-75" />
-                      
-                      <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/70 backdrop-blur-sm text-[10px] uppercase tracking-[0.18em] font-sans text-[#FAF7F2]">
-                        {service.event_type}
-                      </div>
-
-                      <div className="num-lining absolute bottom-3 right-3 px-3 py-1 rounded-xl bg-black/85 text-xs font-sans text-[#FAF7F2] font-semibold">
-                        From {service.price_starting}
-                      </div>
-                    </div>
-
-                    {/* Card Content */}
-                    <div className="p-6 space-y-4">
-                      <div className="flex items-center justify-between text-xs font-sans text-[#6E645D]">
-                        <span className="text-[#A64B38] font-semibold uppercase tracking-wider">{service.badge}</span>
-                        <span className="num-lining flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {service.duration}</span>
-                      </div>
-
-                      <h3 className="font-editorial text-2xl text-[#241E1A] group-hover:text-[#A64B38] transition-colors leading-tight">
-                        {service.name}
-                      </h3>
-
-                      <p className="text-xs font-sans text-[#6E645D] leading-relaxed line-clamp-3">
-                        {service.description}
-                      </p>
-
-                      <ul className="space-y-1.5 pt-3 border-t border-[#D9CEC5]">
-                        {(service.includes || []).slice(0, 3).map((item, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-[11px] font-sans text-[#241E1A]">
-                            <span className="text-[#A64B38] mt-0.5">•</span>
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Card Action Button */}
-                  <div className="p-6 pt-0">
-                    <a
-                      href={waUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full py-3 rounded-xl bg-[#EDE4DC] hover:bg-[#A64B38] text-[#241E1A] hover:text-[#FAF7F2] text-xs uppercase tracking-[0.16em] font-sans font-semibold flex items-center justify-center gap-2 transition-all duration-300"
-                    >
-                      <span>Book on WhatsApp</span>
-                      <ArrowUpRight className="w-4 h-4" />
-                    </a>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
+        <div className="container footer-bottom">
+          <p>© {new Date().getFullYear()} Bhuvi Mehandi. All Rights Reserved. Crafted for Royal Brides.</p>
         </div>
-      </section>
+      </footer>
 
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* 4. INTERACTIVE BESPOKE HENNA CALCULATOR / ESTIMATOR         */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      <section id="builder" className="py-24 sm:py-32 bg-[#F5EFEB] relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 relative z-10">
-          
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-xs uppercase tracking-[0.25em] text-[#A64B38] font-sans font-bold block mb-2">
-              Interactive Atelier Studio
-            </span>
-            <h2 className="font-editorial text-4xl sm:text-6xl text-[#241E1A] mb-4">
-              Bespoke Henna Calculator
-            </h2>
-            <p className="text-sm text-[#6E645D] font-sans leading-relaxed">
-              Tailor every element of your ceremony — from hand lengths to custom portraiture and guest party count. 
-              Receive real-time duration and cone estimations instantly.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-            
-            {/* Left Configuration Panel */}
-            <div className="lg:col-span-7 bg-[#FFFFFF] p-8 sm:p-10 rounded-3xl border border-[#D9CEC5] space-y-8 shadow-lg">
-              
-              {/* Step 1: Hand Length */}
-              <div>
-                <label className="block text-xs uppercase tracking-[0.18em] text-[#A64B38] font-sans font-bold mb-3">
-                  1. Bride Hand Coverage Length
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-sans">
-                  {[
-                    { id: 'wrist', label: 'Wrist', time: '~2 hrs' },
-                    { id: 'forearm', label: 'Mid-Forearm', time: '~3.5 hrs' },
-                    { id: 'elbow', label: 'Elbow Length', time: '~5 hrs' },
-                    { id: 'shoulder', label: 'Shoulder Bridal', time: '~7 hrs' }
-                  ].map(opt => (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => setBuilderConfig({ ...builderConfig, handLength: opt.id })}
-                      className={`p-3 rounded-xl border text-center transition-all cursor-pointer shadow-sm ${
-                        builderConfig.handLength === opt.id
-                          ? 'border-[#A64B38] bg-[#EDE4DC] text-[#241E1A] font-bold'
-                          : 'border-[#D9CEC5] bg-[#FFFFFF] text-[#6E645D] hover:border-[#A64B38]/50'
-                      }`}
-                    >
-                      <p className="text-xs font-semibold">{opt.label}</p>
-                      <p className="num-lining text-[10px] text-[#6E645D] mt-0.5">{opt.time}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Step 2: Feet Length */}
-              <div>
-                <label className="block text-xs uppercase tracking-[0.18em] text-[#A64B38] font-sans font-bold mb-3">
-                  2. Bride Feet & Calves Coverage
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-sans">
-                  {[
-                    { id: 'none', label: 'Hands Only', time: '0 hrs' },
-                    { id: 'anklet', label: 'Anklet Payal', time: '~1 hr' },
-                    { id: 'mid-calf', label: 'Mid-Calf Jaal', time: '~2 hrs' },
-                    { id: 'knee', label: 'Full Knee Royal', time: '~3.5 hrs' }
-                  ].map(opt => (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => setBuilderConfig({ ...builderConfig, feetLength: opt.id })}
-                      className={`p-3 rounded-xl border text-center transition-all cursor-pointer shadow-sm ${
-                        builderConfig.feetLength === opt.id
-                          ? 'border-[#A64B38] bg-[#EDE4DC] text-[#241E1A] font-bold'
-                          : 'border-[#D9CEC5] bg-[#FFFFFF] text-[#6E645D] hover:border-[#A64B38]/50'
-                      }`}
-                    >
-                      <p className="text-xs font-semibold">{opt.label}</p>
-                      <p className="num-lining text-[10px] text-[#6E645D] mt-0.5">{opt.time}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Step 3: Signature Storyline Elements */}
-              <div>
-                <label className="block text-xs uppercase tracking-[0.18em] text-[#A64B38] font-sans font-bold mb-3">
-                  3. Signature Storyline Add-ons
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-sans">
-                  <button
-                    type="button"
-                    onClick={() => setBuilderConfig({ ...builderConfig, hasPortrait: !builderConfig.hasPortrait })}
-                    className={`p-4 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer shadow-sm ${
-                      builderConfig.hasPortrait
-                        ? 'border-[#A64B38] bg-[#EDE4DC] text-[#241E1A]'
-                        : 'border-[#D9CEC5] bg-[#FFFFFF] text-[#6E645D]'
-                    }`}
-                  >
-                    <div>
-                      <p className="text-xs font-semibold">Dulha-Dulhan Handdrawn Portrait</p>
-                      <p className="num-lining text-[10px] text-[#6E645D]">Temple archway figurines (+₹1,500)</p>
-                    </div>
-                    <CheckCircle
-                      className={`w-4 h-4 flex-shrink-0 ${builderConfig.hasPortrait ? 'text-[#A64B38]' : 'text-[#D9CEC5]'}`}
-                    />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setBuilderConfig({ ...builderConfig, hasHashtag: !builderConfig.hasHashtag })}
-                    className={`p-4 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer shadow-sm ${
-                      builderConfig.hasHashtag
-                        ? 'border-[#A64B38] bg-[#EDE4DC] text-[#241E1A]'
-                        : 'border-[#D9CEC5] bg-[#FFFFFF] text-[#6E645D]'
-                    }`}
-                  >
-                    <div>
-                      <p className="text-xs font-semibold">Wedding Hashtag & Date Weaving</p>
-                      <p className="num-lining text-[10px] text-[#6E645D]">Hidden monogram typography (+₹500)</p>
-                    </div>
-                    <CheckCircle
-                      className={`w-4 h-4 flex-shrink-0 ${builderConfig.hasHashtag ? 'text-[#A64B38]' : 'text-[#D9CEC5]'}`}
-                    />
-                  </button>
-                </div>
-              </div>
-
-              {/* Step 4: Guest / Bridesmaid Count Slider */}
-              <div>
-                <div className="flex justify-between items-center mb-2 font-sans">
-                  <label className="text-xs uppercase tracking-[0.18em] text-[#A64B38] font-bold">
-                    4. Bridesmaids & Family Guests ({builderConfig.guestCount} Guests)
-                  </label>
-                  <span className="num-lining text-xs font-semibold text-[#241E1A]">~₹{builderConfig.guestCount * 400}</span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="50"
-                  step="5"
-                  value={builderConfig.guestCount}
-                  onChange={(e) => setBuilderConfig({ ...builderConfig, guestCount: parseInt(e.target.value) })}
-                  className="w-full accent-[#A64B38] h-2 rounded-lg cursor-pointer bg-[#EDE4DC]"
-                />
-                <div className="num-lining flex justify-between text-[10px] text-[#6E645D] font-sans mt-1">
-                  <span>Bride only (0)</span>
-                  <span>Intimate (15)</span>
-                  <span>Grand Sangeet (50+)</span>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Right Live Estimate Summary Card */}
-            <div className="lg:col-span-5 rounded-3xl bg-[#FFFFFF] p-8 sm:p-10 border border-[#D9CEC5] shadow-2xl relative">
-              <div className="space-y-6">
-                
-                <div className="flex items-center justify-between border-b border-[#D9CEC5] pb-4">
-                  <span className="text-xs uppercase tracking-[0.18em] text-[#A64B38] font-sans font-bold">
-                    Quotation Estimate
-                  </span>
-                  <span className="text-[11px] px-3 py-1 rounded-full bg-[#EDE4DC] text-[#A64B38] font-sans font-semibold">
-                    Bespoke Atelier
-                  </span>
-                </div>
-
-                <div>
-                  <span className="text-xs uppercase tracking-wider text-[#6E645D] font-sans block">Estimated Investment</span>
-                  <span className="num-lining font-editorial text-4xl sm:text-5xl text-[#241E1A] block mt-1 font-bold">
-                    ₹{calculation.price.toLocaleString('en-IN')}
-                  </span>
-                  <span className="text-[11px] text-[#6E645D] font-sans">*Includes organic cones, sealant spray & travel consult</span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-[#D9CEC5] font-sans">
-                  <div className="p-3.5 rounded-xl bg-[#EDE4DC] border border-[#D9CEC5]">
-                    <span className="text-[10px] uppercase tracking-wider text-[#6E645D] block">Application Time</span>
-                    <span className="num-lining text-sm font-semibold text-[#241E1A] mt-0.5 block flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-[#A64B38]" />
-                      ~{calculation.hours} Hours
-                    </span>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-[#EDE4DC] border border-[#D9CEC5]">
-                    <span className="text-[10px] uppercase tracking-wider text-[#6E645D] block">Organic Cones</span>
-                    <span className="num-lining text-sm font-semibold text-[#241E1A] mt-0.5 block flex items-center gap-1.5">
-                      <ShieldCheck className="w-3.5 h-3.5 text-[#A64B38]" />
-                      {calculation.conesCount} Cones Fresh
-                    </span>
-                  </div>
-                </div>
-
-                {/* Direct WhatsApp Quote Button */}
-                <div className="pt-4">
-                  <a
-                    href={createWhatsAppUrl({
-                      phone: settings.whatsapp_phone,
-                      eventType: 'Custom Henna Package Quote',
-                      customNote: `Hi Bhuvi! I used your Bespoke Henna Calculator on the website:\n- Hand Length: ${builderConfig.handLength}\n- Feet Length: ${builderConfig.feetLength}\n- Portrait: ${builderConfig.hasPortrait ? 'Yes' : 'No'}\n- Hashtag: ${builderConfig.hasHashtag ? 'Yes' : 'No'}\n- Guests: ${builderConfig.guestCount}\n- Est. Investment: ₹${calculation.price.toLocaleString('en-IN')}\n\nPlease confirm date availability!`
-                    })}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-4 rounded-full bg-[#A64B38] hover:bg-[#8A3B2A] text-[#FAF7F2] font-bold text-xs uppercase tracking-[0.18em] font-sans text-center flex items-center justify-center gap-2 shadow-lg hover:scale-[1.01] transition-all"
-                  >
-                    <span>Send Custom Specs to WhatsApp</span>
-                    <ArrowUpRight className="w-4 h-4" />
-                  </a>
-                </div>
-
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* 5. PORTFOLIO ARCHIVE GALLERY (Dynamic Supabase Sync)        */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      <section id="portfolio" className="py-24 sm:py-32 bg-[#EDE4DC] border-t border-b border-[#D9CEC5]">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10">
-          
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 pb-6 border-b border-[#D9CEC5]">
-            <div>
-              <span className="text-xs uppercase tracking-[0.25em] text-[#A64B38] font-sans font-bold block mb-2">
-                Curated Works
-              </span>
-              <h2 className="font-editorial text-4xl sm:text-6xl text-[#241E1A]">
-                Atelier Archive
-              </h2>
-            </div>
-
-            {/* Category Filter Pills */}
-            <div className="flex flex-wrap gap-2 font-sans text-xs uppercase tracking-[0.16em] mt-6 md:mt-0">
-              {['all', 'bridal', 'arabic', 'rajasthani', 'feet', 'engagement', 'minimalist'].map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveGalleryTab(cat)}
-                  className={`px-4 py-2 rounded-full border transition-all cursor-pointer shadow-sm ${
-                    activeGalleryTab === cat
-                      ? 'bg-[#A64B38] text-[#FAF7F2] border-[#A64B38] font-bold'
-                      : 'bg-[#F5EFEB] text-[#6E645D] border-[#D9CEC5] hover:text-[#241E1A]'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Grid of Designs */}
-          {loadingData ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map(i => (
-                <div key={i} className="aspect-[3/4] rounded-2xl bg-[#FFFFFF] animate-pulse" />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {filteredDesigns.map(design => (
-                <div
-                  key={design.id}
-                  onClick={() => setSelectedDesign(design)}
-                  className="group relative rounded-2xl overflow-hidden border border-[#D9CEC5] bg-[#FFFFFF] cursor-pointer hover:shadow-xl transition-all duration-400 hover:-translate-y-1 shadow-sm"
-                >
-                  <div className="relative aspect-[3/4] overflow-hidden bg-stone-900">
-                    <img
-                      src={design.image_url}
-                      alt={design.title}
-                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
-
-                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-sm text-[9px] uppercase tracking-[0.18em] font-sans text-amber-200">
-                      {design.tag || design.category}
-                    </div>
-
-                    <div className="absolute bottom-3 left-3 right-3 text-[#FAF7F2]">
-                      <h4 className="font-editorial text-lg truncate">
-                        {design.title}
-                      </h4>
-                      <p className="num-lining text-[11px] font-sans text-[#EDE4DC] mt-0.5">
-                        {design.price_range || 'Custom Quote'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* 6. THE 48-HOUR STAIN OXIDATION TIMELINE                     */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      <section id="stain" className="py-24 sm:py-32 bg-[#F5EFEB] relative">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10">
-          
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-xs uppercase tracking-[0.25em] text-[#A64B38] font-sans font-bold block mb-2">
-              The Chemistry of Organic Henna
-            </span>
-            <h2 className="font-editorial text-4xl sm:text-6xl text-[#241E1A] mb-4">
-              The Stain Oxidation Journey
-            </h2>
-            <p className="text-sm text-[#6E645D] font-sans leading-relaxed">
-              Pure Sojat henna contains natural lawsone molecules that react gently with air and body heat over 48 hours to create our signature deep mahogany stain.
-            </p>
-          </div>
-
-          {/* Stepper Control */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10 font-sans">
-            {STAIN_STAGES.map((st, idx) => (
-              <button
-                key={idx}
-                onClick={() => setStainStage(idx)}
-                className={`p-4 rounded-2xl border transition-all text-center cursor-pointer shadow-sm ${
-                  stainStage === idx
-                    ? 'border-[#A64B38] bg-[#FFFFFF] shadow-md'
-                    : 'border-[#D9CEC5] bg-[#EDE4DC] text-[#6E645D] hover:border-[#A64B38]/50'
-                }`}
-              >
-                <div
-                  className="w-6 h-6 rounded-full mx-auto mb-2 border border-black/20 shadow-inner"
-                  style={{ backgroundColor: st.colorHex }}
-                />
-                <p className="num-lining text-xs font-semibold text-[#241E1A]">{st.hours}</p>
-                <p className="text-[10px] text-[#A64B38] mt-0.5 font-medium">{st.badge}</p>
-              </button>
-            ))}
-          </div>
-
-          {/* Active Stage Showcase Card */}
-          <div className="rounded-3xl border border-[#D9CEC5] bg-[#FFFFFF] p-8 sm:p-12 grid grid-cols-1 md:grid-cols-12 gap-8 items-center shadow-lg">
-            <div className="md:col-span-4 flex flex-col items-center text-center p-6 rounded-2xl bg-[#EDE4DC] border border-[#D9CEC5]">
-              <div
-                className="w-24 h-24 rounded-full border-4 border-[#A64B38]/30 shadow-2xl mb-4"
-                style={{ backgroundColor: STAIN_STAGES[stainStage].colorHex }}
-              />
-              <span className="font-editorial text-2xl text-[#241E1A]">{STAIN_STAGES[stainStage].title}</span>
-              <span className="text-xs text-[#A64B38] font-sans font-semibold mt-1">{STAIN_STAGES[stainStage].badge}</span>
-            </div>
-
-            <div className="md:col-span-8 space-y-4">
-              <h3 className="font-editorial text-3xl text-[#241E1A]">
-                {STAIN_STAGES[stainStage].title}
-              </h3>
-              <p className="text-sm text-[#6E645D] font-sans leading-relaxed">
-                {STAIN_STAGES[stainStage].description}
-              </p>
-
-              <div className="p-4 rounded-xl bg-[#EDE4DC] border border-[#D9CEC5]">
-                <p className="text-xs font-semibold text-[#A64B38] uppercase tracking-wider font-sans mb-1 flex items-center gap-1.5">
-                  <Flame className="w-3.5 h-3.5" />
-                  Atelier Aftercare Ritual
-                </p>
-                <p className="text-xs text-[#241E1A] font-sans leading-relaxed">
-                  {STAIN_STAGES[stainStage].aftercareTip}
-                </p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* 7. REAL BRIDE REVIEWS (With User-Only Edit / Delete)        */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      <section id="reviews" className="py-24 sm:py-32 bg-[#EDE4DC] border-t border-b border-[#D9CEC5]">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10">
-          
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 pb-6 border-b border-[#D9CEC5]">
-            <div>
-              <span className="text-xs uppercase tracking-[0.25em] text-[#A64B38] font-sans font-bold block mb-2">
-                Client Testimonials
-              </span>
-              <h2 className="font-editorial text-4xl sm:text-6xl text-[#241E1A]">
-                Words from Real Brides
-              </h2>
-            </div>
-
-            {/* "+ Write a Review" Button */}
-            <div className="mt-6 md:mt-0 font-sans">
-              <button
+      {/* ================= LIGHTBOX MODAL ================= */}
+      {lightboxItem && (
+        <div className="lightbox active" onClick={() => setLightboxItem(null)}>
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <button className="lightbox-close" onClick={() => setLightboxItem(null)}>✕</button>
+            <img src={lightboxItem.image_url || lightboxItem.src} alt={lightboxItem.title} />
+            <div className="lightbox-caption">
+              <h3>{lightboxItem.title}</h3>
+              <p>{lightboxItem.category_label || lightboxItem.category}</p>
+              <a
+                href="#booking"
+                className="btn btn-primary"
+                style={{ marginTop: '12px', display: 'inline-block' }}
                 onClick={() => {
-                  setEditingReviewId(null);
-                  setReviewForm({ client_name: '', rating: 5, event_type: 'Bridal Mehandi', location: '', comment: '' });
-                  setReviewModalOpen(true);
+                  setBookingData((prev) => ({ ...prev, notes: `Inquiring about design: ${lightboxItem.title}` }));
+                  setLightboxItem(null);
                 }}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#A64B38] hover:bg-[#8A3B2A] text-[#FAF7F2] text-xs font-bold uppercase tracking-wider shadow-md cursor-pointer transition-all hover:scale-[1.02]"
               >
-                <Plus className="w-4 h-4" />
-                <span>Write a Bride Review</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Reviews Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {reviews.map(rev => {
-              const isOwner = rev.author_token === authorToken;
-
-              return (
-                <div
-                  key={rev.id}
-                  className="p-6 rounded-2xl bg-[#FFFFFF] border border-[#D9CEC5] flex flex-col justify-between space-y-4 shadow-sm relative group"
-                >
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <div className="flex gap-0.5">
-                        {[1, 2, 3, 4, 5].map(i => (
-                          <Star
-                            key={i}
-                            className={`w-3.5 h-3.5 ${i <= rev.rating ? 'fill-amber-500 text-amber-500' : 'text-stone-300'}`}
-                          />
-                        ))}
-                      </div>
-
-                      {/* Author Edit/Delete Controls (Only visible to review creator) */}
-                      {isOwner && (
-                        <div className="flex items-center gap-1.5 opacity-90">
-                          <button
-                            onClick={() => handleOpenEditReview(rev)}
-                            className="p-1 text-stone-500 hover:text-[#A64B38] cursor-pointer"
-                            title="Edit your review"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteReview(rev.id, false)}
-                            className="p-1 text-stone-500 hover:text-red-600 cursor-pointer"
-                            title="Delete your review"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    <p className="text-xs font-sans text-[#6E645D] leading-relaxed italic">
-                      "{rev.comment}"
-                    </p>
-                  </div>
-
-                  <div className="pt-3 border-t border-[#D9CEC5]">
-                    <div className="flex justify-between items-baseline">
-                      <p className="font-editorial text-lg text-[#241E1A] font-bold">{rev.client_name}</p>
-                      {isOwner && (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-sans font-semibold">
-                          Your Review
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[10px] text-[#A64B38] font-sans font-semibold mt-0.5">
-                      {rev.event_type} • {rev.location}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* 8. VIP DATE RESERVATION & INQUIRY FORM                      */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      <section id="inquire" className="py-24 sm:py-32 bg-[#F5EFEB]">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
-            
-            {/* Left Info */}
-            <div className="lg:col-span-5 space-y-6">
-              <span className="text-xs uppercase tracking-[0.25em] text-[#A64B38] font-sans font-bold block">
-                Direct Booking
-              </span>
-              <h2 className="font-editorial text-4xl sm:text-6xl text-[#241E1A]">
-                Reserve Your Date
-              </h2>
-              <p className="text-sm text-[#6E645D] font-sans leading-relaxed">
-                Due to the intimate, hand-sketched nature of our bridal work, we accept a limited number of weddings per season.
-                Submit your celebration details below for immediate confirmation and custom quote.
-              </p>
-
-              <div className="p-6 rounded-2xl bg-[#FFFFFF] border border-[#D9CEC5] space-y-3 font-sans text-xs shadow-sm">
-                <div>
-                  <span className="text-[#6E645D] uppercase tracking-wider block text-[10px]">Instant WhatsApp Line</span>
-                  <span className="num-lining text-sm font-semibold text-[#A64B38]">+{settings.whatsapp_phone}</span>
-                </div>
-                <div>
-                  <span className="text-[#6E645D] uppercase tracking-wider block text-[10px]">Studio Location</span>
-                  <span className="text-sm text-[#241E1A]">{settings.studio_location}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Form */}
-            <div className="lg:col-span-7 bg-[#FFFFFF] p-8 sm:p-12 rounded-3xl border border-[#D9CEC5] shadow-xl">
-              {formSuccess ? (
-                <div className="py-12 text-center space-y-4 font-sans">
-                  <CheckCircle className="w-12 h-12 text-[#A64B38] mx-auto" />
-                  <h3 className="font-editorial text-3xl text-[#241E1A]">Inquiry Received</h3>
-                  <p className="text-xs text-[#6E645D] max-w-sm mx-auto">
-                    Your date inquiry has been registered in the Atelier database. A WhatsApp chat has also opened to finalize your booking directly.
-                  </p>
-                  <button
-                    onClick={() => setFormSuccess(false)}
-                    className="text-xs uppercase tracking-widest text-[#A64B38] border-b border-[#A64B38] pb-1 cursor-pointer font-semibold"
-                  >
-                    Submit Another Inquiry
-                  </button>
-                </div>
-              ) : (
-                <form onSubmit={handleBookingSubmit} className="space-y-6 font-sans">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[10px] uppercase tracking-wider text-[#6E645D] mb-1.5 font-semibold">Your Name *</label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.name}
-                        onChange={e => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="e.g. Radhika Shah"
-                        className="w-full px-4 py-3 rounded-xl bg-[#F5EFEB] border border-[#D9CEC5] text-sm text-[#241E1A] outline-none focus:border-[#A64B38]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] uppercase tracking-wider text-[#6E645D] mb-1.5 font-semibold">Phone / WhatsApp *</label>
-                      <input
-                        type="tel"
-                        required
-                        value={formData.phone}
-                        onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                        placeholder="+91 98765 43210"
-                        className="num-lining w-full px-4 py-3 rounded-xl bg-[#F5EFEB] border border-[#D9CEC5] text-sm text-[#241E1A] outline-none focus:border-[#A64B38]"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[10px] uppercase tracking-wider text-[#6E645D] mb-1.5 font-semibold">Event Date *</label>
-                      <input
-                        type="date"
-                        required
-                        value={formData.eventDate}
-                        onChange={e => setFormData({ ...formData, eventDate: e.target.value })}
-                        className="num-lining w-full px-4 py-3 rounded-xl bg-[#F5EFEB] border border-[#D9CEC5] text-sm text-[#241E1A] outline-none focus:border-[#A64B38]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] uppercase tracking-wider text-[#6E645D] mb-1.5 font-semibold">Event Type</label>
-                      <select
-                        value={formData.eventType}
-                        onChange={e => setFormData({ ...formData, eventType: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl bg-[#F5EFEB] border border-[#D9CEC5] text-sm text-[#241E1A] outline-none cursor-pointer focus:border-[#A64B38]"
-                      >
-                        <option>Royal Bridal Celebration</option>
-                        <option>Engagement & Roka Soirée</option>
-                        <option>Sangeet & Bridesmaids Party</option>
-                        <option>Contemporary Arabic</option>
-                        <option>Mom-to-Be Godh Bharai</option>
-                        <option>Destination Wedding</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-wider text-[#6E645D] mb-1.5 font-semibold">City & Venue Location</label>
-                    <input
-                      type="text"
-                      value={formData.cityVenue}
-                      onChange={e => setFormData({ ...formData, cityVenue: e.target.value })}
-                      placeholder="e.g. Grand Hyatt / The Leela Palace"
-                      className="w-full px-4 py-3 rounded-xl bg-[#F5EFEB] border border-[#D9CEC5] text-sm text-[#241E1A] outline-none focus:border-[#A64B38]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] uppercase tracking-wider text-[#6E645D] mb-1.5 font-semibold">Special Requests or Design Vision</label>
-                    <textarea
-                      rows={3}
-                      value={formData.message}
-                      onChange={e => setFormData({ ...formData, message: e.target.value })}
-                      placeholder="Share lehenga shades, customized story moments or guest count..."
-                      className="w-full px-4 py-3 rounded-xl bg-[#F5EFEB] border border-[#D9CEC5] text-sm text-[#241E1A] outline-none resize-none focus:border-[#A64B38]"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={formSubmitting}
-                    className="w-full py-4 rounded-full bg-[#A64B38] hover:bg-[#8A3B2A] text-[#FAF7F2] font-bold text-xs uppercase tracking-[0.18em] transition-all disabled:opacity-50 cursor-pointer shadow-lg hover:scale-[1.01]"
-                  >
-                    {formSubmitting ? 'Registering...' : 'Submit Inquiry & Open WhatsApp →'}
-                  </button>
-                </form>
-              )}
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* 9. LIGHTBOX PREVIEW MODAL                                   */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      {selectedDesign && (
-        <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-6"
-          onClick={() => setSelectedDesign(null)}
-        >
-          <div
-            className="bg-[#FFFFFF] border border-[#D9CEC5] rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col md:flex-row shadow-2xl"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="md:w-1/2 aspect-square md:aspect-auto bg-stone-900">
-              <img
-                src={selectedDesign.image_url}
-                alt={selectedDesign.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            
-            <div className="md:w-1/2 p-8 flex flex-col justify-between overflow-y-auto font-sans">
-              <div className="space-y-4">
-                <div className="flex justify-between items-start">
-                  <span className="text-[10px] uppercase tracking-[0.18em] px-3 py-1 rounded-full bg-[#EDE4DC] text-[#A64B38] font-semibold">
-                    {selectedDesign.category}
-                  </span>
-                  <button
-                    onClick={() => setSelectedDesign(null)}
-                    className="text-xs uppercase tracking-widest text-[#6E645D] hover:text-[#241E1A] cursor-pointer"
-                  >
-                    Close [×]
-                  </button>
-                </div>
-
-                <h3 className="font-editorial text-3xl text-[#241E1A]">
-                  {selectedDesign.title}
-                </h3>
-
-                <p className="text-xs font-sans text-[#6E645D] leading-relaxed">
-                  {selectedDesign.description || 'Intricate bespoke henna composition handcrafted by Bhuvi.'}
-                </p>
-
-                {selectedDesign.price_range && (
-                  <div className="pt-2">
-                    <span className="text-[10px] uppercase tracking-wider text-[#6E645D] block">Investment</span>
-                    <span className="num-lining font-editorial text-2xl text-[#241E1A] font-bold">{selectedDesign.price_range}</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="pt-6 border-t border-[#D9CEC5]">
-                <a
-                  href={createWhatsAppUrl({
-                    phone: settings.whatsapp_phone,
-                    eventType: 'Archive Design Inquiry',
-                    designCode: selectedDesign.title,
-                    customNote: `Hi Bhuvi! I love the "${selectedDesign.title}" design from your portfolio archive. Can you share availability for this style?`
-                  })}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-3.5 rounded-full bg-[#A64B38] hover:bg-[#8A3B2A] text-[#FAF7F2] font-bold text-xs uppercase tracking-[0.18em] text-center inline-block shadow-md"
-                >
-                  Book This Design on WhatsApp
-                </a>
-              </div>
+                Book This Exact Design →
+              </a>
             </div>
           </div>
         </div>
       )}
 
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* 10. WRITE / EDIT REVIEW MODAL                               */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      {reviewModalOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-6"
-          onClick={() => setReviewModalOpen(false)}
-        >
-          <div
-            className="bg-[#FFFFFF] border border-[#D9CEC5] rounded-3xl max-w-lg w-full p-8 font-sans shadow-2xl space-y-6"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="flex justify-between items-center pb-3 border-b border-[#D9CEC5]">
-              <h3 className="font-editorial text-2xl text-[#241E1A]">
-                {editingReviewId ? 'Edit Your Bride Review' : 'Share Your Bride Experience'}
-              </h3>
-              <button
-                onClick={() => setReviewModalOpen(false)}
-                className="text-xs uppercase tracking-widest text-[#6E645D] hover:text-[#241E1A] cursor-pointer"
-              >
-                Close [×]
-              </button>
+      {/* ================= REVIEW SUBMISSION MODAL ================= */}
+      {isReviewModalOpen && (
+        <div className="modal-overlay active" onClick={() => setIsReviewModalOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>✦ Share Your Bridal Experience</h3>
+              <button className="modal-close" onClick={() => setIsReviewModalOpen(false)}>✕</button>
             </div>
-
-            <form onSubmit={handleReviewSubmit} className="space-y-4 text-xs font-sans">
-              <div>
-                <label className="block text-[10px] uppercase tracking-wider text-[#6E645D] mb-1 font-semibold">Your Name *</label>
+            <form onSubmit={handleReviewSubmit} className="modal-form">
+              <div className="form-group">
+                <label>Your Name *</label>
                 <input
                   type="text"
                   required
-                  value={reviewForm.client_name}
-                  onChange={e => setReviewForm({ ...reviewForm, client_name: e.target.value })}
-                  placeholder="e.g. Radhika Patel"
-                  className="w-full p-2.5 rounded-lg bg-[#F5EFEB] border border-[#D9CEC5] text-[#241E1A] text-sm"
+                  placeholder="e.g. Radhika Mehta"
+                  value={reviewFormData.author}
+                  onChange={(e) => setReviewFormData({ ...reviewFormData, author: e.target.value })}
                 />
               </div>
-
-              <div>
-                <label className="block text-[10px] uppercase tracking-wider text-[#6E645D] mb-1 font-semibold">Rating (1 to 5 Stars)</label>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map(star => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setReviewForm({ ...reviewForm, rating: star })}
-                      className="p-1 cursor-pointer"
-                    >
-                      <Star
-                        className={`w-6 h-6 ${star <= reviewForm.rating ? 'fill-amber-500 text-amber-500' : 'text-stone-300'}`}
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[10px] uppercase tracking-wider text-[#6E645D] mb-1 font-semibold">Event Type</label>
-                  <input
-                    type="text"
-                    value={reviewForm.event_type}
-                    onChange={e => setReviewForm({ ...reviewForm, event_type: e.target.value })}
-                    placeholder="e.g. Bridal Mehandi"
-                    className="w-full p-2.5 rounded-lg bg-[#F5EFEB] border border-[#D9CEC5] text-[#241E1A]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] uppercase tracking-wider text-[#6E645D] mb-1 font-semibold">City / Venue</label>
-                  <input
-                    type="text"
-                    value={reviewForm.location}
-                    onChange={e => setReviewForm({ ...reviewForm, location: e.target.value })}
-                    placeholder="e.g. The Leela, Gandhinagar"
-                    className="w-full p-2.5 rounded-lg bg-[#F5EFEB] border border-[#D9CEC5] text-[#241E1A]"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[10px] uppercase tracking-wider text-[#6E645D] mb-1 font-semibold">Your Review / Feedback *</label>
-                <textarea
-                  rows={4}
-                  required
-                  value={reviewForm.comment}
-                  onChange={e => setReviewForm({ ...reviewForm, comment: e.target.value })}
-                  placeholder="Share how the design looked, stain darkness, and overall experience..."
-                  className="w-full p-2.5 rounded-lg bg-[#F5EFEB] border border-[#D9CEC5] text-[#241E1A] resize-none"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={submittingReview}
-                className="w-full py-3 rounded-full bg-[#A64B38] hover:bg-[#8A3B2A] text-[#FAF7F2] font-bold text-xs uppercase tracking-widest shadow-md cursor-pointer disabled:opacity-50"
-              >
-                {submittingReview ? 'Saving...' : (editingReviewId ? 'Update My Review' : 'Publish Review')}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* 11. SUPABASE AUTH MODAL (Google OAuth + Email)              */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      {authModalOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-6"
-          onClick={() => { setAuthModalOpen(false); window.location.hash = ''; }}
-        >
-          <div
-            className="bg-[#FFFFFF] border border-[#D9CEC5] rounded-3xl max-w-md w-full p-8 font-sans shadow-2xl space-y-6"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="text-center space-y-2">
-              <div className="w-12 h-12 rounded-full bg-[#EDE4DC] flex items-center justify-center mx-auto text-[#A64B38]">
-                <Lock className="w-6 h-6" />
-              </div>
-              <h3 className="font-editorial text-3xl text-[#241E1A]">Studio Admin Access</h3>
-              <p className="text-xs text-[#6E645D]">Sign in with your Google or Admin account to manage content</p>
-            </div>
-
-            {/* Google OAuth Button */}
-            <button
-              onClick={handleGoogleSignIn}
-              disabled={authLoading}
-              className="w-full py-3 rounded-xl border border-[#D9CEC5] bg-[#FFFFFF] hover:bg-[#F5EFEB] text-[#241E1A] text-xs font-bold flex items-center justify-center gap-3 transition-all cursor-pointer shadow-sm"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-              </svg>
-              <span>Continue with Google Account</span>
-            </button>
-
-            <div className="flex items-center gap-3 text-xs text-[#6E645D]">
-              <div className="flex-1 h-px bg-[#D9CEC5]" />
-              <span>or email</span>
-              <div className="flex-1 h-px bg-[#D9CEC5]" />
-            </div>
-
-            {/* Email Form */}
-            <form onSubmit={handleEmailAuth} className="space-y-4 text-xs">
-              <div>
-                <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Email Address</label>
+              <div className="form-group">
+                <label>Wedding Role / Location *</label>
                 <input
-                  type="email"
+                  type="text"
                   required
-                  value={authEmail}
-                  onChange={e => setAuthEmail(e.target.value)}
-                  placeholder="admin@bhuvi.com"
-                  className="w-full p-2.5 rounded-lg bg-[#F5EFEB] border border-[#D9CEC5] text-sm text-[#241E1A]"
+                  placeholder="e.g. Bride • The Leela Palace, Udaipur"
+                  value={reviewFormData.role}
+                  onChange={(e) => setReviewFormData({ ...reviewFormData, role: e.target.value })}
                 />
               </div>
-
-              <div>
-                <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Password</label>
-                <input
-                  type="password"
-                  required
-                  value={authPassword}
-                  onChange={e => setAuthPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full p-2.5 rounded-lg bg-[#F5EFEB] border border-[#D9CEC5] text-sm text-[#241E1A]"
-                />
-              </div>
-
-              {authError && (
-                <p className="text-xs text-red-600 font-semibold">{authError}</p>
-              )}
-
-              <button
-                type="submit"
-                disabled={authLoading}
-                className="w-full py-3 rounded-full bg-[#A64B38] hover:bg-[#8A3B2A] text-[#FAF7F2] font-bold text-xs uppercase tracking-widest shadow-md cursor-pointer disabled:opacity-50"
-              >
-                {authLoading ? 'Signing In...' : (authMode === 'signin' ? 'Sign In as Admin' : 'Create Admin Account')}
-              </button>
-
-              <div className="text-center pt-1">
-                <button
-                  type="button"
-                  onClick={() => { setAuthMode(authMode === 'signin' ? 'signup' : 'signin'); setAuthError(''); }}
-                  className="text-xs text-[#A64B38] hover:underline font-semibold"
+              <div className="form-group">
+                <label>Rating (Stars)</label>
+                <select
+                  value={reviewFormData.stars}
+                  onChange={(e) => setReviewFormData({ ...reviewFormData, stars: Number(e.target.value) })}
                 >
-                  {authMode === 'signin' ? 'Need an account? Register here' : 'Already have an account? Sign in'}
-                </button>
+                  <option value={5}>★★★★★ (5 Stars - Outstanding)</option>
+                  <option value={4}>★★★★☆ (4 Stars - Great)</option>
+                  <option value={3}>★★★☆☆ (3 Stars - Good)</option>
+                </select>
               </div>
+              <div className="form-group">
+                <label>Your Testimonial Review *</label>
+                <textarea
+                  required
+                  rows="4"
+                  placeholder="Describe your henna experience with Bhuvi, the stain darkness, punctuality, and guest feedback..."
+                  value={reviewFormData.content}
+                  onChange={(e) => setReviewFormData({ ...reviewFormData, content: e.target.value })}
+                ></textarea>
+              </div>
+              <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '10px' }}>
+                Publish Bride Review
+              </button>
             </form>
           </div>
         </div>
       )}
 
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* 12. NON-TECHNICAL STUDIO ADMIN DRAWER (With File Uploads)   */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      {adminOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex justify-end"
-          onClick={() => { setAdminOpen(false); window.location.hash = ''; }}
-        >
-          <div
-            className="bg-[#FFFFFF] border-l border-[#D9CEC5] w-full max-w-2xl h-full p-6 sm:p-8 overflow-y-auto font-sans flex flex-col justify-between"
-            onClick={e => e.stopPropagation()}
-          >
-            <div>
-              {/* Drawer Top Bar */}
-              <div className="flex justify-between items-center pb-4 border-b border-[#D9CEC5] mb-6">
-                <div>
-                  <h3 className="font-editorial text-3xl text-[#241E1A]">Studio Control Dashboard</h3>
-                  <p className="text-xs text-[#6E645D]">
-                    Logged in as <strong className="text-[#A64B38]">{adminUser?.email || 'Admin'}</strong>
-                  </p>
+      {/* ================= ADMIN CMS PORTAL MODAL ================= */}
+      {isAdminModalOpen && (
+        <div className="modal-overlay active" onClick={() => setIsAdminModalOpen(false)}>
+          <div className="modal-content admin-modal-container" style={{ maxWidth: '850px', maxHeight: '90vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>👑 Bhuvi Mehandi — Studio Admin CMS</h3>
+              <button className="modal-close" onClick={() => setIsAdminModalOpen(false)}>✕</button>
+            </div>
+
+            {!isAdminLoggedIn ? (
+              <form onSubmit={handleAdminLogin} style={{ padding: '24px' }}>
+                <p style={{ marginBottom: '16px', color: 'var(--text-muted)' }}>Enter Studio Admin Password to manage inquiries, gallery photos, and prices.</p>
+                <div className="form-group">
+                  <label>Admin Password</label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Enter password (default: admin123)"
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
+                  />
                 </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={handleSignOut}
-                    className="text-xs text-red-600 hover:underline flex items-center gap-1 cursor-pointer font-bold"
-                  >
-                    <LogOut className="w-3.5 h-3.5" />
-                    <span>Sign Out</span>
+                <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '16px' }}>
+                  Unlock Admin Portal
+                </button>
+              </form>
+            ) : (
+              <div style={{ padding: '20px' }}>
+                <div style={{ display: 'flex', gap: '10px', borderBottom: '1px solid var(--border)', paddingBottom: '12px', marginBottom: '20px' }}>
+                  <button className={`filter-btn ${adminActiveTab === 'inquiries' ? 'active' : ''}`} onClick={() => setAdminActiveTab('inquiries')}>
+                    📋 Inquiries ({inquiries.length})
                   </button>
-                  <button
-                    onClick={() => { setAdminOpen(false); window.location.hash = ''; }}
-                    className="text-xs uppercase tracking-widest text-[#6E645D] hover:text-[#241E1A] cursor-pointer"
-                  >
-                    Close [×]
+                  <button className={`filter-btn ${adminActiveTab === 'gallery' ? 'active' : ''}`} onClick={() => setAdminActiveTab('gallery')}>
+                    🖼️ Gallery ({gallery.length})
+                  </button>
+                  <button className={`filter-btn ${adminActiveTab === 'reviews' ? 'active' : ''}`} onClick={() => setAdminActiveTab('reviews')}>
+                    ⭐ Reviews ({reviews.length})
+                  </button>
+                  <button className="btn btn-outline" style={{ marginLeft: 'auto' }} onClick={() => setIsAdminLoggedIn(false)}>
+                    Lock
                   </button>
                 </div>
-              </div>
 
-              {/* Navigation Tabs in Admin */}
-              <div className="flex flex-wrap gap-2 mb-6 border-b border-[#D9CEC5] pb-3 text-xs uppercase tracking-wider font-semibold">
-                {[
-                  { id: 'settings', label: 'Site & Hero', icon: Settings },
-                  { id: 'services', label: 'Services', icon: ImageIcon },
-                  { id: 'designs', label: 'Portfolio', icon: Sparkles },
-                  { id: 'reviews', label: 'Reviews', icon: Star },
-                  { id: 'inquiries', label: `Bookings (${inquiries.length})`, icon: Calendar },
-                  { id: 'supabase', label: 'Database', icon: Database }
-                ].map(tab => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setAdminTab(tab.id)}
-                    className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all cursor-pointer ${
-                      adminTab === tab.id
-                        ? 'bg-[#A64B38] text-[#FAF7F2]'
-                        : 'bg-[#EDE4DC] text-[#6E645D] hover:text-[#241E1A]'
-                    }`}
-                  >
-                    <tab.icon className="w-3.5 h-3.5" />
-                    <span>{tab.label}</span>
-                  </button>
-                ))}
-              </div>
-
-              {/* ── TAB 1: HERO & SITE SETTINGS (WITH REAL FILE UPLOAD) ── */}
-              {adminTab === 'settings' && (
-                <form onSubmit={handleSaveSettings} className="space-y-5 text-xs">
-                  <div className="p-5 rounded-2xl bg-[#EDE4DC] space-y-4">
-                    <h4 className="font-bold text-sm text-[#241E1A]">Hero Background Image & Headings</h4>
-                    
-                    {/* Real File Upload for Hero Image */}
-                    <div>
-                      <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1.5">
-                        Upload Hero Photo (Select from Phone / Computer)
-                      </label>
-                      <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-[#C4B6AA] rounded-xl bg-[#FFFFFF] hover:border-[#A64B38] transition-colors cursor-pointer relative">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleHeroImageUpload}
-                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                        />
-                        <Upload className="w-6 h-6 text-[#A64B38] mb-1" />
-                        <span className="font-semibold text-xs text-[#241E1A]">
-                          {uploadingHero ? 'Uploading file...' : 'Click to choose image file from device'}
-                        </span>
-                        <span className="text-[10px] text-[#6E645D]">PNG, JPG, WebP supported</span>
-                      </div>
-
-                      {editSettingsForm.hero_image_url && (
-                        <div className="mt-3 h-32 rounded-xl overflow-hidden border border-[#D9CEC5] relative group">
-                          <img src={editSettingsForm.hero_image_url} alt="Hero Preview" className="w-full h-full object-cover" />
-                          <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/70 text-[9px] text-white">
-                            Current Hero Image Preview
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Main Headline</label>
-                      <input
-                        type="text"
-                        value={editSettingsForm.headline}
-                        onChange={e => setEditSettingsForm({ ...editSettingsForm, headline: e.target.value })}
-                        className="w-full p-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9CEC5] text-sm text-[#241E1A]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Subheadline</label>
-                      <textarea
-                        rows={2}
-                        value={editSettingsForm.subheadline}
-                        onChange={e => setEditSettingsForm({ ...editSettingsForm, subheadline: e.target.value })}
-                        className="w-full p-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9CEC5] text-sm text-[#241E1A]"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="p-5 rounded-2xl bg-[#EDE4DC] space-y-4">
-                    <h4 className="font-bold text-sm text-[#241E1A]">Contact & Studio Details</h4>
-                    
-                    <div>
-                      <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">WhatsApp Phone Number</label>
-                      <input
-                        type="text"
-                        value={editSettingsForm.whatsapp_phone}
-                        onChange={e => setEditSettingsForm({ ...editSettingsForm, whatsapp_phone: e.target.value })}
-                        className="num-lining w-full p-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9CEC5] text-sm"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Studio Location</label>
-                      <input
-                        type="text"
-                        value={editSettingsForm.studio_location}
-                        onChange={e => setEditSettingsForm({ ...editSettingsForm, studio_location: e.target.value })}
-                        className="w-full p-2.5 rounded-lg bg-[#FFFFFF] border border-[#D9CEC5] text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full py-3.5 rounded-full bg-[#A64B38] hover:bg-[#8A3B2A] text-[#FAF7F2] font-bold text-xs uppercase tracking-wider cursor-pointer shadow-md"
-                  >
-                    Save Changes to Live Website
-                  </button>
-                </form>
-              )}
-
-              {/* ── TAB 2: SERVICES MANAGER (WITH REAL FILE UPLOAD) ── */}
-              {adminTab === 'services' && (
-                <div className="space-y-6 text-xs">
-                  <div className="p-5 rounded-2xl bg-[#EDE4DC] space-y-3">
-                    <h4 className="font-bold text-sm text-[#241E1A]">Add New Celebration Package</h4>
-                    <form onSubmit={handleCreateService} className="space-y-3">
-                      <div>
-                        <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Service Name *</label>
-                        <input
-                          type="text"
-                          required
-                          value={newServiceForm.name}
-                          onChange={e => setNewServiceForm({ ...newServiceForm, name: e.target.value })}
-                          placeholder="e.g. Royal Destination Bridal"
-                          className="w-full p-2 rounded bg-[#FFFFFF] border border-[#D9CEC5]"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Category</label>
-                          <select
-                            value={newServiceForm.category}
-                            onChange={e => setNewServiceForm({ ...newServiceForm, category: e.target.value })}
-                            className="w-full p-2 rounded bg-[#FFFFFF] border border-[#D9CEC5]"
-                          >
-                            <option>Bridal</option>
-                            <option>Engagement</option>
-                            <option>Arabic</option>
-                            <option>Traditional</option>
-                            <option>Baby Shower</option>
-                            <option>Family & Guests</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Starting Price</label>
-                          <input
-                            type="text"
-                            value={newServiceForm.price_starting}
-                            onChange={e => setNewServiceForm({ ...newServiceForm, price_starting: e.target.value })}
-                            className="w-full p-2 rounded bg-[#FFFFFF] border border-[#D9CEC5]"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Real File Upload for Service Cover Photo */}
-                      <div>
-                        <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">
-                          Select Cover Photo (From Phone / Computer)
-                        </label>
-                        <div className="flex items-center gap-3 p-3 bg-[#FFFFFF] border border-[#D9CEC5] rounded-lg">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleServiceImageUpload}
-                            className="text-xs cursor-pointer"
-                          />
-                          {uploadingService && <span className="text-[10px] text-[#A64B38] font-bold">Uploading...</span>}
-                        </div>
-                        {newServiceForm.image_url && (
-                          <div className="mt-2 h-20 w-32 rounded overflow-hidden border border-[#D9CEC5]">
-                            <img src={newServiceForm.image_url} alt="Preview" className="w-full h-full object-cover" />
-                          </div>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Inclusions (Comma Separated)</label>
-                        <input
-                          type="text"
-                          value={newServiceForm.includes}
-                          onChange={e => setNewServiceForm({ ...newServiceForm, includes: e.target.value })}
-                          className="w-full p-2 rounded bg-[#FFFFFF] border border-[#D9CEC5]"
-                        />
-                      </div>
-
-                      <button
-                        type="submit"
-                        className="w-full py-2.5 rounded-full bg-[#A64B38] text-[#FAF7F2] font-bold uppercase tracking-wider shadow-md"
-                      >
-                        Add Service to Website
-                      </button>
-                    </form>
-                  </div>
-
-                  {/* Existing Services List */}
+                {adminActiveTab === 'inquiries' && (
                   <div>
-                    <h4 className="font-bold text-sm text-[#241E1A] mb-3">Live Services ({services.length})</h4>
-                    <div className="space-y-2">
-                      {services.map(s => (
-                        <div key={s.id} className="p-3 rounded-lg bg-[#EDE4DC] flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <img src={s.image_url} alt={s.name} className="w-10 h-10 rounded object-cover" />
-                            <div>
-                              <p className="font-bold text-[#241E1A]">{s.name}</p>
-                              <p className="num-lining text-[10px] text-[#6E645D]">{s.price_starting} • {s.duration}</p>
+                    <h4>Client Appointment Inquiries</h4>
+                    {inquiries.length === 0 ? (
+                      <p style={{ color: 'var(--text-muted)', marginTop: '12px' }}>No new inquiries yet.</p>
+                    ) : (
+                      <div style={{ display: 'grid', gap: '12px', marginTop: '12px' }}>
+                        {inquiries.map((inq) => (
+                          <div key={inq.id} style={{ border: '1px solid var(--border)', borderRadius: '8px', padding: '14px', background: 'var(--bg-card)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                              <strong>{inq.name} ({inq.phone})</strong>
+                              <span style={{ padding: '2px 8px', borderRadius: '4px', background: inq.status === 'confirmed' ? '#4A5D4E' : '#A64B38', color: '#fff', fontSize: '12px' }}>
+                                {inq.status || 'pending'}
+                              </span>
+                            </div>
+                            <p style={{ fontSize: '13px', margin: '4px 0' }}>📅 {inq.event_date} | 📍 {inq.venue} | 👥 {inq.guests_count} guests | 🎨 {inq.design_style}</p>
+                            {inq.notes && <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>"{inq.notes}"</p>}
+                            <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                              <button className="btn btn-outline" style={{ fontSize: '12px', padding: '4px 8px' }} onClick={() => handleUpdateInquiry(inq.id, 'confirmed')}>
+                                Mark Confirmed
+                              </button>
+                              <a href={`https://wa.me/91${inq.phone}`} target="_blank" rel="noopener" className="btn btn-primary" style={{ fontSize: '12px', padding: '4px 8px' }}>
+                                Chat WhatsApp
+                              </a>
                             </div>
                           </div>
-                          <button
-                            onClick={() => handleDeleteService(s.id)}
-                            className="p-1.5 text-red-600 hover:bg-red-100 rounded cursor-pointer"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* ── TAB 3: PORTFOLIO DESIGNS (WITH REAL FILE UPLOAD) ── */}
-              {adminTab === 'designs' && (
-                <div className="space-y-6 text-xs">
-                  <form onSubmit={handleCreateDesign} className="p-5 rounded-2xl bg-[#EDE4DC] space-y-3">
-                    <h4 className="font-bold text-sm text-[#241E1A]">Upload New Design to Gallery</h4>
-                    <div>
-                      <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Title</label>
+                {adminActiveTab === 'gallery' && (
+                  <div>
+                    <h4>Add New Gallery Design</h4>
+                    <form onSubmit={handleAddDesign} style={{ display: 'grid', gap: '10px', margin: '14px 0 24px' }}>
                       <input
                         type="text"
+                        placeholder="Design Title (e.g. Royal Bridal Feet Mehndi)"
                         required
-                        value={newDesignForm.title}
-                        onChange={e => setNewDesignForm({ ...newDesignForm, title: e.target.value })}
-                        placeholder="e.g. Royal Lotus Bridal Sleeve"
-                        className="w-full p-2 rounded bg-[#FFFFFF] border border-[#D9CEC5]"
+                        value={newDesign.title}
+                        onChange={(e) => setNewDesign({ ...newDesign, title: e.target.value })}
                       />
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Category</label>
-                        <select
-                          value={newDesignForm.category}
-                          onChange={e => setNewDesignForm({ ...newDesignForm, category: e.target.value })}
-                          className="w-full p-2 rounded bg-[#FFFFFF] border border-[#D9CEC5]"
-                        >
-                          <option value="bridal">Bridal</option>
-                          <option value="arabic">Arabic</option>
-                          <option value="rajasthani">Rajasthani</option>
-                          <option value="feet">Feet Art</option>
-                          <option value="minimalist">Minimalist</option>
-                          <option value="engagement">Engagement</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">Price Range</label>
-                        <input
-                          type="text"
-                          value={newDesignForm.priceRange}
-                          onChange={e => setNewDesignForm({ ...newDesignForm, priceRange: e.target.value })}
-                          className="w-full p-2 rounded bg-[#FFFFFF] border border-[#D9CEC5]"
-                        />
-                      </div>
-                    </div>
+                      <input
+                        type="url"
+                        placeholder="Image URL (Unsplash or Cloud URL)"
+                        required
+                        value={newDesign.image_url}
+                        onChange={(e) => setNewDesign({ ...newDesign, image_url: e.target.value })}
+                      />
+                      <select
+                        value={newDesign.category}
+                        onChange={(e) => setNewDesign({ ...newDesign, category: e.target.value, category_label: e.target.value.toUpperCase() })}
+                      >
+                        <option value="bridal">Bridal</option>
+                        <option value="arabic">Arabic</option>
+                        <option value="rajasthani">Rajasthani</option>
+                        <option value="engagement">Engagement</option>
+                        <option value="festival">Festival</option>
+                      </select>
+                      <button type="submit" className="btn btn-primary">
+                        + Add Design to Gallery
+                      </button>
+                    </form>
 
-                    {/* Real File Upload for Design Photo */}
-                    <div>
-                      <label className="block text-[10px] uppercase font-bold text-[#6E645D] mb-1">
-                        Select Photo (From Phone / Computer)
-                      </label>
-                      <div className="flex items-center gap-3 p-3 bg-[#FFFFFF] border border-[#D9CEC5] rounded-lg">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleDesignImageUpload}
-                          className="text-xs cursor-pointer"
-                        />
-                        {uploadingDesign && <span className="text-[10px] text-[#A64B38] font-bold">Uploading...</span>}
-                      </div>
-                      {newDesignForm.imageUrl && (
-                        <div className="mt-2 h-24 w-24 rounded-lg overflow-hidden border border-[#D9CEC5]">
-                          <img src={newDesignForm.imageUrl} alt="Design Preview" className="w-full h-full object-cover" />
-                        </div>
-                      )}
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={uploadingDesign || !newDesignForm.imageUrl}
-                      className="w-full py-2.5 rounded-full bg-[#A64B38] text-[#FAF7F2] font-bold uppercase tracking-wider shadow-md disabled:opacity-50"
-                    >
-                      Add Photo to Gallery
-                    </button>
-                  </form>
-
-                  <div>
-                    <h4 className="font-bold text-sm text-[#241E1A] mb-3">Live Designs ({designs.length})</h4>
-                    <div className="grid grid-cols-2 gap-3">
-                      {designs.map(d => (
-                        <div key={d.id} className="relative rounded-lg overflow-hidden border border-[#D9CEC5] bg-[#EDE4DC]">
-                          <img src={d.image_url} alt={d.title} className="w-full h-24 object-cover" />
-                          <div className="p-2 flex justify-between items-center">
-                            <p className="font-bold truncate text-[11px]">{d.title}</p>
-                            <button
-                              onClick={() => handleDeleteDesign(d.id)}
-                              className="text-red-600 p-1 cursor-pointer"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
+                    <h4>Existing Designs ({gallery.length})</h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '10px', marginTop: '12px' }}>
+                      {gallery.map((g) => (
+                        <div key={g.id} style={{ border: '1px solid var(--border)', borderRadius: '6px', overflow: 'hidden' }}>
+                          <img src={g.image_url} alt={g.title} style={{ width: '100%', height: '110px', objectFit: 'cover' }} />
+                          <div style={{ padding: '6px' }}>
+                            <p style={{ fontSize: '12px', fontWeight: 600, truncate: true }}>{g.title}</p>
+                            <button onClick={() => handleDeleteDesign(g.id)} style={{ color: '#c00', fontSize: '11px', border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}>
+                              Delete ✕
                             </button>
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* ── TAB 4: REVIEWS MODERATION ── */}
-              {adminTab === 'reviews' && (
-                <div className="space-y-4 text-xs">
-                  <h4 className="font-bold text-sm text-[#241E1A]">All Bride Reviews ({reviews.length})</h4>
-                  <div className="space-y-3">
-                    {reviews.map(r => (
-                      <div key={r.id} className="p-4 rounded-xl bg-[#EDE4DC] space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="font-bold text-sm text-[#241E1A]">{r.client_name} ({r.rating}★)</span>
-                          <button
-                            onClick={() => handleDeleteReview(r.id, true)}
-                            className="text-red-600 text-[10px] font-bold hover:underline cursor-pointer"
-                          >
-                            Delete Review
-                          </button>
-                        </div>
-                        <p className="text-[11px] text-[#6E645D]">"{r.comment}"</p>
-                        <p className="text-[10px] text-[#A64B38] font-bold">{r.event_type} • {r.location}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* ── TAB 5: INQUIRIES & BOOKINGS ── */}
-              {adminTab === 'inquiries' && (
-                <div className="space-y-4 text-xs">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-bold text-sm text-[#241E1A]">Incoming Client Inquiries ({inquiries.length})</h4>
-                    <button onClick={loadAdminInquiries} className="text-[#A64B38] flex items-center gap-1 cursor-pointer font-bold">
-                      <RefreshCw className="w-3.5 h-3.5" /> Refresh
-                    </button>
-                  </div>
-
-                  {inquiries.length === 0 ? (
-                    <p className="text-[#6E645D] italic">No inquiries received yet.</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {inquiries.map(inq => (
-                        <div key={inq.id} className="p-4 rounded-xl bg-[#EDE4DC] border border-[#D9CEC5] space-y-2">
-                          <div className="flex justify-between items-center">
-                            <span className="font-bold text-sm text-[#241E1A]">{inq.name}</span>
-                            <span className="px-2 py-0.5 rounded-full bg-[#FFFFFF] text-[9px] uppercase tracking-wider font-bold text-[#A64B38]">
-                              {inq.status || 'New'}
-                            </span>
-                          </div>
-
-                          <p className="num-lining text-[#6E645D]">
-                            📞 {inq.phone} • 📅 {inq.event_date} • {inq.event_type}
-                          </p>
-                          {inq.city_venue && <p className="text-[#241E1A]">📍 {inq.city_venue}</p>}
-                          {inq.message && <p className="text-[#6E645D] italic">"{inq.message}"</p>}
-
-                          <div className="pt-2 flex items-center justify-between border-t border-[#D9CEC5]">
-                            <a
-                              href={`https://wa.me/${inq.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hi ${inq.name}! Thank you for inquiring with Bhuvi Mehandi Atelier for your ${inq.event_type}.`)}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="px-3 py-1 rounded-lg bg-[#25d366] text-white text-[10px] font-bold flex items-center gap-1"
-                            >
-                              <Phone className="w-3 h-3" />
-                              <span>WhatsApp Reply</span>
-                            </a>
-
-                            <div className="flex items-center gap-2">
-                              <select
-                                value={inq.status || 'New'}
-                                onChange={e => handleInquiryStatus(inq.id, e.target.value)}
-                                className="p-1 rounded bg-[#FFFFFF] border border-[#D9CEC5] text-[10px]"
-                              >
-                                <option value="New">New</option>
-                                <option value="Contacted">Contacted</option>
-                                <option value="Confirmed">Confirmed</option>
-                                <option value="Completed">Completed</option>
-                              </select>
-                              <button
-                                onClick={() => handleDeleteInquiry(inq.id)}
-                                className="text-red-600 p-1 cursor-pointer"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
+                {adminActiveTab === 'reviews' && (
+                  <div>
+                    <h4>Bride Testimonials</h4>
+                    <div style={{ display: 'grid', gap: '10px', marginTop: '12px' }}>
+                      {currentReviews.map((r, idx) => (
+                        <div key={r.id || idx} style={{ border: '1px solid var(--border)', borderRadius: '8px', padding: '10px' }}>
+                          <strong>{r.author}</strong> - <span>{r.role}</span>
+                          <p style={{ fontSize: '13px', margin: '4px 0' }}>"{r.content}"</p>
                         </div>
                       ))}
                     </div>
-                  )}
-                </div>
-              )}
-
-              {/* ── TAB 6: DATABASE & CLOUD STATUS ── */}
-              {adminTab === 'supabase' && (
-                <div className="space-y-4 text-xs">
-                  <div className="p-4 rounded-xl bg-[#EDE4DC] space-y-2">
-                    <span className="font-bold text-sm text-[#241E1A] block">Supabase Connection</span>
-                    <p className="text-[#6E645D]">
-                      {dbStatus?.connected
-                        ? (dbStatus.hasTables ? '🟢 Connected to live Supabase cloud database & storage' : '🟡 Connected (run supabase-schema.sql for cloud tables)')
-                        : '⚪ Local Storage Fallback Mode Active'}
-                    </p>
-                    <p className="text-[9px] font-mono text-[#6E645D]">{SUPABASE_URL}</p>
                   </div>
-
-                  <div className="p-4 rounded-xl bg-[#EDE4DC] space-y-2">
-                    <span className="font-bold text-sm text-[#241E1A] block">Database Setup Instructions</span>
-                    <p className="text-[#6E645D] leading-relaxed">
-                      To create all tables in your own Supabase project:
-                    </p>
-                    <ol className="list-decimal pl-4 space-y-1 text-[#6E645D]">
-                      <li>Open your Supabase project dashboard at <a href="https://supabase.com" target="_blank" rel="noreferrer" className="underline font-bold">supabase.com</a>.</li>
-                      <li>Go to <strong>SQL Editor</strong> on the left sidebar.</li>
-                      <li>Copy the contents of <code className="bg-[#FFFFFF] px-1 rounded font-mono">supabase-schema.sql</code> and click <strong>Run</strong>.</li>
-                    </ol>
-                  </div>
-                </div>
-              )}
-
-            </div>
-
-            <div className="pt-6 border-t border-[#D9CEC5] text-[10px] text-[#6E645D] text-center font-sans">
-              BHUVI MEHANDI ATELIER • STUDIO CLOUD
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* 13. LUXURY FOOTER (Clean & Public - No Admin Button)       */}
-      {/* ─────────────────────────────────────────────────────────── */}
-      <footer className="border-t border-[#D9CEC5] bg-[#F5EFEB] py-16 font-sans">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-[#6E645D]">
-          <div>
-            <span className="font-editorial text-2xl text-[#241E1A] tracking-widest block font-bold">
-              BHUVI MEHANDI
-            </span>
-            <p className="text-[11px] mt-1">
-              © {new Date().getFullYear()} Bhuvi Mehandi Atelier. Pure Organic Sojat Artistry.
-            </p>
-          </div>
-
-          <div className="flex items-center space-x-6 tracking-[0.15em] uppercase text-[11px]">
-            <a
-              href={createWhatsAppUrl({ phone: settings.whatsapp_phone, customNote: 'General inquiry for Bhuvi Mehandi.' })}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[#241E1A] transition-colors"
-            >
-              WhatsApp
-            </a>
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="hover:text-[#241E1A] transition-colors cursor-pointer"
-            >
-              Top ↑
-            </button>
-          </div>
-        </div>
-      </footer>
-
-      {/* ─────────────────────────────────────────────────────────── */}
-      {/* 14. FLOATING WHATSAPP CONCIERGE BUTTON                      */}
-      {/* ─────────────────────────────────────────────────────────── */}
+      {/* ================= FLOATING QUICK ACTION BUTTONS ================= */}
       <a
-        href={createWhatsAppUrl({ phone: settings.whatsapp_phone, customNote: 'Hello Bhuvi! I am visiting your website and would love to ask a quick question.' })}
+        href="https://wa.me/918094935632?text=Hello%20Bhuvi%20Mehandi,%20I%20would%20like%20to%20inquire%20about%20booking"
         target="_blank"
-        rel="noopener noreferrer"
+        rel="noopener"
+        className="floating-whatsapp"
         aria-label="Chat with Bhuvi on WhatsApp"
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-[#25d366] text-white flex items-center justify-center shadow-2xl hover:scale-110 transition-transform duration-300"
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          zIndex: 999,
+          background: '#25D366',
+          color: '#fff',
+          borderRadius: '50%',
+          width: '56px',
+          height: '56px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 6px 20px rgba(0,0,0,0.3)',
+          transition: 'transform 0.3s ease'
+        }}
       >
-        <span className="absolute inset-0 rounded-full bg-[#25d366] animate-ping opacity-30 pointer-events-none" />
-        <svg viewBox="0 0 24 24" className="w-7 h-7 fill-white">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-        </svg>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
       </a>
-
     </div>
   );
 }
