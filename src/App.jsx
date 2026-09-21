@@ -1,63 +1,151 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './style.css';
-import {
-  createWhatsAppUrl,
-  fetchSettings,
-  updateSettings,
-  fetchServices,
-  createService,
-  deleteService,
-  fetchDesigns,
-  createDesign,
-  deleteDesign,
-  fetchReviews,
-  submitReview,
-  deleteReview,
-  fetchInquiries,
-  submitInquiry,
-  updateInquiryStatus,
-  deleteInquiry,
-  DEFAULT_SETTINGS
-} from './lib/supabase';
+import React, { useState, useEffect } from 'react';
+import initialData from './data/data_store.json';
 
 export default function App() {
-  // --- STATE MANAGEMENT ---
-  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
-  const [services, setServices] = useState([]);
-  const [gallery, setGallery] = useState([]);
-  const [reviews, setReviews] = useState([]);
-  const [inquiries, setInquiries] = useState([]);
+  // --- SITE STATES HYDRATED FROM DATA STORE ---
+  const [settings, setSettings] = useState(initialData.settings || {
+    whatsapp: '918094935632',
+    phone: '+91 80949 35632',
+    email: 'prajapatbhavna2003@gmail.com',
+    address: 'Near Mohanlal Sukhadia University, Udaipur, Rajasthan 313001',
+    instagram: 'bhuvi_mehandi_24',
+    adminPassword: 'admin123'
+  });
 
-  // UI States
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [lightboxItem, setLightboxItem] = useState(null);
+  const [heroBanners, setHeroBanners] = useState(
+    initialData.heroBanners && initialData.heroBanners.length > 0
+      ? initialData.heroBanners
+      : [
+          {
+            id: 'banner-1',
+            image: '/hero-banner.png',
+            title: 'Bhuvi Mehandi - Professional Bridal Mehndi Artist Udaipur'
+          },
+          {
+            id: 'banner-2',
+            image: 'https://images.unsplash.com/photo-1599833975787-5f6b0e8d1b55?auto=format&fit=crop&w=2000&q=85',
+            title: 'Royal Rajasthani Bridal Mehndi - Udaipur Heritage'
+          },
+          {
+            id: 'banner-3',
+            image: 'https://images.unsplash.com/photo-1610992015732-2449b76344bc?auto=format&fit=crop&w=2000&q=85',
+            title: 'Exquisite Fine-Line Floral & Arabic Bridal Henna'
+          }
+        ]
+  );
+
+  const [gallery, setGallery] = useState(
+    initialData.gallery && initialData.gallery.length > 0
+      ? initialData.gallery
+      : [
+          {
+            id: 'gal-1',
+            title: 'Royal Bridal Full-Arm Mehndi',
+            category: 'bridal',
+            categoryLabel: 'BRIDAL COLLECTION',
+            subtitle: 'Royal Bridal Henna',
+            image: 'https://images.unsplash.com/photo-1599833975787-5f6b0e8d1b55?auto=format&fit=crop&w=900&q=80',
+            isLarge: true
+          },
+          {
+            id: 'gal-2',
+            title: 'Modern Arabic Floral Trail',
+            category: 'arabic',
+            categoryLabel: 'ARABIC STYLE',
+            subtitle: 'Floral Trail',
+            image: 'https://images.unsplash.com/photo-1610992015732-2449b76344bc?auto=format&fit=crop&w=700&q=80'
+          },
+          {
+            id: 'gal-3',
+            title: 'Heritage Marwari Bharwa Mehndi',
+            category: 'rajasthani',
+            categoryLabel: 'RAJASTHANI',
+            subtitle: 'Heritage Marwari',
+            image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=700&q=80'
+          },
+          {
+            id: 'gal-4',
+            title: 'Delicate Ring Ceremony Mehndi',
+            category: 'engagement',
+            categoryLabel: 'ENGAGEMENT',
+            subtitle: 'Delicate Mandala',
+            image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=700&q=80'
+          },
+          {
+            id: 'gal-5',
+            title: 'Festive Teej & Karwa Chauth Henna',
+            category: 'festival',
+            categoryLabel: 'FESTIVALS',
+            subtitle: 'Festive Grace',
+            image: 'https://images.unsplash.com/photo-1609220136736-443140cffec6?auto=format&fit=crop&w=700&q=80'
+          },
+          {
+            id: 'gal-6',
+            title: 'Intricate Bridal Palms & Cuffs',
+            category: 'bridal',
+            categoryLabel: 'BRIDAL COLLECTION',
+            subtitle: 'Palms & Cuffs',
+            image: 'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=700&q=80'
+          },
+          {
+            id: 'gal-7',
+            title: 'Contemporary Negative-Space Arabic',
+            category: 'arabic',
+            categoryLabel: 'ARABIC DESIGNER',
+            subtitle: 'Negative Space',
+            image: 'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=700&q=80'
+          },
+          {
+            id: 'gal-8',
+            title: 'Traditional Jharokha & Peacock Art',
+            category: 'rajasthani',
+            categoryLabel: 'RAJASTHANI HERITAGE',
+            subtitle: 'Jharokha & Peacock',
+            image: 'https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=700&q=80'
+          }
+        ]
+  );
+
+  const [reviews, setReviews] = useState(
+    initialData.reviews && initialData.reviews.length > 0
+      ? initialData.reviews
+      : [
+          {
+            name: 'Pooja Rathore',
+            role: 'Destination Bride • Jagmandir Palace, Udaipur',
+            stars: 5,
+            text: 'Bhuvi is an absolute magician! She drew our destination wedding story and hidden portraits so exquisitely on my hands. The stain on my wedding day was pitch dark and lasted for over 3 weeks. Highly recommend her to every Udaipur bride!'
+          },
+          {
+            name: 'Ananya Singhal',
+            role: 'Royal Wedding • The Oberoi Udaivilas, Udaipur',
+            stars: 5,
+            text: 'The patience and precision Bhuvi has is unmatched. She arrived on time at our resort, brought natural organic henna that smelled heavenly, and created the cleanest fine lines I\'ve ever seen. Every single wedding guest was mesmerized!'
+          },
+          {
+            name: 'Sneha Sharma',
+            role: 'Sangeet & Bridal • Aurika, Udaipur',
+            stars: 5,
+            text: 'Booked Bhuvi for my engagement and then again for my sister\'s wedding group. Her designs are super modern, chic, and the color payoff is extraordinary. She is polite, gentle, and a true artist!'
+          }
+        ]
+  );
+
+  // --- UI INTERACTIVE STATES ---
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [lightboxData, setLightboxData] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [adminPassword, setAdminPassword] = useState('');
-  const [adminActiveTab, setAdminActiveTab] = useState('inquiries');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [adminPasswordInput, setAdminPasswordInput] = useState('');
+  const [adminTab, setAdminTab] = useState('inquiries');
+  const [inquiriesList, setInquiriesList] = useState([]);
   const [activeFaq, setActiveFaq] = useState(null);
 
-  // Hero Carousel State
-  const [currentHeroSlide, setCurrentHeroSlide] = useState(0);
-  const heroSlides = [
-    {
-      img: '/hero-banner.png',
-      alt: 'Bhuvi Mehandi - Professional Bridal Mehndi Artist Udaipur'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1599833975787-5f6b0e8d1b55?auto=format&fit=crop&w=2000&q=85',
-      alt: 'Royal Rajasthani Bridal Mehndi - Udaipur Heritage'
-    },
-    {
-      img: 'https://images.unsplash.com/photo-1610992015732-2449b76344bc?auto=format&fit=crop&w=2000&q=85',
-      alt: 'Exquisite Fine-Line Floral & Arabic Bridal Henna'
-    }
-  ];
-
   // Booking Form State
-  const [bookingData, setBookingData] = useState({
+  const [booking, setBooking] = useState({
     name: '',
     phone: '',
     email: '',
@@ -69,152 +157,50 @@ export default function App() {
     design: 'Bridal',
     notes: ''
   });
-  const [bookingSubmitted, setBookingSubmitted] = useState(false);
+  const [bookingMessage, setBookingMessage] = useState(false);
 
-  // Review Form State
-  const [reviewFormData, setReviewFormData] = useState({
-    author: '',
+  // New Review Modal Form State
+  const [newReview, setNewReview] = useState({
+    name: '',
     role: 'Bride • Udaipur Wedding',
     stars: 5,
-    content: ''
+    text: ''
   });
 
-  // Admin New Item Forms
-  const [newDesign, setNewDesign] = useState({ title: '', category: 'bridal', category_label: 'Bridal Collection', image_url: '', is_large: false });
-  const [newService, setNewService] = useState({ title: '', description: '', price: '', duration: '', icon: '♕' });
+  // Admin New Design Form State
+  const [newDesign, setNewDesign] = useState({
+    title: '',
+    category: 'bridal',
+    categoryLabel: 'BRIDAL COLLECTION',
+    image: '',
+    isLarge: false
+  });
 
-  // --- INITIAL DATA FETCH & AUTO-CAROUSEL ---
+  // --- 5s AUTO CAROUSEL ---
   useEffect(() => {
-    // Load initial data
-    loadAllData();
-
-    // Auto-advance hero carousel every 5 seconds
-    const timer = setInterval(() => {
-      setCurrentHeroSlide((prev) => (prev + 1) % heroSlides.length);
+    if (heroBanners.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentSlideIndex((prev) => (prev + 1) % heroBanners.length);
     }, 5000);
+    return () => clearInterval(interval);
+  }, [heroBanners.length]);
 
-    return () => clearInterval(timer);
-  }, []);
-
-  const loadAllData = async () => {
-    try {
-      const [fetchedSettings, fetchedServices, fetchedDesigns, fetchedReviews, fetchedInquiries] = await Promise.all([
-        fetchSettings(),
-        fetchServices(),
-        fetchDesigns(),
-        fetchReviews(),
-        fetchInquiries()
-      ]);
-      if (fetchedSettings) setSettings(fetchedSettings);
-      if (fetchedServices?.length) setServices(fetchedServices);
-      if (fetchedDesigns?.length) setGallery(fetchedDesigns);
-      if (fetchedReviews?.length) setReviews(fetchedReviews);
-      if (fetchedInquiries?.length) setInquiries(fetchedInquiries);
-    } catch (err) {
-      console.warn('Error fetching data from cloud, using fallback data:', err);
-    }
+  const prevSlide = () => {
+    setCurrentSlideIndex((prev) => (prev - 1 + heroBanners.length) % heroBanners.length);
   };
 
-  // --- CAROUSEL CONTROLS ---
-  const handleNextSlide = () => {
-    setCurrentHeroSlide((prev) => (prev + 1) % heroSlides.length);
-  };
-  const handlePrevSlide = () => {
-    setCurrentHeroSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
-  };
-
-  // --- FILTERED GALLERY ---
-  const defaultGallery = [
-    {
-      id: '1',
-      title: 'Royal Bridal Full-Arm Mehndi',
-      category: 'bridal',
-      category_label: 'Bridal Collection',
-      subtitle: 'Royal Bridal Henna',
-      image_url: 'https://images.unsplash.com/photo-1599833975787-5f6b0e8d1b55?auto=format&fit=crop&w=900&q=80',
-      is_large: true
-    },
-    {
-      id: '2',
-      title: 'Modern Arabic Floral Trail',
-      category: 'arabic',
-      category_label: 'Arabic Style',
-      subtitle: 'Floral Trail',
-      image_url: 'https://images.unsplash.com/photo-1610992015732-2449b76344bc?auto=format&fit=crop&w=700&q=80'
-    },
-    {
-      id: '3',
-      title: 'Heritage Marwari Bharwa Mehndi',
-      category: 'rajasthani',
-      category_label: 'Rajasthani',
-      subtitle: 'Heritage Marwari',
-      image_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=700&q=80'
-    },
-    {
-      id: '4',
-      title: 'Delicate Ring Ceremony Mehndi',
-      category: 'engagement',
-      category_label: 'Engagement',
-      subtitle: 'Delicate Mandala',
-      image_url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=700&q=80'
-    },
-    {
-      id: '5',
-      title: 'Festive Teej & Karwa Chauth Henna',
-      category: 'festival',
-      category_label: 'Festivals',
-      subtitle: 'Festive Grace',
-      image_url: 'https://images.unsplash.com/photo-1609220136736-443140cffec6?auto=format&fit=crop&w=700&q=80'
-    },
-    {
-      id: '6',
-      title: 'Intricate Bridal Palms & Cuffs',
-      category: 'bridal',
-      category_label: 'Bridal Collection',
-      subtitle: 'Palms & Cuffs',
-      image_url: 'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=700&q=80'
-    },
-    {
-      id: '7',
-      title: 'Contemporary Negative-Space Arabic',
-      category: 'arabic',
-      category_label: 'Arabic Designer',
-      subtitle: 'Negative Space',
-      image_url: 'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=700&q=80'
-    },
-    {
-      id: '8',
-      title: 'Traditional Jharokha & Peacock Art',
-      category: 'rajasthani',
-      category_label: 'Rajasthani Heritage',
-      subtitle: 'Jharokha & Peacock',
-      image_url: 'https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=700&q=80'
-    }
-  ];
-
-  const currentGallery = gallery.length > 0 ? gallery : defaultGallery;
-  const filteredGallery = activeCategory === 'all'
-    ? currentGallery
-    : currentGallery.filter((item) => (item.category || '').toLowerCase() === activeCategory);
-
-  // Category Counts
-  const categoryCounts = {
-    all: currentGallery.length,
-    bridal: currentGallery.filter((i) => (i.category || '').toLowerCase() === 'bridal').length,
-    arabic: currentGallery.filter((i) => (i.category || '').toLowerCase() === 'arabic').length,
-    rajasthani: currentGallery.filter((i) => (i.category || '').toLowerCase() === 'rajasthani').length,
-    engagement: currentGallery.filter((i) => (i.category || '').toLowerCase() === 'engagement').length,
-    festival: currentGallery.filter((i) => (i.category || '').toLowerCase() === 'festival').length
+  const nextSlide = () => {
+    setCurrentSlideIndex((prev) => (prev + 1) % heroBanners.length);
   };
 
   // --- SERVICES LIST ---
-  const defaultServices = [
+  const servicesList = [
     { icon: '♕', title: 'Bridal Mehndi', styleKey: 'Bridal', desc: 'Intricate full arm and feet bridal patterns with personalized groom figures, portraits, and love stories.' },
     { icon: '✦', title: 'Arabic Mehndi', styleKey: 'Arabic', desc: 'Flowing diagonal trails with bold negative space, floral highlights, and chic modern elegance.' },
     { icon: '❈', title: 'Bharwa Rajasthani', styleKey: 'Rajasthani', desc: 'Heritage Marwari patterns featuring peacocks, jharokhas, doli-baraat, and royal palace motifs.' },
     { icon: '❋', title: 'Designer Mehndi', styleKey: 'Designer', desc: 'Modern geometric lace, Moroccan mandalas, and fusion designs crafted for contemporary brides.' },
     { icon: '♡', title: 'Engagement & Roka', styleKey: 'Engagement', desc: 'Delicate wrist cuffs, subtle palm mandalas, and graceful backhand motifs for ring ceremonies.' },
-    { icon: '◈', title: 'Groom Mehndi', styleKey: 'Simple', desc: "Subtle, classy patterns, bride's initials, and minimalistic sacred mandalas for the handsome groom." },
+    { icon: '◈', title: 'Groom Mehndi', styleKey: 'Simple', desc: 'Subtle, classy patterns, bride\'s initials, and minimalistic sacred mandalas for the handsome groom.' },
     { icon: '✿', title: 'Baby Shower & Godh Bharai', styleKey: 'Simple', desc: 'Auspicious and charming symbols of motherhood, joy, and blessings for the mother-to-be.' },
     { icon: '☼', title: 'Festival Mehndi', styleKey: 'Simple', desc: 'Celebrate Karwa Chauth, Teej, Diwali, and Raksha Bandhan with festive and quick-drying designs.' },
     { icon: '♧', title: 'Sangeet & Family Groups', styleKey: 'Simple', desc: 'Professional multi-artist henna team for wedding guests, bridesmaids, and family gatherings.' },
@@ -223,139 +209,110 @@ export default function App() {
     { icon: '✧', title: 'Custom Love Story', styleKey: 'Bridal', desc: 'Bring your unique story to life with custom skylines, proposal moments, and portrait artistry.' }
   ];
 
-  // --- REVIEWS LIST ---
-  const defaultReviews = [
-    {
-      author: 'Pooja Rathore',
-      role: 'Destination Bride • Jagmandir Palace, Udaipur',
-      stars: 5,
-      content: 'Bhuvi is an absolute magician! She drew our destination wedding story and hidden portraits so exquisitely on my hands. The stain on my wedding day was pitch dark and lasted for over 3 weeks. Highly recommend her to every Udaipur bride!'
-    },
-    {
-      author: 'Ananya Singhal',
-      role: 'Royal Wedding • The Oberoi Udaivilas, Udaipur',
-      stars: 5,
-      content: 'The patience and precision Bhuvi has is unmatched. She arrived on time at our resort, brought natural organic henna that smelled heavenly, and created the cleanest fine lines I\'ve ever seen. Every single wedding guest was mesmerized!'
-    },
-    {
-      author: 'Sneha Sharma',
-      role: 'Sangeet & Bridal • Aurika, Udaipur',
-      stars: 5,
-      content: 'Booked Bhuvi for my engagement and then again for my sister\'s wedding group. Her designs are super modern, chic, and the color payoff is extraordinary. She is polite, gentle, and a true artist!'
-    }
-  ];
-  const currentReviews = reviews.length > 0 ? reviews : defaultReviews;
+  // --- CATEGORY FILTERING ---
+  const filteredGallery = activeFilter === 'all'
+    ? gallery
+    : gallery.filter((item) => (item.category || '').toLowerCase() === activeFilter.toLowerCase());
 
-  // --- BOOKING SUBMISSION HANDLER ---
-  const handleBookingSubmit = async (e) => {
+  const getCategoryCount = (cat) => {
+    if (cat === 'all') return gallery.length;
+    return gallery.filter((i) => (i.category || '').toLowerCase() === cat.toLowerCase()).length;
+  };
+
+  // --- BOOKING FORM SUBMISSION ---
+  const handleBookingSubmit = (e) => {
     e.preventDefault();
-    setBookingSubmitted(true);
+    setBookingMessage(true);
 
-    try {
-      await submitInquiry({
-        name: bookingData.name,
-        phone: bookingData.phone,
-        email: bookingData.email,
-        event_type: bookingData.event,
-        event_date: bookingData.date,
-        time_slot: bookingData.time,
-        venue: bookingData.venue,
-        guests_count: parseInt(bookingData.people, 10) || 1,
-        design_style: bookingData.design,
-        notes: bookingData.notes
-      });
-    } catch (err) {
-      console.warn('Could not store inquiry to cloud:', err);
-    }
+    const newInquiry = {
+      id: 'inq-' + Date.now(),
+      name: booking.name,
+      phone: booking.phone,
+      email: booking.email,
+      event: booking.event,
+      date: booking.date,
+      time: booking.time,
+      venue: booking.venue,
+      people: booking.people,
+      design: booking.design,
+      notes: booking.notes,
+      createdAt: new Date().toLocaleString(),
+      status: 'pending'
+    };
 
-    // Direct WhatsApp redirect with structured template
-    const text = `🌿 *NEW BOOKING INQUIRY — BHUVI MEHANDI* 🌿\n\n` +
-      `👤 *Name:* ${bookingData.name}\n` +
-      `📞 *Phone:* ${bookingData.phone}\n` +
-      `✨ *Event:* ${bookingData.event}\n` +
-      `📅 *Date:* ${bookingData.date || 'TBD'}\n` +
-      `⏰ *Time:* ${bookingData.time || 'Flexible'}\n` +
-      `📍 *Venue:* ${bookingData.venue}\n` +
-      `👥 *Guests:* ${bookingData.people || '1'}\n` +
-      `🎨 *Style:* ${bookingData.design}\n` +
-      `📝 *Notes:* ${bookingData.notes || 'None'}`;
+    setInquiriesList([newInquiry, ...inquiriesList]);
 
-    const waUrl = `https://wa.me/918094935632?text=${encodeURIComponent(text)}`;
+    // Build structured WhatsApp inquiry
+    const msg = `🌿 *NEW BOOKING INQUIRY — BHUVI MEHANDI* 🌿\n\n` +
+      `👤 *Name:* ${booking.name}\n` +
+      `📞 *Phone:* ${booking.phone}\n` +
+      `✨ *Event:* ${booking.event}\n` +
+      `📅 *Date:* ${booking.date || 'TBD'}\n` +
+      `⏰ *Time:* ${booking.time || 'Flexible'}\n` +
+      `📍 *Venue:* ${booking.venue}\n` +
+      `👥 *Guests:* ${booking.people || '1'}\n` +
+      `🎨 *Style:* ${booking.design}\n` +
+      `📝 *Notes:* ${booking.notes || 'None'}`;
+
+    const waNum = settings.whatsapp || '918094935632';
+    const waUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`;
     window.open(waUrl, '_blank');
   };
 
-  // --- REVIEW SUBMISSION HANDLER ---
-  const handleReviewSubmit = async (e) => {
+  // --- REVIEW SUBMISSION ---
+  const handleReviewSubmit = (e) => {
     e.preventDefault();
-    const newRev = {
-      author: reviewFormData.author,
-      role: reviewFormData.role,
-      stars: Number(reviewFormData.stars),
-      content: reviewFormData.content,
-      created_at: new Date().toISOString()
+    const createdRev = {
+      name: newReview.name,
+      role: newReview.role,
+      stars: Number(newReview.stars),
+      text: newReview.text
     };
-
-    setReviews([newRev, ...reviews]);
+    setReviews([createdRev, ...reviews]);
     setIsReviewModalOpen(false);
-    try {
-      await submitReview(newRev);
-    } catch (err) {
-      console.warn('Could not save review online:', err);
-    }
-    setReviewFormData({ author: '', role: 'Bride • Udaipur Wedding', stars: 5, content: '' });
+    setNewReview({ name: '', role: 'Bride • Udaipur Wedding', stars: 5, text: '' });
   };
 
-  // --- ADMIN AUTH & ACTIONS ---
+  // --- ADMIN ACTIONS ---
   const handleAdminLogin = (e) => {
     e.preventDefault();
-    if (adminPassword === 'admin123' || adminPassword === 'bhuvi2026' || adminPassword === 'admin') {
+    if (adminPasswordInput === 'admin123' || adminPasswordInput === settings.adminPassword) {
       setIsAdminLoggedIn(true);
     } else {
-      alert('Incorrect admin password. (Default: admin123)');
+      alert('Incorrect admin password (default: admin123)');
     }
   };
 
-  const handleAddDesign = async (e) => {
+  const handleAddDesign = (e) => {
     e.preventDefault();
-    if (!newDesign.image_url) return;
-    const item = {
-      title: newDesign.title || 'Mehndi Art',
+    if (!newDesign.image) return;
+    const added = {
+      id: 'gal-' + Date.now(),
+      title: newDesign.title || 'Mehndi Design',
       category: newDesign.category,
-      category_label: newDesign.category_label || 'Bridal Collection',
-      image_url: newDesign.image_url,
-      is_large: newDesign.is_large
+      categoryLabel: newDesign.category.toUpperCase(),
+      subtitle: newDesign.title || 'Royal Henna',
+      image: newDesign.image,
+      isLarge: newDesign.isLarge
     };
-    try {
-      const created = await createDesign(item);
-      setGallery([created, ...gallery]);
-      setNewDesign({ title: '', category: 'bridal', category_label: 'Bridal Collection', image_url: '', is_large: false });
-      alert('New design added successfully!');
-    } catch (err) {
-      alert('Error adding design: ' + err.message);
-    }
+    setGallery([added, ...gallery]);
+    setNewDesign({ title: '', category: 'bridal', categoryLabel: 'BRIDAL COLLECTION', image: '', isLarge: false });
+    alert('Design added to gallery successfully!');
   };
 
-  const handleDeleteDesign = async (id) => {
-    if (!confirm('Are you sure you want to delete this design?')) return;
-    try {
-      await deleteDesign(id);
+  const handleDeleteDesign = (id) => {
+    if (confirm('Delete this design from gallery?')) {
       setGallery(gallery.filter((g) => g.id !== id));
-    } catch (err) {
-      alert('Error deleting design: ' + err.message);
     }
   };
 
-  const handleUpdateInquiry = async (id, status) => {
-    try {
-      await updateInquiryStatus(id, status);
-      setInquiries(inquiries.map((inq) => (inq.id === id ? { ...inq, status } : inq)));
-    } catch (err) {
-      alert('Error updating status: ' + err.message);
-    }
+  const getImageSrc = (item) => {
+    if (!item) return '';
+    return item.image || item.image_url || item.src || '';
   };
 
   return (
-    <div className="bhuvi-root">
+    <div className="bhuvi-container-wrapper">
       {/* ================= HEADER ================= */}
       <header id="header">
         <div className="container nav">
@@ -382,7 +339,7 @@ export default function App() {
                 </a>
               </li>
               <li className="nav-mobile-insta">
-                <a href="https://instagram.com/bhuvi_mehandi_24" target="_blank" rel="noopener" className="mobile-insta-item">
+                <a href={`https://instagram.com/${settings.instagram || 'bhuvi_mehandi_24'}`} target="_blank" rel="noopener" className="mobile-insta-item">
                   <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -391,14 +348,14 @@ export default function App() {
                     </svg>
                     Follow on Instagram
                   </span>
-                  <small style={{ color: 'var(--gold)', fontWeight: 700 }}>@bhuvi_mehandi_24 ↗</small>
+                  <small style={{ color: 'var(--gold)', fontWeight: 700 }}>@{settings.instagram || 'bhuvi_mehandi_24'} ↗</small>
                 </a>
               </li>
             </ul>
           </nav>
 
           <div className="nav-actions">
-            <a href="https://instagram.com/bhuvi_mehandi_24" target="_blank" rel="noopener" className="nav-insta" aria-label="Follow on Instagram" title="Follow @bhuvi_mehandi_24">
+            <a href={`https://instagram.com/${settings.instagram || 'bhuvi_mehandi_24'}`} target="_blank" rel="noopener" className="nav-insta" aria-label="Follow on Instagram" title={`Follow @${settings.instagram || 'bhuvi_mehandi_24'}`}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                 <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
@@ -417,28 +374,36 @@ export default function App() {
         </div>
       </header>
 
-      {/* ================= MAIN CONTENT ================= */}
+      {/* ================= MAIN ================= */}
       <main>
         {/* ================= HERO CAROUSEL ================= */}
         <section className="hero" id="home">
           <div className="hero-carousel" id="heroCarousel">
-            <div className="hero-carousel-track" style={{ transform: `translateX(-${currentHeroSlide * 100}%)`, display: 'flex', transition: 'transform 0.8s ease' }}>
-              {heroSlides.map((slide, idx) => (
-                <div key={idx} className={`hero-slide ${currentHeroSlide === idx ? 'active' : ''}`} style={{ minWidth: '100%' }}>
-                  <img src={slide.img} alt={slide.alt} loading={idx === 0 ? 'eager' : 'lazy'} />
+            <div className="hero-carousel-track" id="heroCarouselTrack" style={{ transform: `translateX(-${currentSlideIndex * 100}%)`, display: 'flex', transition: 'transform 0.8s ease' }}>
+              {heroBanners.map((slide, idx) => (
+                <div key={slide.id || idx} className={`hero-slide ${currentSlideIndex === idx ? 'active' : ''}`} style={{ minWidth: '100%' }}>
+                  <img
+                    src={slide.image?.startsWith('hero-banner.png') ? '/hero-banner.png' : slide.image}
+                    alt={slide.title || 'Bhuvi Mehandi Luxury Bridal Henna'}
+                    loading={idx === 0 ? 'eager' : 'lazy'}
+                  />
                 </div>
               ))}
             </div>
 
-            <button className="hero-carousel-arrow prev" onClick={handlePrevSlide} aria-label="Previous Slide">‹</button>
-            <button className="hero-carousel-arrow next" onClick={handleNextSlide} aria-label="Next Slide">›</button>
+            <button className="hero-carousel-arrow prev" onClick={prevSlide} aria-label="Previous Banner Slide">
+              ‹
+            </button>
+            <button className="hero-carousel-arrow next" onClick={nextSlide} aria-label="Next Banner Slide">
+              ›
+            </button>
 
             <div className="hero-carousel-dots">
-              {heroSlides.map((_, idx) => (
+              {heroBanners.map((_, idx) => (
                 <button
                   key={idx}
-                  className={`hero-dot ${currentHeroSlide === idx ? 'active' : ''}`}
-                  onClick={() => setCurrentHeroSlide(idx)}
+                  className={`hero-dot ${currentSlideIndex === idx ? 'active' : ''}`}
+                  onClick={() => setCurrentSlideIndex(idx)}
                   aria-label={`Slide ${idx + 1}`}
                 />
               ))}
@@ -452,7 +417,7 @@ export default function App() {
             <span className="eyebrow">The Royal Art of Henna</span>
             <h2>Where tradition meets timeless beauty.</h2>
             <p>
-              Bhuvi Mehandi is a professional henna artist based in Udaipur, Rajasthan, specializing in elegant bridal and festive mehndi designs. 
+              Bhuvi Mehandi is a professional henna artist based in Udaipur, Rajasthan, specializing in elegant bridal and festive mehndi designs.
               Every design is thoughtfully created to make your special moments even more beautiful and memorable.
             </p>
 
@@ -496,13 +461,13 @@ export default function App() {
               <span className="eyebrow">Our Artistry Styles</span>
               <h2>Mehndi for Every Celebration</h2>
               <p>
-                From elaborate royal bridal coverage to graceful minimalist designs, 
+                From elaborate royal bridal coverage to graceful minimalist designs,
                 discover our specialized artistry tailored for your big day.
               </p>
             </div>
 
             <div className="services-grid">
-              {defaultServices.map((svc, idx) => (
+              {servicesList.map((svc, idx) => (
                 <div className="service-card" key={idx}>
                   <div className="service-icon">{svc.icon}</div>
                   <h3>{svc.title}</h3>
@@ -511,7 +476,11 @@ export default function App() {
                     href="#booking"
                     className="card-action"
                     onClick={() => {
-                      setBookingData((prev) => ({ ...prev, design: svc.styleKey, event: svc.styleKey === 'Bridal' ? 'Bridal' : prev.event }));
+                      setBooking((prev) => ({
+                        ...prev,
+                        design: svc.styleKey,
+                        event: svc.styleKey === 'Bridal' ? 'Bridal' : prev.event
+                      }));
                     }}
                   >
                     Book This Style →
@@ -522,7 +491,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* ================= GALLERY / PORTFOLIO ================= */}
+        {/* ================= PORTFOLIO / GALLERY ================= */}
         <section className="section portfolio" id="portfolio">
           <div className="container">
             <div className="section-heading">
@@ -533,44 +502,48 @@ export default function App() {
               </p>
             </div>
 
-            <div className="filters">
-              <button className={`filter-btn ${activeCategory === 'all' ? 'active' : ''}`} onClick={() => setActiveCategory('all')}>
-                All Designs ({categoryCounts.all})
+            <div className="filters" id="galleryFilters">
+              <button className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`} onClick={() => setActiveFilter('all')}>
+                All Designs ({getCategoryCount('all')})
               </button>
-              <button className={`filter-btn ${activeCategory === 'bridal' ? 'active' : ''}`} onClick={() => setActiveCategory('bridal')}>
-                Bridal ({categoryCounts.bridal})
+              <button className={`filter-btn ${activeFilter === 'bridal' ? 'active' : ''}`} onClick={() => setActiveFilter('bridal')}>
+                Bridal ({getCategoryCount('bridal')})
               </button>
-              <button className={`filter-btn ${activeCategory === 'arabic' ? 'active' : ''}`} onClick={() => setActiveCategory('arabic')}>
-                Arabic ({categoryCounts.arabic})
+              <button className={`filter-btn ${activeFilter === 'arabic' ? 'active' : ''}`} onClick={() => setActiveFilter('arabic')}>
+                Arabic ({getCategoryCount('arabic')})
               </button>
-              <button className={`filter-btn ${activeCategory === 'rajasthani' ? 'active' : ''}`} onClick={() => setActiveCategory('rajasthani')}>
-                Rajasthani ({categoryCounts.rajasthani})
+              <button className={`filter-btn ${activeFilter === 'rajasthani' ? 'active' : ''}`} onClick={() => setActiveFilter('rajasthani')}>
+                Rajasthani ({getCategoryCount('rajasthani')})
               </button>
-              <button className={`filter-btn ${activeCategory === 'engagement' ? 'active' : ''}`} onClick={() => setActiveCategory('engagement')}>
-                Engagement ({categoryCounts.engagement})
+              <button className={`filter-btn ${activeFilter === 'engagement' ? 'active' : ''}`} onClick={() => setActiveFilter('engagement')}>
+                Engagement ({getCategoryCount('engagement')})
               </button>
-              <button className={`filter-btn ${activeCategory === 'festival' ? 'active' : ''}`} onClick={() => setActiveCategory('festival')}>
-                Festival ({categoryCounts.festival})
+              <button className={`filter-btn ${activeFilter === 'festival' ? 'active' : ''}`} onClick={() => setActiveFilter('festival')}>
+                Festival ({getCategoryCount('festival')})
               </button>
             </div>
 
-            <div className="gallery">
-              {filteredGallery.map((item, idx) => (
-                <div
-                  key={item.id || idx}
-                  className={`gallery-item ${item.is_large ? 'large' : ''}`}
-                  onClick={() => setLightboxItem(item)}
-                >
-                  <img src={item.image_url || item.src} alt={item.title} loading="lazy" />
-                  <div className="gallery-overlay">
-                    <div>
-                      <small>{item.category_label || item.category}</small>
-                      <span>{item.subtitle || item.title}</span>
+            <div className="gallery" id="galleryGrid">
+              {filteredGallery.map((item, idx) => {
+                const isLarge = item.isLarge || item.is_large;
+                const src = getImageSrc(item);
+                return (
+                  <div
+                    key={item.id || idx}
+                    className={`gallery-item ${isLarge ? 'large' : ''}`}
+                    onClick={() => setLightboxData(item)}
+                  >
+                    <img src={src} alt={item.title || 'Mehndi Design'} loading="lazy" />
+                    <div className="gallery-overlay">
+                      <div>
+                        <small>{item.categoryLabel || item.category_label || (item.category ? item.category.toUpperCase() : 'MEHNDI')}</small>
+                        <span>{item.subtitle || item.title || 'Royal Henna'}</span>
+                      </div>
+                      <span className="zoom-btn">🔍 View</span>
                     </div>
-                    <span className="zoom-btn">🔍 View</span>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
@@ -594,13 +567,13 @@ export default function App() {
               <span className="eyebrow">Meet The Artist</span>
               <h2>Where Mewari Tradition Meets Fine Bridal Couture.</h2>
               <p>
-                Hello, I am <strong>Bhuvi Prajapat</strong>, the artist behind Bhuvi Mehandi in Udaipur. 
-                Rooted in the royal city of lakes and palaces, my passion is creating breathtaking henna 
+                Hello, I am <strong>Bhuvi Prajapat</strong>, the artist behind Bhuvi Mehandi in Udaipur.
+                Rooted in the royal city of lakes and palaces, my passion is creating breathtaking henna
                 that honors ancient Indian customs while complementing modern bridal elegance.
               </p>
               <p>
-                Every bridal design is drawn with patience, pure concentration, and organic Sojat henna freshly 
-                infused with pure essential oils. Whether you dream of a traditional Marwari Doli-Baraat story 
+                Every bridal design is drawn with patience, pure concentration, and organic Sojat henna freshly
+                infused with pure essential oils. Whether you dream of a traditional Marwari Doli-Baraat story
                 or contemporary fine-line lace, I am dedicated to making your bridal experience unforgettable.
               </p>
 
@@ -641,13 +614,13 @@ export default function App() {
               </p>
             </div>
 
-            <div className="reviews-grid">
-              {currentReviews.map((rev, idx) => (
+            <div className="reviews-grid" id="reviewsGrid">
+              {reviews.map((rev, idx) => (
                 <div className="testimonial-card" key={idx}>
                   <div className="stars">{'★'.repeat(rev.stars || 5)}</div>
-                  <p>"{rev.content}"</p>
+                  <p>"{rev.text || rev.content}"</p>
                   <div className="review-author">
-                    <strong>{rev.author}</strong>
+                    <strong>{rev.name || rev.author}</strong>
                     <span>{rev.role}</span>
                   </div>
                 </div>
@@ -669,8 +642,8 @@ export default function App() {
               <span className="eyebrow">Book Your Appointment</span>
               <h2>Let's create your dream bridal henna.</h2>
               <p>
-                Reserve your date in advance to guarantee availability during wedding season. 
-                Fill out the form below, and we will instantly connect with you on WhatsApp with 
+                Reserve your date in advance to guarantee availability during wedding season.
+                Fill out the form below, and we will instantly connect with you on WhatsApp with
                 custom design options and package quotes.
               </p>
 
@@ -700,11 +673,11 @@ export default function App() {
 
               <div className="direct-contact-note">
                 <p><strong>Prefer a direct phone call?</strong></p>
-                <p>📞 Call Bhuvi: <a href="tel:+918094935632" style={{ color: 'var(--gold-light)', textDecoration: 'underline' }}>+91 8094935632</a></p>
+                <p>📞 Call Bhuvi: <a href={`tel:${settings.phone?.replace(/\s+/g, '') || '+918094935632'}`} style={{ color: 'var(--gold-light)', textDecoration: 'underline' }}>{settings.phone || '+91 8094935632'}</a></p>
               </div>
             </div>
 
-            <form className="booking-form" onSubmit={handleBookingSubmit}>
+            <form className="booking-form" id="bookingForm" onSubmit={handleBookingSubmit}>
               <div className="form-header">
                 <h3>Appointment Inquiry Form</h3>
                 <p>Fill details below to launch booking on WhatsApp</p>
@@ -718,8 +691,8 @@ export default function App() {
                     id="name"
                     required
                     placeholder="e.g. Radhika Sharma"
-                    value={bookingData.name}
-                    onChange={(e) => setBookingData({ ...bookingData, name: e.target.value })}
+                    value={booking.name}
+                    onChange={(e) => setBooking({ ...booking, name: e.target.value })}
                   />
                 </div>
 
@@ -729,12 +702,12 @@ export default function App() {
                     type="tel"
                     id="phone"
                     required
-                    maxLength="10"
+                    maxLength={10}
                     pattern="[0-9]{10}"
                     inputMode="numeric"
                     placeholder="Enter 10-digit number"
-                    value={bookingData.phone}
-                    onChange={(e) => setBookingData({ ...bookingData, phone: e.target.value })}
+                    value={booking.phone}
+                    onChange={(e) => setBooking({ ...booking, phone: e.target.value })}
                   />
                 </div>
 
@@ -744,8 +717,8 @@ export default function App() {
                     type="email"
                     id="email"
                     placeholder="your@email.com"
-                    value={bookingData.email}
-                    onChange={(e) => setBookingData({ ...bookingData, email: e.target.value })}
+                    value={booking.email}
+                    onChange={(e) => setBooking({ ...booking, email: e.target.value })}
                   />
                 </div>
 
@@ -754,8 +727,8 @@ export default function App() {
                   <select
                     id="event"
                     required
-                    value={bookingData.event}
-                    onChange={(e) => setBookingData({ ...bookingData, event: e.target.value })}
+                    value={booking.event}
+                    onChange={(e) => setBooking({ ...booking, event: e.target.value })}
                   >
                     <option value="Bridal">Bridal Wedding</option>
                     <option value="Engagement">Engagement / Roka</option>
@@ -773,8 +746,8 @@ export default function App() {
                     type="date"
                     id="date"
                     required
-                    value={bookingData.date}
-                    onChange={(e) => setBookingData({ ...bookingData, date: e.target.value })}
+                    value={booking.date}
+                    onChange={(e) => setBooking({ ...booking, date: e.target.value })}
                   />
                 </div>
 
@@ -783,8 +756,8 @@ export default function App() {
                   <input
                     type="time"
                     id="time"
-                    value={bookingData.time}
-                    onChange={(e) => setBookingData({ ...bookingData, time: e.target.value })}
+                    value={booking.time}
+                    onChange={(e) => setBooking({ ...booking, time: e.target.value })}
                   />
                 </div>
 
@@ -795,8 +768,8 @@ export default function App() {
                     id="venue"
                     required
                     placeholder="e.g. Hotel / Resort Name, Area, Udaipur"
-                    value={bookingData.venue}
-                    onChange={(e) => setBookingData({ ...bookingData, venue: e.target.value })}
+                    value={booking.venue}
+                    onChange={(e) => setBooking({ ...booking, venue: e.target.value })}
                   />
                 </div>
 
@@ -807,8 +780,8 @@ export default function App() {
                     id="people"
                     min="1"
                     placeholder="e.g. 1 (Bride only) or 10"
-                    value={bookingData.people}
-                    onChange={(e) => setBookingData({ ...bookingData, people: e.target.value })}
+                    value={booking.people}
+                    onChange={(e) => setBooking({ ...booking, people: e.target.value })}
                   />
                 </div>
 
@@ -816,8 +789,8 @@ export default function App() {
                   <label htmlFor="design">Preferred Design Style</label>
                   <select
                     id="design"
-                    value={bookingData.design}
-                    onChange={(e) => setBookingData({ ...bookingData, design: e.target.value })}
+                    value={booking.design}
+                    onChange={(e) => setBooking({ ...booking, design: e.target.value })}
                   >
                     <option value="Bridal">Royal Full Bridal</option>
                     <option value="Arabic">Modern Arabic Trail</option>
@@ -834,8 +807,8 @@ export default function App() {
                   <textarea
                     id="notes"
                     placeholder="Mention any custom story motifs (doli, baraat, portraits, initials) or specific requirements..."
-                    value={bookingData.notes}
-                    onChange={(e) => setBookingData({ ...bookingData, notes: e.target.value })}
+                    value={booking.notes}
+                    onChange={(e) => setBooking({ ...booking, notes: e.target.value })}
                   ></textarea>
                 </div>
               </div>
@@ -844,8 +817,8 @@ export default function App() {
                 <span>💬 Send Booking Inquiry on WhatsApp</span>
               </button>
 
-              {bookingSubmitted && (
-                <div className="form-message" style={{ display: 'block' }}>
+              {bookingMessage && (
+                <div className="form-message" id="formMessage" style={{ display: 'block' }}>
                   Opening WhatsApp with your appointment details...
                 </div>
               )}
@@ -911,27 +884,27 @@ export default function App() {
             </div>
 
             <div className="contact-grid">
-              <a className="contact-card" href="tel:+918094935632">
+              <a className="contact-card" href={`tel:${settings.phone?.replace(/\s+/g, '') || '+918094935632'}`}>
                 <div className="contact-icon">📞</div>
                 <div>
                   <small>Call Direct</small>
-                  <strong>+91 8094935632</strong>
+                  <strong>{settings.phone || '+91 8094935632'}</strong>
                 </div>
               </a>
 
-              <a className="contact-card" href="https://wa.me/918094935632?text=Hello%20Bhuvi%20Mehandi,%20I%20would%20like%20to%20inquire%20about%20booking" target="_blank" rel="noopener">
+              <a className="contact-card" href={`https://wa.me/${settings.whatsapp || '918094935632'}?text=Hello%20Bhuvi%20Mehandi,%20I%20would%20like%20to%20inquire%20about%20booking`} target="_blank" rel="noopener">
                 <div className="contact-icon">💬</div>
                 <div>
                   <small>WhatsApp Chat</small>
-                  <strong>+91 8094935632</strong>
+                  <strong>+{settings.whatsapp || '918094935632'}</strong>
                 </div>
               </a>
 
-              <a className="contact-card" href="mailto:prajapatbhavna2003@gmail.com">
+              <a className="contact-card" href={`mailto:${settings.email || 'prajapatbhavna2003@gmail.com'}`}>
                 <div className="contact-icon">✉️</div>
                 <div>
                   <small>Email Inquiries</small>
-                  <strong>prajapatbhavna2003@gmail.com</strong>
+                  <strong>{settings.email || 'prajapatbhavna2003@gmail.com'}</strong>
                 </div>
               </a>
 
@@ -939,7 +912,7 @@ export default function App() {
                 <div className="contact-icon">📍</div>
                 <div>
                   <small>Studio Location</small>
-                  <strong>Near MLSU, Udaipur, Rajasthan</strong>
+                  <strong>{settings.address || 'Near MLSU, Udaipur, Rajasthan'}</strong>
                 </div>
               </div>
             </div>
@@ -952,7 +925,7 @@ export default function App() {
             <span className="eyebrow">Your Big Day Deserves Regal Artistry</span>
             <h2>Ready to book your bridal mehndi?</h2>
             <p>
-              Dates for the upcoming wedding season fill up quickly. 
+              Dates for the upcoming wedding season fill up quickly.
               Connect with Bhuvi today and let's create something extraordinary together.
             </p>
             <a href="#booking" className="btn btn-primary">
@@ -968,15 +941,15 @@ export default function App() {
           <div>
             <h3>Bhuvi Mehandi</h3>
             <p>
-              Premier luxury bridal and designer henna artistry based in the royal city of Udaipur, Rajasthan. 
+              Premier luxury bridal and designer henna artistry based in the royal city of Udaipur, Rajasthan.
               Dedicated to honoring your happiest celebrations with passion and pure organic henna.
             </p>
             <div className="socials">
-              <a href="https://instagram.com/bhuvi_mehandi_24" target="_blank" rel="noopener" aria-label="Instagram" className="social-instagram" title="Instagram @bhuvi_mehandi_24">
+              <a href={`https://instagram.com/${settings.instagram || 'bhuvi_mehandi_24'}`} target="_blank" rel="noopener" aria-label="Instagram" className="social-instagram" title={`Instagram @${settings.instagram || 'bhuvi_mehandi_24'}`}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
                 Instagram
               </a>
-              <a href="https://wa.me/918094935632" target="_blank" rel="noopener" aria-label="WhatsApp" className="social-whatsapp" title="WhatsApp +91 8094935632">
+              <a href={`https://wa.me/${settings.whatsapp || '918094935632'}`} target="_blank" rel="noopener" aria-label="WhatsApp" className="social-whatsapp" title={`WhatsApp +${settings.whatsapp || '918094935632'}`}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                 WhatsApp
               </a>
@@ -1008,10 +981,10 @@ export default function App() {
 
           <div>
             <h4>Studio & Booking</h4>
-            <p style={{ color: 'var(--text-muted)', fontSize: '14px', lineHeight: 1.7, marginBottom: '14px' }}>
+            <p style={{ color: 'var(--muted)', fontSize: '14px', lineHeight: 1.7, marginBottom: '14px' }}>
               📍 Near MLSU Campus, Udaipur, Rajasthan<br />
-              📞 <a href="tel:+918094935632" style={{ color: 'var(--gold-light)' }}>+91 8094935632</a><br />
-              ✉️ <a href="mailto:prajapatbhavna2003@gmail.com" style={{ color: 'var(--gold-light)' }}>prajapatbhavna2003@gmail.com</a>
+              📞 <a href={`tel:${settings.phone?.replace(/\s+/g, '') || '+918094935632'}`} style={{ color: 'var(--gold-deep)' }}>{settings.phone || '+91 8094935632'}</a><br />
+              ✉️ <a href={`mailto:${settings.email || 'prajapatbhavna2003@gmail.com'}`} style={{ color: 'var(--gold-deep)' }}>{settings.email || 'prajapatbhavna2003@gmail.com'}</a>
             </p>
             <button className="btn btn-outline" style={{ fontSize: '12px', padding: '6px 14px' }} onClick={() => setIsAdminModalOpen(true)}>
               🔒 Studio CMS Login
@@ -1025,21 +998,21 @@ export default function App() {
       </footer>
 
       {/* ================= LIGHTBOX MODAL ================= */}
-      {lightboxItem && (
-        <div className="lightbox active" onClick={() => setLightboxItem(null)}>
+      {lightboxData && (
+        <div className="lightbox active" onClick={() => setLightboxData(null)}>
           <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
-            <button className="lightbox-close" onClick={() => setLightboxItem(null)}>✕</button>
-            <img src={lightboxItem.image_url || lightboxItem.src} alt={lightboxItem.title} />
+            <button className="lightbox-close" onClick={() => setLightboxData(null)}>✕</button>
+            <img src={getImageSrc(lightboxData)} alt={lightboxData.title} />
             <div className="lightbox-caption">
-              <h3>{lightboxItem.title}</h3>
-              <p>{lightboxItem.category_label || lightboxItem.category}</p>
+              <h3>{lightboxData.title}</h3>
+              <p>{lightboxData.categoryLabel || lightboxData.category}</p>
               <a
                 href="#booking"
                 className="btn btn-primary"
                 style={{ marginTop: '12px', display: 'inline-block' }}
                 onClick={() => {
-                  setBookingData((prev) => ({ ...prev, notes: `Inquiring about design: ${lightboxItem.title}` }));
-                  setLightboxItem(null);
+                  setBooking((prev) => ({ ...prev, notes: `Inquiring about design: ${lightboxData.title}` }));
+                  setLightboxData(null);
                 }}
               >
                 Book This Exact Design →
@@ -1064,8 +1037,8 @@ export default function App() {
                   type="text"
                   required
                   placeholder="e.g. Radhika Mehta"
-                  value={reviewFormData.author}
-                  onChange={(e) => setReviewFormData({ ...reviewFormData, author: e.target.value })}
+                  value={newReview.name}
+                  onChange={(e) => setNewReview({ ...newReview, name: e.target.value })}
                 />
               </div>
               <div className="form-group">
@@ -1074,15 +1047,15 @@ export default function App() {
                   type="text"
                   required
                   placeholder="e.g. Bride • The Leela Palace, Udaipur"
-                  value={reviewFormData.role}
-                  onChange={(e) => setReviewFormData({ ...reviewFormData, role: e.target.value })}
+                  value={newReview.role}
+                  onChange={(e) => setNewReview({ ...newReview, role: e.target.value })}
                 />
               </div>
               <div className="form-group">
                 <label>Rating (Stars)</label>
                 <select
-                  value={reviewFormData.stars}
-                  onChange={(e) => setReviewFormData({ ...reviewFormData, stars: Number(e.target.value) })}
+                  value={newReview.stars}
+                  onChange={(e) => setNewReview({ ...newReview, stars: Number(e.target.value) })}
                 >
                   <option value={5}>★★★★★ (5 Stars - Outstanding)</option>
                   <option value={4}>★★★★☆ (4 Stars - Great)</option>
@@ -1093,10 +1066,10 @@ export default function App() {
                 <label>Your Testimonial Review *</label>
                 <textarea
                   required
-                  rows="4"
+                  rows={4}
                   placeholder="Describe your henna experience with Bhuvi, the stain darkness, punctuality, and guest feedback..."
-                  value={reviewFormData.content}
-                  onChange={(e) => setReviewFormData({ ...reviewFormData, content: e.target.value })}
+                  value={newReview.text}
+                  onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
                 ></textarea>
               </div>
               <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '10px' }}>
@@ -1118,15 +1091,15 @@ export default function App() {
 
             {!isAdminLoggedIn ? (
               <form onSubmit={handleAdminLogin} style={{ padding: '24px' }}>
-                <p style={{ marginBottom: '16px', color: 'var(--text-muted)' }}>Enter Studio Admin Password to manage inquiries, gallery photos, and prices.</p>
+                <p style={{ marginBottom: '16px', color: 'var(--muted)' }}>Enter Studio Admin Password to manage inquiries, gallery photos, and prices.</p>
                 <div className="form-group">
                   <label>Admin Password</label>
                   <input
                     type="password"
                     required
                     placeholder="Enter password (default: admin123)"
-                    value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
+                    value={adminPasswordInput}
+                    onChange={(e) => setAdminPasswordInput(e.target.value)}
                   />
                 </div>
                 <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '16px' }}>
@@ -1136,13 +1109,13 @@ export default function App() {
             ) : (
               <div style={{ padding: '20px' }}>
                 <div style={{ display: 'flex', gap: '10px', borderBottom: '1px solid var(--border)', paddingBottom: '12px', marginBottom: '20px' }}>
-                  <button className={`filter-btn ${adminActiveTab === 'inquiries' ? 'active' : ''}`} onClick={() => setAdminActiveTab('inquiries')}>
-                    📋 Inquiries ({inquiries.length})
+                  <button className={`filter-btn ${adminTab === 'inquiries' ? 'active' : ''}`} onClick={() => setAdminTab('inquiries')}>
+                    📋 Inquiries ({inquiriesList.length})
                   </button>
-                  <button className={`filter-btn ${adminActiveTab === 'gallery' ? 'active' : ''}`} onClick={() => setAdminActiveTab('gallery')}>
+                  <button className={`filter-btn ${adminTab === 'gallery' ? 'active' : ''}`} onClick={() => setAdminTab('gallery')}>
                     🖼️ Gallery ({gallery.length})
                   </button>
-                  <button className={`filter-btn ${adminActiveTab === 'reviews' ? 'active' : ''}`} onClick={() => setAdminActiveTab('reviews')}>
+                  <button className={`filter-btn ${adminTab === 'reviews' ? 'active' : ''}`} onClick={() => setAdminTab('reviews')}>
                     ⭐ Reviews ({reviews.length})
                   </button>
                   <button className="btn btn-outline" style={{ marginLeft: 'auto' }} onClick={() => setIsAdminLoggedIn(false)}>
@@ -1150,29 +1123,26 @@ export default function App() {
                   </button>
                 </div>
 
-                {adminActiveTab === 'inquiries' && (
+                {adminTab === 'inquiries' && (
                   <div>
                     <h4>Client Appointment Inquiries</h4>
-                    {inquiries.length === 0 ? (
-                      <p style={{ color: 'var(--text-muted)', marginTop: '12px' }}>No new inquiries yet.</p>
+                    {inquiriesList.length === 0 ? (
+                      <p style={{ color: 'var(--muted)', marginTop: '12px' }}>No new inquiries yet.</p>
                     ) : (
                       <div style={{ display: 'grid', gap: '12px', marginTop: '12px' }}>
-                        {inquiries.map((inq) => (
-                          <div key={inq.id} style={{ border: '1px solid var(--border)', borderRadius: '8px', padding: '14px', background: 'var(--bg-card)' }}>
+                        {inquiriesList.map((inq) => (
+                          <div key={inq.id} style={{ border: '1px solid var(--border)', borderRadius: '8px', padding: '14px', background: 'var(--cream)' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                               <strong>{inq.name} ({inq.phone})</strong>
-                              <span style={{ padding: '2px 8px', borderRadius: '4px', background: inq.status === 'confirmed' ? '#4A5D4E' : '#A64B38', color: '#fff', fontSize: '12px' }}>
-                                {inq.status || 'pending'}
+                              <span style={{ padding: '2px 8px', borderRadius: '4px', background: inq.status === 'confirmed' ? '#4A5D4E' : 'var(--maroon)', color: '#fff', fontSize: '12px' }}>
+                                {inq.status}
                               </span>
                             </div>
-                            <p style={{ fontSize: '13px', margin: '4px 0' }}>📅 {inq.event_date} | 📍 {inq.venue} | 👥 {inq.guests_count} guests | 🎨 {inq.design_style}</p>
-                            {inq.notes && <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>"{inq.notes}"</p>}
+                            <p style={{ fontSize: '13px', margin: '4px 0' }}>📅 {inq.date} | 📍 {inq.venue} | 👥 {inq.people} guests | 🎨 {inq.design}</p>
+                            {inq.notes && <p style={{ fontSize: '13px', color: 'var(--muted)' }}>"{inq.notes}"</p>}
                             <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-                              <button className="btn btn-outline" style={{ fontSize: '12px', padding: '4px 8px' }} onClick={() => handleUpdateInquiry(inq.id, 'confirmed')}>
-                                Mark Confirmed
-                              </button>
                               <a href={`https://wa.me/91${inq.phone}`} target="_blank" rel="noopener" className="btn btn-primary" style={{ fontSize: '12px', padding: '4px 8px' }}>
-                                Chat WhatsApp
+                                Chat on WhatsApp
                               </a>
                             </div>
                           </div>
@@ -1182,7 +1152,7 @@ export default function App() {
                   </div>
                 )}
 
-                {adminActiveTab === 'gallery' && (
+                {adminTab === 'gallery' && (
                   <div>
                     <h4>Add New Gallery Design</h4>
                     <form onSubmit={handleAddDesign} style={{ display: 'grid', gap: '10px', margin: '14px 0 24px' }}>
@@ -1195,14 +1165,14 @@ export default function App() {
                       />
                       <input
                         type="url"
-                        placeholder="Image URL (Unsplash or Cloud URL)"
+                        placeholder="Image URL (Unsplash or Cloud Image URL)"
                         required
-                        value={newDesign.image_url}
-                        onChange={(e) => setNewDesign({ ...newDesign, image_url: e.target.value })}
+                        value={newDesign.image}
+                        onChange={(e) => setNewDesign({ ...newDesign, image: e.target.value })}
                       />
                       <select
                         value={newDesign.category}
-                        onChange={(e) => setNewDesign({ ...newDesign, category: e.target.value, category_label: e.target.value.toUpperCase() })}
+                        onChange={(e) => setNewDesign({ ...newDesign, category: e.target.value })}
                       >
                         <option value="bridal">Bridal</option>
                         <option value="arabic">Arabic</option>
@@ -1215,13 +1185,13 @@ export default function App() {
                       </button>
                     </form>
 
-                    <h4>Existing Designs ({gallery.length})</h4>
+                    <h4>Existing Gallery Designs ({gallery.length})</h4>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '10px', marginTop: '12px' }}>
                       {gallery.map((g) => (
                         <div key={g.id} style={{ border: '1px solid var(--border)', borderRadius: '6px', overflow: 'hidden' }}>
-                          <img src={g.image_url} alt={g.title} style={{ width: '100%', height: '110px', objectFit: 'cover' }} />
+                          <img src={getImageSrc(g)} alt={g.title} style={{ width: '100%', height: '110px', objectFit: 'cover' }} />
                           <div style={{ padding: '6px' }}>
-                            <p style={{ fontSize: '12px', fontWeight: 600, truncate: true }}>{g.title}</p>
+                            <p style={{ fontSize: '12px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{g.title}</p>
                             <button onClick={() => handleDeleteDesign(g.id)} style={{ color: '#c00', fontSize: '11px', border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}>
                               Delete ✕
                             </button>
@@ -1232,14 +1202,14 @@ export default function App() {
                   </div>
                 )}
 
-                {adminActiveTab === 'reviews' && (
+                {adminTab === 'reviews' && (
                   <div>
                     <h4>Bride Testimonials</h4>
                     <div style={{ display: 'grid', gap: '10px', marginTop: '12px' }}>
-                      {currentReviews.map((r, idx) => (
-                        <div key={r.id || idx} style={{ border: '1px solid var(--border)', borderRadius: '8px', padding: '10px' }}>
-                          <strong>{r.author}</strong> - <span>{r.role}</span>
-                          <p style={{ fontSize: '13px', margin: '4px 0' }}>"{r.content}"</p>
+                      {reviews.map((r, idx) => (
+                        <div key={idx} style={{ border: '1px solid var(--border)', borderRadius: '8px', padding: '10px' }}>
+                          <strong>{r.name || r.author}</strong> - <span>{r.role}</span>
+                          <p style={{ fontSize: '13px', margin: '4px 0' }}>"{r.text || r.content}"</p>
                         </div>
                       ))}
                     </div>
@@ -1251,31 +1221,18 @@ export default function App() {
         </div>
       )}
 
-      {/* ================= FLOATING QUICK ACTION BUTTONS ================= */}
+      {/* ================= FLOATING WHATSAPP BUTTON ================= */}
       <a
-        href="https://wa.me/918094935632?text=Hello%20Bhuvi%20Mehandi,%20I%20would%20like%20to%20inquire%20about%20booking"
+        href={`https://wa.me/${settings.whatsapp || '918094935632'}?text=Hello%20Bhuvi%20Mehandi,%20I%20would%20like%20to%20inquire%20about%20booking`}
+        className="floating-whatsapp"
         target="_blank"
         rel="noopener"
-        className="floating-whatsapp"
         aria-label="Chat with Bhuvi on WhatsApp"
-        style={{
-          position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          zIndex: 999,
-          background: '#25D366',
-          color: '#fff',
-          borderRadius: '50%',
-          width: '56px',
-          height: '56px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 6px 20px rgba(0,0,0,0.3)',
-          transition: 'transform 0.3s ease'
-        }}
       >
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+        </svg>
+        <span className="wa-tooltip">Chat with Bhuvi on WhatsApp</span>
       </a>
     </div>
   );
