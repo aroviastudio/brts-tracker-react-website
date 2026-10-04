@@ -2,7 +2,7 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Snera Store Admin | Luxury Boutique Dashboard</title>
   
   <!-- Fonts & Icons -->
@@ -53,7 +53,7 @@
       --text-secondary: #6B5057;
       --text-muted: #9B7A84;
       --card-shadow: 0 8px 30px rgba(107, 39, 55, 0.04), 0 2px 8px rgba(0, 0, 0, 0.02);
-      --header-bg: rgba(255, 255, 255, 0.92);
+      --header-bg: rgba(255, 255, 255, 0.95);
       --sidebar-bg: #4E1A28;
       --sidebar-text: rgba(255, 255, 255, 0.75);
       --sidebar-active: #FFFFFF;
@@ -71,7 +71,7 @@
       --text-secondary: #C8ACAF;
       --text-muted: #8E7073;
       --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-      --header-bg: rgba(24, 9, 12, 0.92);
+      --header-bg: rgba(24, 9, 12, 0.95);
       --sidebar-bg: #0F0406;
       --sidebar-text: rgba(247, 234, 235, 0.75);
       --sidebar-active: #FFFFFF;
@@ -93,6 +93,7 @@
       font-size: 14px;
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
     /* Scrollbars */
@@ -106,7 +107,9 @@
       display: flex;
       min-height: 100vh;
       width: 100%;
+      max-width: 100vw;
       position: relative;
+      overflow-x: hidden;
     }
 
     /* Mobile Topbar */
@@ -115,12 +118,13 @@
       align-items: center;
       justify-content: space-between;
       height: 60px;
-      padding: 0 1.25rem;
+      padding: 0 1rem;
       background: var(--sidebar-bg);
       position: sticky;
       top: 0;
       z-index: 200;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      width: 100%;
     }
     .mobile-topbar .brand {
       font-family: var(--font-display);
@@ -133,11 +137,30 @@
       background: none;
       border: none;
       color: rgba(255, 255, 255, 0.9);
-      font-size: 24px;
+      font-size: 26px;
       cursor: pointer;
-      padding: 6px;
+      padding: 8px;
       display: flex;
       align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 44px;
+    }
+
+    /* Sidebar Drawer & Mobile Backdrop */
+    .sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(3px);
+      z-index: 950;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar-backdrop.active {
+      display: block;
+      opacity: 1;
     }
 
     /* Sidebar Navigation */
@@ -147,7 +170,7 @@
       background: var(--sidebar-bg);
       display: flex;
       flex-direction: column;
-      z-index: 150;
+      z-index: 1000;
       border-right: 1px solid var(--border);
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -176,8 +199,8 @@
       margin-top: 4px;
     }
     .connection-dot {
-      width: 7px;
-      height: 7px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: var(--danger);
       display: inline-block;
@@ -191,18 +214,20 @@
       gap: 4px;
       padding: 0 0.75rem;
       flex: 1;
+      overflow-y: auto;
     }
     .nav-item {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 0.8rem 1rem;
-      font-size: 13.5px;
+      padding: 0.85rem 1rem;
+      font-size: 14px;
       color: var(--sidebar-text);
       cursor: pointer;
       border-radius: var(--radius-md);
       transition: all 0.2s ease;
       font-weight: 500;
+      min-height: 44px;
     }
     .nav-item:hover {
       background: rgba(255, 255, 255, 0.06);
@@ -213,7 +238,7 @@
       color: var(--gold-light);
       font-weight: 600;
     }
-    .nav-item i { font-size: 19px; }
+    .nav-item i { font-size: 20px; }
 
     .sidebar-footer {
       padding: 1.25rem;
@@ -253,7 +278,7 @@
     
     .topbar {
       height: 64px;
-      padding: 0 1.75rem;
+      padding: 0 1.5rem;
       background: var(--header-bg);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
@@ -264,9 +289,14 @@
       top: 0;
       z-index: 100;
     }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
     .topbar h2 {
       font-family: var(--font-display);
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 600;
       color: var(--text-primary);
     }
@@ -277,7 +307,7 @@
     }
 
     .page-body {
-      padding: 1.75rem;
+      padding: 1.5rem;
       flex: 1;
     }
 
@@ -291,7 +321,7 @@
     /* Metric Cards Grid */
     .metrics-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1.25rem;
       margin-bottom: 1.5rem;
     }
@@ -305,19 +335,20 @@
       align-items: center;
       justify-content: space-between;
     }
-    .metric-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
-    .metric-value { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--text-primary); margin: 4px 0; }
-    .metric-sub { font-size: 12px; color: var(--text-secondary); }
+    .metric-label { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+    .metric-value { font-family: var(--font-display); font-size: 26px; font-weight: 700; color: var(--text-primary); margin: 4px 0; }
+    .metric-sub { font-size: 11.5px; color: var(--text-secondary); }
     .metric-icon {
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       border-radius: var(--radius-md);
       background: var(--bg-hover);
       color: var(--wine);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: 22px;
+      flex-shrink: 0;
     }
 
     /* Cards & Containers */
@@ -358,7 +389,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
       color: var(--text-primary);
-      font-size: 13.5px;
+      font-size: 14px;
       outline: none;
       transition: border-color 0.2s;
     }
@@ -380,6 +411,7 @@
       border: none;
       transition: all 0.2s ease;
       text-decoration: none;
+      min-height: 40px;
     }
     .btn-primary { background: var(--wine); color: #FFF; }
     .btn-primary:hover { background: var(--wine-dark); }
@@ -387,13 +419,17 @@
     .btn-gold:hover { background: var(--gold-hover); }
     .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-primary); }
     .btn-outline:hover { background: var(--bg-hover); }
-    .btn-sm { padding: 0.4rem 0.8rem; font-size: 12px; }
-    .btn-icon-only { width: 38px; height: 38px; padding: 0; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border); color: var(--text-primary); }
+    .btn-sm { padding: 0.4rem 0.8rem; font-size: 12px; min-height: 34px; }
+    .btn-icon-only { width: 40px; height: 40px; padding: 0; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border); color: var(--text-primary); }
     .btn-icon-only:hover { background: var(--bg-hover); }
 
     /* Tables */
-    .table-responsive { width: 100%; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; text-align: left; }
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; min-width: 600px; }
     th {
       background: var(--bg-secondary);
       padding: 0.85rem 1.25rem;
@@ -454,10 +490,10 @@
     /* Modal Dialogs */
     .modal-overlay {
       position: fixed; inset: 0;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.65);
       backdrop-filter: blur(4px);
       display: none; align-items: center; justify-content: center;
-      z-index: 1000; padding: 1rem;
+      z-index: 2000; padding: 1rem;
     }
     .modal-overlay.active { display: flex; animation: fadeIn 0.2s ease; }
     .modal-content {
@@ -486,31 +522,49 @@
     .form-group label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
-    /* Mobile Responsive Breakpoints */
+    /* Mobile Responsive Breakpoints & Overrides */
     @media (max-width: 900px) {
       .sidebar {
-        position: fixed; top: 0; bottom: 0; left: 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 270px;
+        max-width: 85vw;
+        z-index: 1000;
         transform: translateX(-100%);
+        box-shadow: 10px 0 30px rgba(0,0,0,0.4);
       }
       .sidebar.open { transform: translateX(0); }
       .mobile-topbar { display: flex; }
+      .desktop-hamburger { display: flex !important; }
       .col-hide-mobile { display: none; }
-      .metrics-grid { grid-template-columns: 1fr 1fr; }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
       .page-body { padding: 1rem; }
+      .input-field, .select-field, input, select, textarea { font-size: 16px !important; }
     }
     @media (max-width: 550px) {
       .metrics-grid { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
+      .card-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+      .card-header button { width: 100%; }
+      .filter-bar { flex-direction: column; }
+      .filter-bar .input-field, .filter-bar .select-field, .filter-bar .btn { width: 100%; }
+      .modal-content { width: 95vw; margin: 0 auto; max-height: 92vh; }
+      .modal-body { padding: 1rem; }
     }
   </style>
 </head>
 <body>
 
+  <!-- MOBILE SIDEBAR BACKDROP -->
+  <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar()"></div>
+
   <div class="snera-admin-wrapper">
     <!-- MOBILE TOPBAR -->
     <div class="mobile-topbar">
       <div class="brand">Snera Store</div>
-      <button class="hamburger-btn" onclick="toggleSidebar()"><i class="ti ti-menu-2"></i></button>
+      <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Toggle Navigation"><i class="ti ti-menu-2"></i></button>
     </div>
 
     <!-- SIDEBAR NAVIGATION -->
@@ -521,7 +575,7 @@
         </div>
         <small>
           <span class="connection-dot" id="db-status-dot"></span>
-          <span id="db-status-text">Disconnected</span>
+          <span id="db-status-text">Connecting...</span>
         </small>
       </div>
 
@@ -562,7 +616,10 @@
     <main class="main-content">
       <!-- TOPBAR -->
       <header class="topbar">
-        <h2 id="current-page-title">Dashboard Overview</h2>
+        <div class="topbar-left">
+          <button class="hamburger-btn desktop-hamburger" onclick="toggleSidebar()" style="display:none; color: var(--text-primary);" aria-label="Toggle Menu"><i class="ti ti-menu-2"></i></button>
+          <h2 id="current-page-title">Dashboard Overview</h2>
+        </div>
         <div class="topbar-actions">
           <button class="btn btn-icon-only" onclick="toggleTheme()" title="Toggle Theme">
             <i class="ti ti-moon" id="theme-icon"></i>
@@ -631,7 +688,7 @@
                   </tr>
                 </thead>
                 <tbody id="dash-orders-body">
-                  <tr><td colspan="5" style="text-align:center; color: var(--text-muted);">Connect Supabase to fetch live orders</td></tr>
+                  <tr><td colspan="5" style="text-align:center; color: var(--text-muted);">Fetching live orders...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -949,6 +1006,10 @@ create policy "Admin All Orders" on orders for all using (true);
 
   <!-- JAVASCRIPT APP LOGIC -->
   <script>
+    // PRE-CONFIGURED DEFAULT KEYS FOR AUTOMATIC CONNECTION
+    const DEFAULT_SUPABASE_URL = 'https://itinnrnvjwwhstnwomki.supabase.co';
+    const DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0aW5ucm52and3aHN0bndvbWtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNTA1MDEsImV4cCI6MjEwNDkyNjUwMX0.FEphwrQL38rskt7t_-n4ZkippCDMPjlAMAoVllRryhM';
+
     // Local State
     let supabaseClient = null;
     let categoriesList = [];
@@ -971,7 +1032,17 @@ create policy "Admin All Orders" on orders for all using (true);
 
     // Sidebar Mobile Toggle
     function toggleSidebar() {
-      document.getElementById('admin-sidebar').classList.toggle('open');
+      const sidebar = document.getElementById('admin-sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      const isOpen = sidebar.classList.contains('open');
+
+      if (isOpen) {
+        sidebar.classList.remove('open');
+        backdrop.classList.remove('active');
+      } else {
+        sidebar.classList.add('open');
+        backdrop.classList.add('active');
+      }
     }
 
     // Switch Admin Sections
@@ -996,13 +1067,14 @@ create policy "Admin All Orders" on orders for all using (true);
       
       if (window.innerWidth <= 900) {
         document.getElementById('admin-sidebar').classList.remove('open');
+        document.getElementById('sidebar-backdrop').classList.remove('active');
       }
     }
 
     // Supabase Setup
     function initSupabase() {
-      const storedUrl = localStorage.getItem('snera_sb_url');
-      const storedKey = localStorage.getItem('snera_sb_key');
+      const storedUrl = localStorage.getItem('snera_sb_url') || DEFAULT_SUPABASE_URL;
+      const storedKey = localStorage.getItem('snera_sb_key') || DEFAULT_SUPABASE_KEY;
 
       if (storedUrl && storedKey) {
         try {
@@ -1024,23 +1096,30 @@ create policy "Admin All Orders" on orders for all using (true);
       try {
         // Fetch Categories
         const { data: cats } = await supabaseClient.from('categories').select('*').order('display_order', { ascending: true });
-        if (cats) {
+        if (cats && cats.length > 0) {
           categoriesList = cats;
           renderCategories();
+        } else {
+          document.getElementById('categories-table-body').innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--text-muted);">No categories found in Supabase. Run SQL setup or add new category.</td></tr>';
         }
 
         // Fetch Products
         const { data: prods } = await supabaseClient.from('products').select('*');
-        if (prods) {
+        if (prods && prods.length > 0) {
           productsList = prods;
           renderProducts();
+        } else {
+          document.getElementById('products-table-body').innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--text-muted);">No products found in catalog.</td></tr>';
         }
 
         // Fetch Orders
         const { data: ords } = await supabaseClient.from('orders').select('*').order('created_at', { ascending: false });
-        if (ords) {
+        if (ords && ords.length > 0) {
           ordersList = ords;
           renderOrders();
+        } else {
+          document.getElementById('dash-orders-body').innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">No recent orders recorded.</td></tr>';
+          document.getElementById('orders-table-body').innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--text-muted);">No orders found.</td></tr>';
         }
 
         updateStats();
