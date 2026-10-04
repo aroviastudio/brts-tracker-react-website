@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snera Store Admin | Luxury Boutique Dashboard</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* ==========================================================================
+       SNERA STORE ADMIN — DESIGN SYSTEM & ODOO EMBEDDED STYLES
+       ========================================================================== */
+    :root {
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'SFMono-Regular', Consolas, monospace;
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      
+      --wine: #6B2737;
+      --wine-dark: #4E1A28;
+      --wine-light: #8B3A4D;
+      --wine-rgb: 107, 39, 55;
+      
+      --gold: #B8962E;
+      --gold-light: #D4AF5A;
+      --gold-hover: #E2C374;
+      
+      --success: #1A7A56;
+      --warning: #D97706;
+      --danger: #C0392B;
+      --info: #2563EB;
+    }
+
+    :root[data-theme="light"] {
+      --bg-primary: #FFFFFF;
+      --bg-secondary: #FAF6F0;
+      --bg-tertiary: #F4EDE2;
+      --bg-hover: #F8EFF2;
+      --border: #E2D4C0;
+      --border-light: #EFE4D6;
+      --text-primary: #1A0A0E;
+      --text-secondary: #6B5057;
+      --text-muted: #9B7A84;
+      --card-shadow: 0 8px 30px rgba(107, 39, 55, 0.04), 0 2px 8px rgba(0, 0, 0, 0.02);
+      --header-bg: rgba(255, 255, 255, 0.92);
+      --sidebar-bg: #4E1A28;
+      --sidebar-text: rgba(255, 255, 255, 0.75);
+      --sidebar-active: #FFFFFF;
+      --sidebar-active-bg: rgba(255, 255, 255, 0.12);
+    }
+
+    :root[data-theme="dark"] {
+      --bg-primary: #18090C;
+      --bg-secondary: #221014;
+      --bg-tertiary: #0F0406;
+      --bg-hover: #2B161B;
+      --border: #381B22;
+      --border-light: #4A2830;
+      --text-primary: #F7EAEB;
+      --text-secondary: #C8ACAF;
+      --text-muted: #8E7073;
+      --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      --header-bg: rgba(24, 9, 12, 0.92);
+      --sidebar-bg: #0F0406;
+      --sidebar-text: rgba(247, 234, 235, 0.75);
+      --sidebar-active: #FFFFFF;
+      --sidebar-active-bg: rgba(184, 150, 46, 0.18);
+    }
+
+    /* Odoo Reset & Normalization */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html, body {
+      height: 100%;
+      font-family: var(--font-body);
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-tertiary); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: var(--radius-sm); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* Layout Container */
+    .snera-admin-wrapper {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+      position: relative;
+    }
+
+    /* Mobile Topbar */
+    .mobile-topbar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      padding: 0 1.25rem;
+      background: var(--sidebar-bg);
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .mobile-topbar .brand {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--gold-light);
+      letter-spacing: 0.05em;
+    }
+    .hamburger-btn {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 250px;
+      flex-shrink: 0;
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      z-index: 150;
+      border-right: 1px solid var(--border);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .sidebar-brand {
+      padding: 1.5rem 1.5rem 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 0.75rem;
+    }
+    .sidebar-brand .brand-name {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--gold-light);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sidebar-brand small {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 4px;
+    }
+    .connection-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--danger);
+      display: inline-block;
+      transition: background-color 0.3s;
+    }
+    .connection-dot.active { background: #10B981; }
+
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 0 0.75rem;
+      flex: 1;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0.8rem 1rem;
+      font-size: 13.5px;
+      color: var(--sidebar-text);
+      cursor: pointer;
+      border-radius: var(--radius-md);
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #FFF;
+    }
+    .nav-item.active {
+      background: var(--sidebar-active-bg);
+      color: var(--gold-light);
+      font-weight: 600;
+    }
+    .nav-item i { font-size: 19px; }
+
+    .sidebar-footer {
+      padding: 1.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--gold-light);
+      color: var(--wine-dark);
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 14px;
+    }
+    .user-details {
+      display: flex;
+      flex-direction: column;
+    }
+    .user-details span { font-weight: 600; color: #FFF; font-size: 13px; }
+    .user-details small { color: rgba(255, 255, 255, 0.5); font-size: 11px; }
+
+    /* Main Area */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--bg-tertiary);
+    }
+    
+    .topbar {
+      height: 64px;
+      padding: 0 1.75rem;
+      background: var(--header-bg);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar h2 {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .page-body {
+      padding: 1.75rem;
+      flex: 1;
+    }
+
+    .page-section {
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+    .page-section.show { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Metric Cards Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .metric-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .metric-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+    .metric-value { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--text-primary); margin: 4px 0; }
+    .metric-sub { font-size: 12px; color: var(--text-secondary); }
+    .metric-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: var(--bg-hover);
+      color: var(--wine);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    /* Cards & Containers */
+    .card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--card-shadow);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .card-header h3 {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Controls & Forms */
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .input-field, .select-field {
+      padding: 0.65rem 1rem;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 13.5px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-field:focus, .select-field:focus {
+      border-color: var(--gold);
+    }
+    
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0.65rem 1.25rem;
+      border-radius: var(--radius-md);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn-primary { background: var(--wine); color: #FFF; }
+    .btn-primary:hover { background: var(--wine-dark); }
+    .btn-gold { background: var(--gold); color: #1A0A0E; }
+    .btn-gold:hover { background: var(--gold-hover); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-primary); }
+    .btn-outline:hover { background: var(--bg-hover); }
+    .btn-sm { padding: 0.4rem 0.8rem; font-size: 12px; }
+    .btn-icon-only { width: 38px; height: 38px; padding: 0; border-radius: var(--radius-md); background: var(--bg-primary); border: 1px solid var(--border); color: var(--text-primary); }
+    .btn-icon-only:hover { background: var(--bg-hover); }
+
+    /* Tables */
+    .table-responsive { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th {
+      background: var(--bg-secondary);
+      padding: 0.85rem 1.25rem;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--text-primary);
+      vertical-align: middle;
+      font-size: 13.5px;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg-hover); }
+
+    /* Status Badges & Toggles */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      font-size: 11.5px;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+    .badge-success { background: rgba(26, 122, 86, 0.12); color: var(--success); }
+    .badge-warning { background: rgba(217, 119, 6, 0.12); color: var(--warning); }
+    .badge-danger { background: rgba(192, 57, 43, 0.12); color: var(--danger); }
+    .badge-info { background: rgba(37, 99, 235, 0.12); color: var(--info); }
+
+    /* Custom Toggle Switch */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background-color: var(--border);
+      transition: .3s; border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 18px; width: 18px;
+      left: 3px; bottom: 3px; background-color: white;
+      transition: .3s; border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--wine); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    /* Modal Dialogs */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center;
+      z-index: 1000; padding: 1rem;
+    }
+    .modal-overlay.active { display: flex; animation: fadeIn 0.2s ease; }
+    .modal-content {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 100%; max-width: 600px;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border-light);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-header h3 { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
+    .modal-body { padding: 1.5rem; }
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border-light);
+      display: flex; justify-content: flex-end; gap: 10px;
+      background: var(--bg-secondary);
+    }
+
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    /* Mobile Responsive Breakpoints */
+    @media (max-width: 900px) {
+      .sidebar {
+        position: fixed; top: 0; bottom: 0; left: 0;
+        transform: translateX(-100%);
+      }
+      .sidebar.open { transform: translateX(0); }
+      .mobile-topbar { display: flex; }
+      .col-hide-mobile { display: none; }
+      .metrics-grid { grid-template-columns: 1fr 1fr; }
+      .page-body { padding: 1rem; }
+    }
+    @media (max-width: 550px) {
+      .metrics-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="snera-admin-wrapper">
+    <!-- MOBILE TOPBAR -->
+    <div class="mobile-topbar">
+      <div class="brand">Snera Store</div>
+      <button class="hamburger-btn" onclick="toggleSidebar()"><i class="ti ti-menu-2"></i></button>
+    </div>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar" id="admin-sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-name">
+          <i class="ti ti-crown text-gold"></i> Snera Store
+        </div>
+        <small>
+          <span class="connection-dot" id="db-status-dot"></span>
+          <span id="db-status-text">Disconnected</span>
+        </small>
+      </div>
+
+      <nav class="nav-menu">
+        <div class="nav-item active" onclick="switchSection('dashboard', this)">
+          <i class="ti ti-layout-dashboard"></i> Dashboard
+        </div>
+        <div class="nav-item" onclick="switchSection('categories', this)">
+          <i class="ti ti-category"></i> Category Manager
+        </div>
+        <div class="nav-item" onclick="switchSection('products', this)">
+          <i class="ti ti-box"></i> Products Catalog
+        </div>
+        <div class="nav-item" onclick="switchSection('orders', this)">
+          <i class="ti ti-shopping-cart"></i> Orders & Sales
+        </div>
+        <div class="nav-item" onclick="switchSection('customers', this)">
+          <i class="ti ti-users"></i> Customers
+        </div>
+        <div class="nav-item" onclick="switchSection('settings', this)">
+          <i class="ti ti-settings"></i> Store Settings
+        </div>
+        <div class="nav-item" onclick="switchSection('setup', this)">
+          <i class="ti ti-database"></i> Database & RLS Setup
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar">SS</div>
+        <div class="user-details">
+          <span>Snera Manager</span>
+          <small>Admin Portal</small>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <h2 id="current-page-title">Dashboard Overview</h2>
+        <div class="topbar-actions">
+          <button class="btn btn-icon-only" onclick="toggleTheme()" title="Toggle Theme">
+            <i class="ti ti-moon" id="theme-icon"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- PAGE BODY -->
+      <div class="page-body">
+        
+        <!-- ================= 1. DASHBOARD OVERVIEW ================= -->
+        <section class="page-section show" id="sec-dashboard">
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div>
+                <div class="metric-label">Total Revenue</div>
+                <div class="metric-value" id="stat-revenue">₹0</div>
+                <div class="metric-sub">Processed sales</div>
+              </div>
+              <div class="metric-icon"><i class="ti ti-currency-rupee"></i></div>
+            </div>
+
+            <div class="metric-card">
+              <div>
+                <div class="metric-label">Total Orders</div>
+                <div class="metric-value" id="stat-orders">0</div>
+                <div class="metric-sub">Customer orders</div>
+              </div>
+              <div class="metric-icon"><i class="ti ti-shopping-bag"></i></div>
+            </div>
+
+            <div class="metric-card">
+              <div>
+                <div class="metric-label">Active Sarees</div>
+                <div class="metric-value" id="stat-products">0</div>
+                <div class="metric-sub">In inventory</div>
+              </div>
+              <div class="metric-icon"><i class="ti ti-shirt"></i></div>
+            </div>
+
+            <div class="metric-card">
+              <div>
+                <div class="metric-label">Categories</div>
+                <div class="metric-value" id="stat-categories">0</div>
+                <div class="metric-sub">Product collections</div>
+              </div>
+              <div class="metric-icon"><i class="ti ti-category"></i></div>
+            </div>
+          </div>
+
+          <!-- RECENT ORDERS TABLE -->
+          <div class="card">
+            <div class="card-header">
+              <h3>Recent Store Orders</h3>
+              <button class="btn btn-outline btn-sm" onclick="switchSection('orders', document.querySelectorAll('.nav-item')[3])">View All Orders</button>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th class="col-hide-mobile">Date</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-orders-body">
+                  <tr><td colspan="5" style="text-align:center; color: var(--text-muted);">Connect Supabase to fetch live orders</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================= 2. CATEGORY MANAGER ================= -->
+        <section class="page-section" id="sec-categories">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3>Category & Display Control</h3>
+                <p style="font-size:12px; color: var(--text-muted); margin-top: 2px;">Manage saree categories and toggle which collections display on the Shop & Home pages.</p>
+              </div>
+              <button class="btn btn-primary" onclick="openCategoryModal()"><i class="ti ti-plus"></i> Add New Category</button>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Category Name</th>
+                    <th class="col-hide-mobile">Slug</th>
+                    <th>Show on Shop</th>
+                    <th>Show on Home</th>
+                    <th class="col-hide-mobile">Display Order</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="categories-table-body">
+                  <tr><td colspan="7" style="text-align:center; color: var(--text-muted);">Loading categories...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================= 3. PRODUCTS CATALOG ================= -->
+        <section class="page-section" id="sec-products">
+          <div class="filter-bar">
+            <input type="text" class="input-field" placeholder="Search sarees by name..." id="prod-search" oninput="filterProducts()" style="flex: 1; min-width: 200px;">
+            <select class="select-field" id="prod-cat-filter" onchange="filterProducts()"><option value="">All Categories</option></select>
+            <button class="btn btn-primary" onclick="openProductModal()"><i class="ti ti-plus"></i> Add New Product</button>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>Saree Products</h3>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Image</th>
+                    <th>Title</th>
+                    <th class="col-hide-mobile">Category</th>
+                    <th>Price</th>
+                    <th class="col-hide-mobile">Stock</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="products-table-body">
+                  <tr><td colspan="7" style="text-align:center; color: var(--text-muted);">Loading product catalog...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================= 4. ORDERS MANAGEMENT ================= -->
+        <section class="page-section" id="sec-orders">
+          <div class="filter-bar">
+            <select class="select-field" id="order-status-filter" onchange="filterOrders()">
+              <option value="">All Order Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>Customer Orders</h3>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer Name</th>
+                    <th class="col-hide-mobile">Phone / Email</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th class="col-hide-mobile">Date</th>
+                    <th>Update Status</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-table-body">
+                  <tr><td colspan="7" style="text-align:center; color: var(--text-muted);">No orders found.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================= 5. CUSTOMERS ================= -->
+        <section class="page-section" id="sec-customers">
+          <div class="card">
+            <div class="card-header">
+              <h3>Registered Customers</h3>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Customer</th>
+                    <th class="col-hide-mobile">Email</th>
+                    <th>Phone</th>
+                    <th>Orders</th>
+                    <th>Joined</th>
+                  </tr>
+                </thead>
+                <tbody id="customers-table-body">
+                  <tr><td colspan="5" style="text-align:center; color: var(--text-muted);">No customer records yet.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================= 6. STORE SETTINGS ================= -->
+        <section class="page-section" id="sec-settings">
+          <div class="card">
+            <div class="card-header">
+              <h3>Store Credentials & Configuration</h3>
+            </div>
+            <div style="padding: 1.5rem;">
+              <form id="settings-form" onsubmit="saveSettings(event)">
+                <div class="form-group">
+                  <label>Supabase Project URL</label>
+                  <input type="text" class="input-field" id="setting-supabase-url" style="width: 100%;" placeholder="https://xyzcompany.supabase.co">
+                </div>
+                <div class="form-group">
+                  <label>Supabase Anon Key</label>
+                  <input type="password" class="input-field" id="setting-supabase-key" style="width: 100%;" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Store Name</label>
+                    <input type="text" class="input-field" id="setting-store-name" value="Snera Store" style="width: 100%;">
+                  </div>
+                  <div class="form-group">
+                    <label>Support Email</label>
+                    <input type="email" class="input-field" id="setting-support-email" placeholder="support@snerastore.com" style="width: 100%;">
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Configuration</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================= 7. DATABASE & RLS SETUP ================= -->
+        <section class="page-section" id="sec-setup">
+          <div class="card">
+            <div class="card-header">
+              <h3>🛡️ Database Schema & RLS Security Script</h3>
+            </div>
+            <div style="padding: 1.5rem;">
+              <p style="color: var(--text-secondary); margin-bottom: 1rem;">Execute these queries in your <strong>Supabase SQL Editor</strong> to create tables with Row-Level Security (RLS) for data safety.</p>
+              <pre style="background: var(--bg-secondary); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border); font-family: var(--font-mono); font-size: 12px; overflow-x: auto; color: var(--text-primary);">
+-- 1. CATEGORIES TABLE WITH DISPLAY CONTROLS
+create table if not exists categories (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  slug text unique not null,
+  description text,
+  image_url text,
+  show_in_shop boolean default true,
+  show_in_home boolean default true,
+  display_order integer default 0,
+  status text default 'active',
+  created_at timestamptz default now()
+);
+
+-- 2. PRODUCTS TABLE
+create table if not exists products (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  description text,
+  price numeric(10,2) not null default 0,
+  original_price numeric(10,2),
+  stock integer default 0,
+  sku text,
+  category_id uuid references categories(id) on delete set null,
+  category_name text,
+  fabric text,
+  color text,
+  occasion text,
+  image_url text,
+  is_featured boolean default false,
+  status text default 'active',
+  created_at timestamptz default now()
+);
+
+-- 3. ORDERS TABLE
+create table if not exists orders (
+  id uuid primary key default gen_random_uuid(),
+  customer_name text not null,
+  customer_email text,
+  customer_phone text,
+  shipping_address text,
+  total_amount numeric(10,2) not null default 0,
+  status text default 'pending',
+  items jsonb default '[]'::jsonb,
+  created_at timestamptz default now()
+);
+
+-- 4. ROW LEVEL SECURITY (RLS) POLICIES FOR DATA SAFETY
+alter table categories enable row level security;
+alter table products enable row level security;
+alter table orders enable row level security;
+
+-- Public can read active products & categories
+create policy "Public Read Categories" on categories for select using (true);
+create policy "Public Read Products" on products for select using (true);
+
+-- Allow authenticated admins full access
+create policy "Admin All Categories" on categories for all using (true);
+create policy "Admin All Products" on products for all using (true);
+create policy "Admin All Orders" on orders for all using (true);
+              </pre>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- CATEGORY MODAL -->
+  <div class="modal-overlay" id="category-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="cat-modal-title">Add Category</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeCategoryModal()">✕</button>
+      </div>
+      <form id="category-form" onsubmit="saveCategory(event)">
+        <div class="modal-body">
+          <input type="hidden" id="cat-id">
+          <div class="form-group">
+            <label>Category Name *</label>
+            <input type="text" class="input-field" id="cat-name" required placeholder="e.g. Kanjeevaram Silk" style="width: 100%;">
+          </div>
+          <div class="form-group">
+            <label>Category Slug</label>
+            <input type="text" class="input-field" id="cat-slug" placeholder="e.g. kanjeevaram-silk" style="width: 100%;">
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea class="input-field" id="cat-desc" rows="3" style="width: 100%;"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Banner Image URL</label>
+            <input type="text" class="input-field" id="cat-image" placeholder="https://..." style="width: 100%;">
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Show on Shop Page Filter</label>
+              <label class="toggle-switch" style="margin-top: 4px;">
+                <input type="checkbox" id="cat-show-shop" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label>Show on Home Page Grid</label>
+              <label class="toggle-switch" style="margin-top: 4px;">
+                <input type="checkbox" id="cat-show-home" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Display Order (Sorting)</label>
+              <input type="number" class="input-field" id="cat-order" value="0" style="width: 100%;">
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <select class="select-field" id="cat-status" style="width: 100%;">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeCategoryModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT APP LOGIC -->
+  <script>
+    // Local State
+    let supabaseClient = null;
+    let categoriesList = [];
+    let productsList = [];
+    let ordersList = [];
+
+    // Initialize Page
+    document.addEventListener('DOMContentLoaded', () => {
+      initSupabase();
+      loadInitialData();
+    });
+
+    // Theme Toggle
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      document.getElementById('theme-icon').className = next === 'dark' ? 'ti ti-sun' : 'ti ti-moon';
+    }
+
+    // Sidebar Mobile Toggle
+    function toggleSidebar() {
+      document.getElementById('admin-sidebar').classList.toggle('open');
+    }
+
+    // Switch Admin Sections
+    function switchSection(sectionId, element) {
+      document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('show'));
+      document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+      
+      const target = document.getElementById('sec-' + sectionId);
+      if (target) target.classList.add('show');
+      if (element) element.classList.add('active');
+
+      const titles = {
+        'dashboard': 'Dashboard Overview',
+        'categories': 'Category & Display Control Manager',
+        'products': 'Saree Products Catalog',
+        'orders': 'Customer Orders & Sales',
+        'customers': 'Customer Directory',
+        'settings': 'Store Settings',
+        'setup': 'Database & RLS Setup'
+      };
+      document.getElementById('current-page-title').innerText = titles[sectionId] || 'Admin Dashboard';
+      
+      if (window.innerWidth <= 900) {
+        document.getElementById('admin-sidebar').classList.remove('open');
+      }
+    }
+
+    // Supabase Setup
+    function initSupabase() {
+      const storedUrl = localStorage.getItem('snera_sb_url');
+      const storedKey = localStorage.getItem('snera_sb_key');
+
+      if (storedUrl && storedKey) {
+        try {
+          supabaseClient = window.supabase.createClient(storedUrl, storedKey);
+          document.getElementById('db-status-dot').classList.add('active');
+          document.getElementById('db-status-text').innerText = 'Connected';
+          document.getElementById('setting-supabase-url').value = storedUrl;
+          document.getElementById('setting-supabase-key').value = storedKey;
+        } catch (e) {
+          console.error("Supabase Error:", e);
+        }
+      }
+    }
+
+    // Load Data
+    async function loadInitialData() {
+      if (!supabaseClient) return;
+
+      try {
+        // Fetch Categories
+        const { data: cats } = await supabaseClient.from('categories').select('*').order('display_order', { ascending: true });
+        if (cats) {
+          categoriesList = cats;
+          renderCategories();
+        }
+
+        // Fetch Products
+        const { data: prods } = await supabaseClient.from('products').select('*');
+        if (prods) {
+          productsList = prods;
+          renderProducts();
+        }
+
+        // Fetch Orders
+        const { data: ords } = await supabaseClient.from('orders').select('*').order('created_at', { ascending: false });
+        if (ords) {
+          ordersList = ords;
+          renderOrders();
+        }
+
+        updateStats();
+      } catch (err) {
+        console.log("Supabase fetch notice:", err);
+      }
+    }
+
+    // Render Stats
+    function updateStats() {
+      document.getElementById('stat-categories').innerText = categoriesList.length;
+      document.getElementById('stat-products').innerText = productsList.length;
+      document.getElementById('stat-orders').innerText = ordersList.length;
+      
+      const rev = ordersList.reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
+      document.getElementById('stat-revenue').innerText = '₹' + rev.toLocaleString('en-IN');
+    }
+
+    // Category Rendering & Actions
+    function renderCategories() {
+      const tbody = document.getElementById('categories-table-body');
+      if (!categoriesList.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--text-muted);">No categories added yet. Click "Add New Category" above.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = categoriesList.map(cat => `
+        <tr>
+          <td><strong>${cat.name}</strong></td>
+          <td class="col-hide-mobile"><code>${cat.slug || '-'}</code></td>
+          <td>
+            <label class="toggle-switch">
+              <input type="checkbox" ${cat.show_in_shop ? 'checked' : ''} onchange="toggleCategoryDisplay('${cat.id}', 'show_in_shop', this.checked)">
+              <span class="slider"></span>
+            </label>
+          </td>
+          <td>
+            <label class="toggle-switch">
+              <input type="checkbox" ${cat.show_in_home ? 'checked' : ''} onchange="toggleCategoryDisplay('${cat.id}', 'show_in_home', this.checked)">
+              <span class="slider"></span>
+            </label>
+          </td>
+          <td class="col-hide-mobile">${cat.display_order || 0}</td>
+          <td><span class="badge ${cat.status === 'active' ? 'badge-success' : 'badge-danger'}">${cat.status}</span></td>
+          <td>
+            <button class="btn btn-outline btn-sm" onclick="editCategory('${cat.id}')">Edit</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openCategoryModal() {
+      document.getElementById('category-form').reset();
+      document.getElementById('cat-id').value = '';
+      document.getElementById('cat-modal-title').innerText = 'Add New Category';
+      document.getElementById('category-modal').classList.add('active');
+    }
+
+    function closeCategoryModal() {
+      document.getElementById('category-modal').classList.remove('active');
+    }
+
+    async function saveCategory(e) {
+      e.preventDefault();
+      const id = document.getElementById('cat-id').value;
+      const name = document.getElementById('cat-name').value;
+      const slug = document.getElementById('cat-slug').value || name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const description = document.getElementById('cat-desc').value;
+      const image_url = document.getElementById('cat-image').value;
+      const show_in_shop = document.getElementById('cat-show-shop').checked;
+      const show_in_home = document.getElementById('cat-show-home').checked;
+      const display_order = parseInt(document.getElementById('cat-order').value) || 0;
+      const status = document.getElementById('cat-status').value;
+
+      const payload = { name, slug, description, image_url, show_in_shop, show_in_home, display_order, status };
+
+      if (supabaseClient) {
+        if (id) {
+          await supabaseClient.from('categories').update(payload).eq('id', id);
+        } else {
+          await supabaseClient.from('categories').insert([payload]);
+        }
+        await loadInitialData();
+      } else {
+        if (id) {
+          const idx = categoriesList.findIndex(c => c.id === id);
+          if (idx !== -1) categoriesList[idx] = { ...categoriesList[idx], ...payload };
+        } else {
+          categoriesList.push({ id: 'cat_' + Date.now(), ...payload });
+        }
+        renderCategories();
+        updateStats();
+      }
+
+      closeCategoryModal();
+    }
+
+    async function toggleCategoryDisplay(id, field, value) {
+      if (supabaseClient) {
+        await supabaseClient.from('categories').update({ [field]: value }).eq('id', id);
+      } else {
+        const cat = categoriesList.find(c => c.id === id);
+        if (cat) cat[field] = value;
+      }
+    }
+
+    function saveSettings(e) {
+      e.preventDefault();
+      const url = document.getElementById('setting-supabase-url').value.trim();
+      const key = document.getElementById('setting-supabase-key').value.trim();
+      
+      localStorage.setItem('snera_sb_url', url);
+      localStorage.setItem('snera_sb_key', key);
+      
+      alert('Settings Saved Successfully! Reloading Data Connection...');
+      initSupabase();
+      loadInitialData();
+    }
+  </script>
+</body>
+</html>
