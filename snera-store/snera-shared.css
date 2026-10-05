@@ -1,0 +1,112 @@
+/* ==============================================================================
+   SNERA STORE — SHARED BRAND STYLES & FOOTER / POLICIES
+   ============================================================================== */
+
+:root {
+  --color-wine: #5B1A3A;
+  --color-wine-dark: #3E0F28;
+  --color-wine-light: #7A2E52;
+  --color-gold: #C9A96E;
+  --color-gold-dark: #A8893F;
+  --color-gold-light: #E4D5B0;
+  --color-ivory: #FAF7F2;
+  --color-sand: #F0EBE3;
+  --color-white: #FFFFFF;
+  --color-charcoal: #2D2D2D;
+  --color-dark: #1A1A1A;
+  --color-gray: #8A8578;
+  --color-border: #E5E0D8;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+}
+
+/* Floating WhatsApp Chat Button */
+.sn-whatsapp-float {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  background-color: #25D366;
+  color: #FFFFFF;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 30px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform 0.25s ease;
+}
+.sn-whatsapp-float:hover {
+  transform: scale(1.1);
+  color: #FFFFFF;
+}
+
+/* Mobile Sticky Cart Bar */
+.sn-mobile-cart-float {
+  display: none;
+}
+@media (max-width: 768px) {
+  .sn-mobile-cart-float {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--color-wine-dark);
+    color: #ffffff;
+    padding: 0.75rem 1.25rem;
+    z-index: 9990;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.15);
+  }
+}
+
+/* Standard Policy Page Shell */
+.sn-policy-container {
+  max-width: 900px;
+  margin: 3rem auto 5rem;
+  padding: 0 1.5rem;
+  font-family: var(--font-sans);
+  color: var(--color-charcoal);
+  line-height: 1.7;
+}
+.sn-policy-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 1.5rem;
+}
+.sn-policy-title {
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  color: var(--color-wine-dark);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.sn-policy-subtitle {
+  color: var(--color-gray);
+  font-size: 0.95rem;
+}
+.sn-policy-section {
+  margin-bottom: 2rem;
+}
+.sn-policy-section h2 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  color: var(--color-wine);
+  margin-bottom: 0.75rem;
+}
+.sn-policy-section p, .sn-policy-section ul {
+  margin-bottom: 1rem;
+  font-size: 0.98rem;
+  color: #444;
+}
+.sn-policy-section ul {
+  padding-left: 1.25rem;
+  list-style-type: disc;
+}
