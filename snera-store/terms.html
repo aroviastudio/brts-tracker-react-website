@@ -1,35 +1,147 @@
 <!-- SNERA STORE — TERMS & CONDITIONS (ODOO EMBED CODE VERSION) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-<div class="sn-policy-container">
-  <div class="sn-policy-header">
-    <h1 class="sn-policy-title">Terms &amp; Conditions</h1>
-    <p class="sn-policy-subtitle">Snera Store — Last Updated: October 2026</p>
-  </div>
+<style>
+.sn-policy-root {
+  --wine: #5B1A3A;
+  --wine-dark: #3E0F28;
+  --gold: #C9A96E;
+  --ivory: #FAF7F2;
+  --charcoal: #2D2D2D;
+  --gray: #8A8578;
+  --border: #E5E0D8;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
 
-  <div class="sn-policy-section">
-    <h2>1. General Overview</h2>
-    <p>Welcome to <strong>Snera Store</strong>. By accessing or purchasing from our storefront, you agree to be bound by the terms and conditions outlined below. Please read them carefully before placing an order.</p>
-  </div>
+  font-family: var(--font-sans);
+  color: var(--charcoal);
+  background: var(--ivory);
+  padding: 2.5rem 1rem 4rem;
+  width: 100%;
+  box-sizing: border-box;
+}
 
-  <div class="sn-policy-section">
-    <h2>2. Handloom Authenticity &amp; Product Variations</h2>
-    <p>All our sarees are authentic handloom products handcrafted by traditional Indian weavers. Due to the nature of authentic handloom weaving, minor variations in thread weave, color shade, or zari motif may occur and are prized marks of genuine craftsmanship.</p>
-  </div>
+.sn-policy-root *, .sn-policy-root *::before, .sn-policy-root *::after {
+  box-sizing: border-box;
+}
 
-  <div class="sn-policy-section">
-    <h2>3. Pricing &amp; Taxes</h2>
-    <p>Prices listed on Snera Store are shown in Indian Rupees (INR). Applicable GST rates (5%) are calculated transparently at checkout. We reserve the right to update prices or discontinue products without prior notice.</p>
-  </div>
+.sn-policy-container {
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
 
-  <div class="sn-policy-section">
-    <h2>4. Order Acceptance &amp; Inventory</h2>
-    <p>Most of our handcrafted sarees are unique single-piece creations. Orders are confirmed upon successful inventory allocation and payment verification (or COD confirmation).</p>
-  </div>
+.sn-policy-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1.5rem;
+}
+.sn-policy-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  color: var(--wine-dark);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.sn-policy-subtitle {
+  color: var(--gray);
+  font-size: 0.95rem;
+}
+.sn-policy-section {
+  margin-bottom: 2rem;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.75rem;
+}
+.sn-policy-section h2 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  color: var(--wine);
+  margin-bottom: 0.75rem;
+}
+.sn-policy-section p, .sn-policy-section ul {
+  margin-bottom: 1rem;
+  font-size: 0.98rem;
+  color: #444;
+  line-height: 1.7;
+}
+.sn-policy-section p:last-child {
+  margin-bottom: 0;
+}
+.sn-policy-section ul {
+  padding-left: 1.25rem;
+  list-style-type: disc;
+}
 
-  <div class="sn-policy-section">
-    <h2>5. Governing Law</h2>
-    <p>These terms shall be governed by and construed in accordance with the laws of India.</p>
+.sn-whatsapp-float {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  right: 20px;
+  width: 54px;
+  height: 54px;
+  background-color: #25D366;
+  color: #FFFFFF;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 28px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform 0.25s ease;
+}
+.sn-whatsapp-float:hover {
+  transform: scale(1.1);
+  color: #FFFFFF;
+}
+
+@media (max-width: 576px) {
+  .sn-policy-root {
+    padding: 1.5rem 0.75rem 3.5rem;
+  }
+  .sn-policy-section {
+    padding: 1.25rem 1rem;
+  }
+}
+</style>
+
+<div class="sn-policy-root">
+  <div class="sn-policy-container">
+    <div class="sn-policy-header">
+      <h1 class="sn-policy-title">Terms &amp; Conditions</h1>
+      <p class="sn-policy-subtitle">Snera Store — Last Updated: October 2026</p>
+    </div>
+
+    <div class="sn-policy-section">
+      <h2>1. General Overview</h2>
+      <p>Welcome to <strong>Snera Store</strong>. By accessing or purchasing from our storefront, you agree to be bound by the terms and conditions outlined below. Please read them carefully before placing an order.</p>
+    </div>
+
+    <div class="sn-policy-section">
+      <h2>2. Handloom Authenticity &amp; Product Variations</h2>
+      <p>All our sarees are authentic handloom products handcrafted by traditional Indian weavers. Due to the nature of authentic handloom weaving, minor variations in thread weave, color shade, or zari motif may occur and are prized marks of genuine craftsmanship.</p>
+    </div>
+
+    <div class="sn-policy-section">
+      <h2>3. Pricing &amp; Taxes</h2>
+      <p>Prices listed on Snera Store are shown in Indian Rupees (INR). Applicable GST rates (5%) are calculated transparently at checkout. We reserve the right to update prices or discontinue products without prior notice.</p>
+    </div>
+
+    <div class="sn-policy-section">
+      <h2>4. Order Acceptance &amp; Inventory</h2>
+      <p>Most of our handcrafted sarees are unique single-piece creations. Orders are confirmed upon successful inventory allocation and payment verification (or COD confirmation).</p>
+    </div>
+
+    <div class="sn-policy-section">
+      <h2>5. Governing Law</h2>
+      <p>These terms shall be governed by and construed in accordance with the laws of India.</p>
+    </div>
   </div>
 </div>
 

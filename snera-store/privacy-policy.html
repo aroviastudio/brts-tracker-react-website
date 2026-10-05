@@ -1,35 +1,147 @@
 <!-- SNERA STORE — PRIVACY POLICY (ODOO EMBED CODE VERSION) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-<div class="sn-policy-container">
-  <div class="sn-policy-header">
-    <h1 class="sn-policy-title">Privacy Policy</h1>
-    <p class="sn-policy-subtitle">Snera Store — Effective Date: October 2026</p>
-  </div>
+<style>
+.sn-policy-root {
+  --wine: #5B1A3A;
+  --wine-dark: #3E0F28;
+  --gold: #C9A96E;
+  --ivory: #FAF7F2;
+  --charcoal: #2D2D2D;
+  --gray: #8A8578;
+  --border: #E5E0D8;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
 
-  <div class="sn-policy-section">
-    <h2>1. Information We Collect</h2>
-    <p>At <strong>Snera Store</strong>, we respect your privacy and are committed to protecting your personal data. When you browse or purchase from our website, we collect necessary personal details including your name, email address, phone number, shipping address, and payment confirmation details.</p>
-  </div>
+  font-family: var(--font-sans);
+  color: var(--charcoal);
+  background: var(--ivory);
+  padding: 2.5rem 1rem 4rem;
+  width: 100%;
+  box-sizing: border-box;
+}
 
-  <div class="sn-policy-section">
-    <h2>2. How We Use Your Information</h2>
-    <p>Your information is used strictly to process orders, fulfill delivery of handcrafted sarees, send order status notifications, respond to customer service inquiries, and ensure secure transaction processing.</p>
-  </div>
+.sn-policy-root *, .sn-policy-root *::before, .sn-policy-root *::after {
+  box-sizing: border-box;
+}
 
-  <div class="sn-policy-section">
-    <h2>3. Payment Security & Data Sharing</h2>
-    <p>We do not store your complete credit card, debit card, or UPI PIN credentials on our servers. All online transactions are securely encrypted and processed directly through PCI-DSS compliant payment gateways (Razorpay). We never sell or lease your personal data to third parties.</p>
-  </div>
+.sn-policy-container {
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
 
-  <div class="sn-policy-section">
-    <h2>4. Cookies & Analytics</h2>
-    <p>We use session cookies to keep track of your shopping cart contents and remember your preferences for a seamless checkout experience.</p>
-  </div>
+.sn-policy-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1.5rem;
+}
+.sn-policy-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  color: var(--wine-dark);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.sn-policy-subtitle {
+  color: var(--gray);
+  font-size: 0.95rem;
+}
+.sn-policy-section {
+  margin-bottom: 2rem;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.75rem;
+}
+.sn-policy-section h2 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  color: var(--wine);
+  margin-bottom: 0.75rem;
+}
+.sn-policy-section p, .sn-policy-section ul {
+  margin-bottom: 1rem;
+  font-size: 0.98rem;
+  color: #444;
+  line-height: 1.7;
+}
+.sn-policy-section p:last-child {
+  margin-bottom: 0;
+}
+.sn-policy-section ul {
+  padding-left: 1.25rem;
+  list-style-type: disc;
+}
 
-  <div class="sn-policy-section">
-    <h2>5. Contact Us Regarding Your Data</h2>
-    <p>If you have any questions or wish to request data correction or removal, please contact our support team at <strong>support@snerastore.com</strong>.</p>
+.sn-whatsapp-float {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  right: 20px;
+  width: 54px;
+  height: 54px;
+  background-color: #25D366;
+  color: #FFFFFF;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 28px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform 0.25s ease;
+}
+.sn-whatsapp-float:hover {
+  transform: scale(1.1);
+  color: #FFFFFF;
+}
+
+@media (max-width: 576px) {
+  .sn-policy-root {
+    padding: 1.5rem 0.75rem 3.5rem;
+  }
+  .sn-policy-section {
+    padding: 1.25rem 1rem;
+  }
+}
+</style>
+
+<div class="sn-policy-root">
+  <div class="sn-policy-container">
+    <div class="sn-policy-header">
+      <h1 class="sn-policy-title">Privacy Policy</h1>
+      <p class="sn-policy-subtitle">Snera Store — Effective Date: October 2026</p>
+    </div>
+
+    <div class="sn-policy-section">
+      <h2>1. Information We Collect</h2>
+      <p>At <strong>Snera Store</strong>, we respect your privacy and are committed to protecting your personal data. When you browse or purchase from our website, we collect necessary personal details including your name, email address, phone number, shipping address, and payment confirmation details.</p>
+    </div>
+
+    <div class="sn-policy-section">
+      <h2>2. How We Use Your Information</h2>
+      <p>Your information is used strictly to process orders, fulfill delivery of handcrafted sarees, send order status notifications, respond to customer service inquiries, and ensure secure transaction processing.</p>
+    </div>
+
+    <div class="sn-policy-section">
+      <h2>3. Payment Security &amp; Data Sharing</h2>
+      <p>We do not store your complete credit card, debit card, or UPI PIN credentials on our servers. All online transactions are securely encrypted and processed directly through PCI-DSS compliant payment gateways (Razorpay). We never sell or lease your personal data to third parties.</p>
+    </div>
+
+    <div class="sn-policy-section">
+      <h2>4. Cookies &amp; Analytics</h2>
+      <p>We use session cookies to keep track of your shopping cart contents and remember your preferences for a seamless checkout experience.</p>
+    </div>
+
+    <div class="sn-policy-section">
+      <h2>5. Contact Us Regarding Your Data</h2>
+      <p>If you have any questions or wish to request data correction or removal, please contact our support team at <strong>support@snerastore.com</strong>.</p>
+    </div>
   </div>
 </div>
 

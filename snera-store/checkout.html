@@ -1,9 +1,11 @@
 <!--
   SNERA STORE — REAL CHECKOUT PAGE (ODOO EMBED CODE VERSION)
   Paste this whole block into an Odoo "Embed Code" snippet.
+  - 100% Self-Contained: All HTML + CSS + JS included inline.
   - No <html>/<head>/<body> (Odoo already provides them)
   - Every class is prefixed "sn-chk-" and scoped under ".sn-checkout-root"
-  - JS lives in window.SneraCheckout
+  - Fully responsive across mobile (360px, 390px, 412px), tablet, and desktop
+  - JS namespace: window.SneraCheckout
   - Connects to Supabase Edge Functions: create-order, validate-coupon, cancel-order
 -->
 
@@ -42,8 +44,10 @@
   color: var(--charcoal);
   line-height: 1.6;
   width: 100%;
+  max-width: 100%;
   padding: 2rem 1rem 4rem;
   box-sizing: border-box;
+  overflow-x: clip;
 }
 
 .sn-checkout-root *, .sn-checkout-root *::before, .sn-checkout-root *::after {
@@ -53,6 +57,7 @@
 .sn-chk-container {
   max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
 }
 
 /* Header & Breadcrumb */
@@ -62,7 +67,7 @@
 }
 .sn-chk-title {
   font-family: var(--font-serif);
-  font-size: 2.2rem;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
   color: var(--wine);
   font-weight: 700;
   margin-bottom: 0.5rem;
@@ -87,12 +92,6 @@
   align-items: start;
 }
 
-@media (max-width: 992px) {
-  .sn-chk-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* Card Box */
 .sn-chk-card {
   background: #ffffff;
@@ -101,11 +100,12 @@
   padding: 1.75rem;
   margin-bottom: 1.5rem;
   box-shadow: var(--shadow-sm);
+  width: 100%;
 }
 
 .sn-chk-card-title {
   font-family: var(--font-serif);
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   color: var(--wine-dark);
   font-weight: 600;
   margin-bottom: 1.25rem;
@@ -122,6 +122,7 @@
 /* Form Fields */
 .sn-chk-form-group {
   margin-bottom: 1.1rem;
+  width: 100%;
 }
 .sn-chk-label {
   display: block;
@@ -135,6 +136,7 @@
 .sn-chk-input, .sn-chk-select, .sn-chk-textarea {
   width: 100%;
   padding: 0.75rem 1rem;
+  min-height: 46px;
   font-size: 0.95rem;
   font-family: inherit;
   background: var(--ivory);
@@ -143,6 +145,7 @@
   color: var(--dark);
   outline: none;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 .sn-chk-input:focus, .sn-chk-select:focus, .sn-chk-textarea:focus {
   border-color: var(--gold);
@@ -155,16 +158,10 @@
   gap: 1rem;
 }
 
-@media (max-width: 576px) {
-  .sn-chk-row-2 {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* Saved Address Selector */
 .sn-chk-saved-addrs {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 0.75rem;
   margin-bottom: 1.25rem;
 }
@@ -175,7 +172,7 @@
   cursor: pointer;
   background: var(--ivory);
   transition: all 0.2s;
-  position: relative;
+  min-height: 48px;
 }
 .sn-chk-addr-option.is-selected {
   border-color: var(--wine);
@@ -196,7 +193,7 @@
 /* Serviceability status badge */
 .sn-chk-pincode-status {
   font-size: 0.8rem;
-  margin-top: 4px;
+  margin-top: 6px;
   font-weight: 500;
 }
 .sn-chk-pincode-status.is-valid { color: var(--success); }
@@ -214,6 +211,7 @@
   justify-content: space-between;
   background: #fff;
   transition: border-color 0.2s;
+  min-height: 52px;
 }
 .sn-chk-pay-option.is-selected {
   border-color: var(--wine);
@@ -259,6 +257,7 @@
   object-fit: cover;
   border-radius: 4px;
   background: var(--sand);
+  flex-shrink: 0;
 }
 .sn-chk-item-info {
   flex: 1;
@@ -280,6 +279,7 @@
   font-weight: 600;
   font-size: 0.9rem;
   color: var(--wine);
+  flex-shrink: 0;
 }
 
 /* Coupon Row */
@@ -294,9 +294,12 @@
   border: 0;
   border-radius: var(--radius-sm);
   padding: 0 1.25rem;
+  min-height: 46px;
   font-weight: 600;
   font-size: 0.85rem;
   transition: background 0.2s;
+  cursor: pointer;
+  white-space: nowrap;
 }
 .sn-chk-btn-apply:hover {
   background: var(--wine-dark);
@@ -331,6 +334,7 @@
 .sn-chk-btn-submit {
   width: 100%;
   padding: 0.95rem;
+  min-height: 48px;
   background: var(--wine);
   color: #ffffff;
   border: 0;
@@ -344,6 +348,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
+  cursor: pointer;
 }
 .sn-chk-btn-submit:hover {
   background: var(--wine-dark);
@@ -358,11 +363,12 @@
   background: #fff;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 3rem 2rem;
+  padding: 3rem 1.5rem;
   text-align: center;
   max-width: 680px;
   margin: 2rem auto;
   box-shadow: var(--shadow-md);
+  width: 100%;
 }
 .sn-chk-success-icon {
   width: 72px;
@@ -382,11 +388,88 @@
   border: 1px solid var(--gold-light);
   color: var(--wine-dark);
   font-family: var(--font-serif);
-  font-size: 1.3rem;
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
   font-weight: 700;
   padding: 0.4rem 1.2rem;
   border-radius: 30px;
   margin: 1rem 0;
+}
+
+/* Floating WhatsApp Chat Button */
+.sn-whatsapp-float {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  right: 20px;
+  width: 54px;
+  height: 54px;
+  background-color: #25D366;
+  color: #FFFFFF;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 28px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform 0.25s ease;
+}
+.sn-whatsapp-float:hover {
+  transform: scale(1.1);
+  color: #FFFFFF;
+}
+
+/* ==========================================================================
+   RESPONSIVE MEDIA QUERIES (360px, 390px, 412px, 768px, 992px)
+   ========================================================================== */
+@media (max-width: 992px) {
+  .sn-chk-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .sn-chk-summary-card {
+    position: static;
+  }
+  .sn-checkout-root {
+    padding: 1.5rem 0.75rem 4rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .sn-chk-card {
+    padding: 1.25rem 1rem;
+  }
+  /* 16px prevents iOS auto-zoom on focus */
+  .sn-chk-input, .sn-chk-select, .sn-chk-textarea {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .sn-chk-row-2 {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .sn-chk-coupon-row {
+    flex-direction: row;
+  }
+  .sn-chk-pay-option {
+    padding: 0.85rem;
+  }
+  .sn-chk-pay-title {
+    font-size: 0.88rem;
+  }
+  .sn-chk-pay-sub {
+    font-size: 0.75rem;
+  }
+  .sn-whatsapp-float {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    right: 16px;
+  }
 }
 </style>
 
@@ -569,6 +652,11 @@
 
   </div>
 </div>
+
+<!-- Floating WhatsApp Chat Button -->
+<a href="https://wa.me/919876543210?text=Hello%20Snera%20Store%2C%20I%20have%20a%20question%20about%20checkout" class="sn-whatsapp-float" target="_blank" aria-label="Chat on WhatsApp">
+  <i class="fa fa-whatsapp"></i>
+</a>
 
 <script>
 (function() {

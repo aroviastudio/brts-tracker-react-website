@@ -1,49 +1,195 @@
 <!-- SNERA STORE — CONTACT US PAGE (ODOO EMBED CODE VERSION) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-<div class="sn-policy-container">
-  <div class="sn-policy-header">
-    <h1 class="sn-policy-title">Contact Us</h1>
-    <p class="sn-policy-subtitle">We are here to help you with your saree orders and inquiries.</p>
-  </div>
+<style>
+.sn-policy-root {
+  --wine: #5B1A3A;
+  --wine-dark: #3E0F28;
+  --gold: #C9A96E;
+  --ivory: #FAF7F2;
+  --charcoal: #2D2D2D;
+  --gray: #8A8578;
+  --border: #E5E0D8;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
 
-  <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-top:2rem;">
-    <div style="background:#fff; border:1px solid var(--color-border); border-radius:12px; padding:2rem;">
-      <h2 style="font-family:var(--font-serif); font-size:1.5rem; color:var(--color-wine); margin-bottom:1rem;">Get in Touch</h2>
-      
-      <p style="margin-bottom:1rem;">
-        <strong>Brand Name:</strong> Snera Store<br>
-        <strong>Support Email:</strong> support@snerastore.com<br>
-        <strong>Phone / WhatsApp:</strong> +91 98765 43210<br>
-        <strong>Boutique Address:</strong> 101 Royal Residency, Ring Road, Surat, Gujarat - 395007, India
-      </p>
+  font-family: var(--font-sans);
+  color: var(--charcoal);
+  background: var(--ivory);
+  padding: 2.5rem 1rem 4rem;
+  width: 100%;
+  box-sizing: border-box;
+}
 
-      <p style="color:var(--color-gray); font-size:0.9rem;">
-        <strong>Customer Support Hours:</strong><br>
-        Monday – Saturday: 10:00 AM – 7:00 PM IST
-      </p>
+.sn-policy-root *, .sn-policy-root *::before, .sn-policy-root *::after {
+  box-sizing: border-box;
+}
+
+.sn-policy-container {
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.sn-policy-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1.5rem;
+}
+.sn-policy-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  color: var(--wine-dark);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.sn-policy-subtitle {
+  color: var(--gray);
+  font-size: 0.95rem;
+}
+
+.sn-contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.sn-contact-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  width: 100%;
+}
+
+.sn-contact-card h2 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  color: var(--wine);
+  margin-bottom: 1rem;
+}
+
+.sn-contact-input, .sn-contact-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  min-height: 46px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  outline: none;
+  background: var(--ivory);
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.sn-contact-input:focus, .sn-contact-textarea:focus {
+  border-color: var(--gold);
+  background: #ffffff;
+}
+
+.sn-contact-btn {
+  width: 100%;
+  padding: 0.85rem;
+  min-height: 48px;
+  background: var(--wine);
+  color: #ffffff;
+  border: 0;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.sn-contact-btn:hover {
+  background: var(--wine-dark);
+}
+
+.sn-whatsapp-float {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  right: 20px;
+  width: 54px;
+  height: 54px;
+  background-color: #25D366;
+  color: #FFFFFF;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 28px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform 0.25s ease;
+}
+.sn-whatsapp-float:hover {
+  transform: scale(1.1);
+  color: #FFFFFF;
+}
+
+@media (max-width: 768px) {
+  .sn-contact-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .sn-contact-card {
+    padding: 1.5rem 1.25rem;
+  }
+  .sn-contact-input, .sn-contact-textarea {
+    font-size: 16px; /* Prevents iOS auto-zoom */
+  }
+}
+</style>
+
+<div class="sn-policy-root">
+  <div class="sn-policy-container">
+    <div class="sn-policy-header">
+      <h1 class="sn-policy-title">Contact Us</h1>
+      <p class="sn-policy-subtitle">We are here to help you with your saree orders and inquiries.</p>
     </div>
 
-    <div style="background:#fff; border:1px solid var(--color-border); border-radius:12px; padding:2rem;">
-      <h2 style="font-family:var(--font-serif); font-size:1.5rem; color:var(--color-wine); margin-bottom:1rem;">Send Us a Message</h2>
-      
-      <form onsubmit="alert('Thank you for reaching out! We will reply shortly.'); return false;">
-        <div style="margin-bottom:1rem;">
-          <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Your Name</label>
-          <input type="text" required style="width:100%; padding:0.75rem; border:1px solid var(--color-border); border-radius:6px; font-family:inherit;">
-        </div>
-        <div style="margin-bottom:1rem;">
-          <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Email or Phone</label>
-          <input type="text" required style="width:100%; padding:0.75rem; border:1px solid var(--color-border); border-radius:6px; font-family:inherit;">
-        </div>
-        <div style="margin-bottom:1.25rem;">
-          <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px;">Message</label>
-          <textarea rows="4" required style="width:100%; padding:0.75rem; border:1px solid var(--color-border); border-radius:6px; font-family:inherit;"></textarea>
-        </div>
-        <button type="submit" style="width:100%; padding:0.85rem; background:var(--color-wine); color:#fff; border:0; border-radius:6px; font-weight:700; cursor:pointer;">
-          Send Message
-        </button>
-      </form>
+    <div class="sn-contact-grid">
+      <div class="sn-contact-card">
+        <h2>Get in Touch</h2>
+        
+        <p style="margin-bottom:1rem; line-height:1.7;">
+          <strong>Brand Name:</strong> Snera Store<br>
+          <strong>Support Email:</strong> support@snerastore.com<br>
+          <strong>Phone / WhatsApp:</strong> +91 98765 43210<br>
+          <strong>Boutique Address:</strong> 101 Royal Residency, Ring Road, Surat, Gujarat - 395007, India
+        </p>
+
+        <p style="color:var(--gray); font-size:0.9rem; line-height:1.6;">
+          <strong>Customer Support Hours:</strong><br>
+          Monday – Saturday: 10:00 AM – 7:00 PM IST
+        </p>
+      </div>
+
+      <div class="sn-contact-card">
+        <h2>Send Us a Message</h2>
+        
+        <form onsubmit="alert('Thank you for reaching out! We will reply shortly.'); return false;">
+          <div style="margin-bottom:1rem;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px; text-transform:uppercase;">Your Name *</label>
+            <input type="text" required class="sn-contact-input" placeholder="e.g. Priya Patel">
+          </div>
+          <div style="margin-bottom:1rem;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px; text-transform:uppercase;">Email or Phone *</label>
+            <input type="text" required class="sn-contact-input" placeholder="priya@example.com or 10-digit phone">
+          </div>
+          <div style="margin-bottom:1.25rem;">
+            <label style="display:block; font-size:0.85rem; font-weight:600; margin-bottom:4px; text-transform:uppercase;">Message *</label>
+            <textarea rows="4" required class="sn-contact-textarea" placeholder="How can we help you?"></textarea>
+          </div>
+          <button type="submit" class="sn-contact-btn">
+            Send Message
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 </div>
