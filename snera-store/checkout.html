@@ -1,12 +1,10 @@
 <!--
   SNERA STORE — REAL CHECKOUT PAGE (ODOO EMBED CODE VERSION)
-  Paste this whole block into an Odoo "Embed Code" snippet.
-  - 100% Self-Contained: All HTML + CSS + JS included inline.
-  - No <html>/<head>/<body> (Odoo already provides them)
-  - Every class is prefixed "sn-chk-" and scoped under ".sn-checkout-root"
-  - Fully responsive across mobile (360px, 390px, 412px), tablet, and desktop
-  - JS namespace: window.SneraCheckout
-  - Connects to Supabase Edge Functions: create-order, validate-coupon, cancel-order
+  URL Route: /checkout
+  Domain: snerafashion.com
+  - 100% Self-Contained Odoo Snippet
+  - Razorpay Ready (UPI, Cards, Netbanking) + COD
+  - Responsive across Mobile (360px, 390px, 412px), Tablet, Desktop
 -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -420,9 +418,7 @@
   color: #FFFFFF;
 }
 
-/* ==========================================================================
-   RESPONSIVE MEDIA QUERIES (360px, 390px, 412px, 768px, 992px)
-   ========================================================================== */
+/* RESPONSIVE MEDIA QUERIES */
 @media (max-width: 992px) {
   .sn-chk-grid {
     grid-template-columns: 1fr;
@@ -440,7 +436,6 @@
   .sn-chk-card {
     padding: 1.25rem 1rem;
   }
-  /* 16px prevents iOS auto-zoom on focus */
   .sn-chk-input, .sn-chk-select, .sn-chk-textarea {
     font-size: 16px;
   }
@@ -496,7 +491,7 @@
             <h2 class="sn-chk-card-title"><i class="fa fa-user-o"></i> 1. Contact Information</h2>
             
             <div id="sn-chk-guest-login-prompt" style="font-size:0.85rem; color:#666; margin-bottom:1rem; display:none;">
-              Already have an account? <a href="/login" style="color:var(--wine); font-weight:600;">Log in for faster checkout</a>
+              Already have an account? <a href="/profile" style="color:var(--wine); font-weight:600;">Log in for faster checkout</a>
             </div>
 
             <div class="sn-chk-row-2">
@@ -670,7 +665,6 @@
   function $(id) { return document.getElementById(id); }
   function money(n) { return '₹' + (Number(n) || 0).toLocaleString('en-IN'); }
 
-  // 1. Load cart from localStorage
   function loadCart() {
     try {
       const stored = localStorage.getItem('snera_cart');
@@ -680,7 +674,6 @@
     }
   }
 
-  // 2. Render summary & calculate totals
   function renderSummary() {
     const listEl = $('sn-chk-cart-items');
     if (!cart.length) {
@@ -703,13 +696,12 @@
       `;
     }).join('');
 
-    // Totals calculation
     let subtotal = cart.reduce((acc, item) => acc + (Number(item.price) || 0) * (Number(item.quantity) || 1), 0);
     let discount = couponData ? couponData.discount : 0;
     if (discount > subtotal) discount = subtotal;
 
     let discountedSub = subtotal - discount;
-    let gst = Math.round((discountedSub * 0.05) * 100) / 100; // 5% GST excluded
+    let gst = Math.round((discountedSub * 0.05) * 100) / 100;
     let shipping = (subtotal >= 999 || subtotal === 0) ? 0 : 100;
     let grandTotal = Math.round((discountedSub + gst + shipping) * 100) / 100;
 
@@ -725,7 +717,6 @@
     $('sn-sum-total').textContent = money(grandTotal);
   }
 
-  // 3. Pincode Auto-fill & Serviceability check
   async function handlePincode(pin) {
     const cleanPin = pin.trim();
     const statusEl = $('sn-chk-pincode-status');
@@ -755,7 +746,6 @@
     }
   }
 
-  // 4. Coupon Application
   async function applyCoupon() {
     const code = $('sn-chk-coupon-code').value.trim();
     const msgEl = $('sn-chk-coupon-msg');
@@ -792,7 +782,6 @@
     }
   }
 
-  // 5. Payment method toggle
   function setPaymentMethod(method) {
     selectedPaymentMethod = method;
     $('sn-opt-cod').classList.toggle('is-selected', method === 'cod');
@@ -803,7 +792,6 @@
     if (radioOnline) radioOnline.checked = (method === 'online');
   }
 
-  // 6. Place Order Submission
   async function placeOrder() {
     if (isPlacing) return;
 
@@ -853,13 +841,11 @@
         throw new Error(data.error || 'Order creation failed');
       }
 
-      // If COD -> Success immediately
       if (selectedPaymentMethod === 'cod') {
         showSuccess(data.order_id);
         return;
       }
 
-      // If Online -> Open Razorpay Modal
       if (selectedPaymentMethod === 'online' && data.razorpay_order_id) {
         const options = {
           key: data.razorpay_key_id,
@@ -897,19 +883,16 @@
     }
   }
 
-  // 7. Show Success View & Clear Cart ONLY AFTER confirmed
   function showSuccess(orderId) {
     $('sn-chk-view-form').style.display = 'none';
     $('sn-chk-view-success').style.display = 'block';
     $('sn-success-order-id').textContent = orderId || 'SN-2026-000000';
 
-    // Clear cart only after confirmed
     localStorage.removeItem('snera_cart');
     cart = [];
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // Initialize
   function init() {
     loadCart();
     renderSummary();
