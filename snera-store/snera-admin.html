@@ -1,16 +1,15 @@
 <!--
-  SNERA STORE ADMIN — ODOO EMBED CODE VERSION
+  SNERA STORE ADMIN — ODOO EMBED CODE VERSION (PHASE 6 UPDATED)
   Paste this whole block into an Odoo "Embed Code" snippet.
   - No <html>/<head>/<body>/<meta viewport> (Odoo already provides them)
   - Every class is prefixed "sn-" and every rule is scoped under ".sn-root"
-    so Bootstrap/Odoo (.card, .btn, .badge, .modal-*, .table ...) can't clash
   - All JS lives in one namespace: window.SneraAdmin
+  - Connects to Supabase project: https://yduueujrykugmzvbnndu.supabase.co
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 
 <style>
 /* ==========================================================================
@@ -21,18 +20,13 @@
   --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'SFMono-Regular', Consolas, monospace;
 
-
   --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px; --radius-full: 9999px;
-
 
   --wine: #6B2737; --wine-dark: #4E1A28; --wine-light: #8B3A4D;
   --gold: #B8962E; --gold-light: #D4AF5A; --gold-hover: #E2C374;
   --success: #1A7A56; --warning: #D97706; --danger: #C0392B; --info: #2563EB;
 
-
-  /* Height of Odoo's fixed/sticky header — set by JS so our sticky parts sit below it */
   --sn-offset: 0px;
-
 
   font-family: var(--font-body);
   font-size: 14px;
@@ -58,10 +52,6 @@
   --sidebar-bg: #0F0406; --sidebar-text: rgba(247,234,235,.78); --sidebar-active-bg: rgba(184,150,46,.18);
 }
 
-
-/* ==========================================================================
-   SCOPED RESET — only affects our own tree, never Odoo's
-   ========================================================================== */
 .sn-root *, .sn-root *::before, .sn-root *::after { box-sizing: border-box; }
 .sn-root h1, .sn-root h2, .sn-root h3, .sn-root p, .sn-root small,
 .sn-root ul, .sn-root label, .sn-root pre, .sn-root table { margin: 0; padding: 0; }
@@ -71,10 +61,6 @@
 .sn-root code { font-family: var(--font-mono); font-size: 12px; background: var(--bg-secondary); color: var(--text-primary); padding: 2px 6px; border-radius: 4px; }
 .sn-root img { max-width: 100%; height: auto; }
 
-
-/* ==========================================================================
-   LAYOUT SHELL
-   ========================================================================== */
 #snera-admin {
   display: flex;
   width: 100%;
@@ -83,12 +69,10 @@
   min-height: calc(100dvh - var(--sn-offset));
   background: var(--bg-tertiary);
   position: relative;
-  overflow-x: clip;               /* clip (not hidden) so sticky children still work */
+  overflow-x: clip;
   isolation: isolate;
 }
 
-
-/* Sidebar (desktop: sticky column, mobile: off-canvas drawer) */
 .sn-root .sn-sidebar {
   width: 250px; flex-shrink: 0;
   background: var(--sidebar-bg);
@@ -109,7 +93,6 @@
 .sn-root .sn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); display: inline-block; flex-shrink: 0; }
 .sn-root .sn-dot.is-on { background: #10B981; }
 
-
 .sn-root .sn-nav { display: flex; flex-direction: column; gap: 4px; padding: 0 .75rem; flex: 1; }
 .sn-root .sn-nav-item {
   display: flex; align-items: center; gap: 12px; width: 100%;
@@ -122,7 +105,6 @@
 .sn-root .sn-nav-item.is-active { background: var(--sidebar-active-bg); color: var(--gold-light); font-weight: 600; }
 .sn-root .sn-nav-item i { font-size: 20px; flex-shrink: 0; }
 
-
 .sn-root .sn-side-foot { padding: 1.25rem; border-top: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 12px; }
 .sn-root .sn-avatar {
   width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
@@ -134,8 +116,6 @@
 .sn-root .sn-user span { font-weight: 600; color: #fff; font-size: 13px; }
 .sn-root .sn-user small { color: rgba(255,255,255,.6); font-size: 11px; }
 
-
-/* Mobile-only bar + backdrop */
 .sn-root .sn-mobile-bar { display: none; }
 .sn-root .sn-backdrop {
   position: fixed; inset: 0; z-index: 1090;
@@ -144,15 +124,12 @@
 }
 .sn-root .sn-backdrop.is-open { opacity: 1; visibility: visible; }
 
-
 .sn-root .sn-burger {
   background: none; border: 0; cursor: pointer; color: rgba(255,255,255,.95);
   font-size: 26px; min-width: 44px; min-height: 44px; padding: 0;
   display: inline-flex; align-items: center; justify-content: center;
 }
 
-
-/* Main column */
 .sn-root .sn-main { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; background: var(--bg-tertiary); }
 .sn-root .sn-topbar {
   min-height: 64px; padding: .5rem 1.5rem;
@@ -164,15 +141,10 @@
 .sn-root .sn-topbar h2 { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text-primary); min-width: 0; }
 .sn-root .sn-body { padding: 1.5rem; flex: 1; min-width: 0; }
 
-
 .sn-root .sn-section { display: none; }
 .sn-root .sn-section.is-shown { display: block; animation: sn-fade .25s ease; }
 @keyframes sn-fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
-
-/* ==========================================================================
-   METRICS
-   ========================================================================== */
 .sn-root .sn-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
 .sn-root .sn-metric {
   background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-lg);
@@ -190,10 +162,6 @@
 }
 .sn-root[data-theme="dark"] .sn-metric-icon { color: var(--gold-light); }
 
-
-/* ==========================================================================
-   CARDS, FORMS, BUTTONS
-   ========================================================================== */
 .sn-root .sn-card {
   background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-lg);
   box-shadow: var(--card-shadow); margin-bottom: 1.5rem; overflow: hidden; min-width: 0;
@@ -206,7 +174,6 @@
 .sn-root .sn-card-head p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 .sn-root .sn-card-pad { padding: 1.5rem; }
 
-
 .sn-root .sn-filters { display: flex; gap: 12px; margin-bottom: 1.25rem; flex-wrap: wrap; }
 .sn-root .sn-input, .sn-root .sn-select, .sn-root .sn-textarea {
   display: block; padding: .65rem 1rem; min-height: 44px; max-width: 100%;
@@ -218,7 +185,6 @@
 .sn-root .sn-textarea { resize: vertical; }
 .sn-root .sn-input:focus, .sn-root .sn-select:focus, .sn-root .sn-textarea:focus { border-color: var(--gold); }
 .sn-root .sn-w-full { width: 100%; }
-
 
 .sn-root .sn-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -235,20 +201,12 @@
 .sn-root .sn-btn-outline:hover { background: var(--bg-hover); color: var(--text-primary); }
 .sn-root .sn-btn-sm { padding: .4rem .8rem; font-size: 12px; min-height: 36px; }
 .sn-root .sn-btn-icon { width: 44px; padding: 0; background: var(--bg-primary); border-color: var(--border); color: var(--text-primary); font-size: 18px; }
-.sn-root .sn-btn-icon:hover { background: var(--bg-hover); }
-.sn-root .sn-btn:focus-visible, .sn-root .sn-nav-item:focus-visible, .sn-root .sn-burger:focus-visible {
-  outline: 2px solid var(--gold); outline-offset: 2px;
-}
-
 
 .sn-root .sn-field { margin-bottom: 1.25rem; min-width: 0; }
 .sn-root .sn-field > label { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
 .sn-root .sn-row2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.sn-root .sn-row3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
 
-
-/* ==========================================================================
-   TABLES (cards on phones)
-   ========================================================================== */
 .sn-root .sn-table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .sn-root .sn-table { width: 100%; min-width: 600px; border-collapse: collapse; text-align: left; background: transparent; border: 0; }
 .sn-root .sn-table th {
@@ -267,7 +225,6 @@
 .sn-root .sn-thumb { width: 44px; height: 56px; object-fit: cover; border-radius: var(--radius-sm); background: var(--bg-tertiary); display: block; }
 .sn-root .sn-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
-
 .sn-root .sn-badge {
   display: inline-flex; align-items: center; gap: 5px; padding: .25rem .65rem;
   border-radius: var(--radius-full); font-size: 11.5px; font-weight: 600; text-transform: capitalize; white-space: nowrap;
@@ -276,13 +233,7 @@
 .sn-root .sn-badge-warning { background: rgba(217,119,6,.12); color: var(--warning); }
 .sn-root .sn-badge-danger  { background: rgba(192,57,43,.12); color: var(--danger); }
 .sn-root .sn-badge-info    { background: rgba(37,99,235,.12); color: var(--info); }
-.sn-root[data-theme="dark"] .sn-badge-success { color: #34D399; }
-.sn-root[data-theme="dark"] .sn-badge-warning { color: #FBBF24; }
-.sn-root[data-theme="dark"] .sn-badge-danger  { color: #F87171; }
-.sn-root[data-theme="dark"] .sn-badge-info    { color: #60A5FA; }
 
-
-/* Toggle switch */
 .sn-root .sn-toggle { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; cursor: pointer; }
 .sn-root .sn-toggle input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 1; }
 .sn-root .sn-slider { position: absolute; inset: 0; background: var(--border); border-radius: 24px; transition: .3s; }
@@ -291,12 +242,8 @@
   background: #fff; border-radius: 50%; transition: .3s;
 }
 .sn-root .sn-toggle input:checked + .sn-slider { background: var(--wine); }
-.sn-root[data-theme="dark"] .sn-toggle input:checked + .sn-slider { background: var(--gold); }
 .sn-root .sn-toggle input:checked + .sn-slider::before { transform: translateX(20px); }
-.sn-root .sn-toggle input:focus-visible + .sn-slider { outline: 2px solid var(--gold); outline-offset: 2px; }
 
-
-/* SQL block */
 .sn-root .sn-code {
   display: block; max-width: 100%; overflow-x: auto; white-space: pre; tab-size: 2;
   background: var(--bg-secondary); color: var(--text-primary);
@@ -304,10 +251,6 @@
   font-family: var(--font-mono); font-size: 12px; line-height: 1.6;
 }
 
-
-/* ==========================================================================
-   MODAL (lives in #snera-portal, appended to <body> so Odoo wrappers can't trap it)
-   ========================================================================== */
 .sn-root .sn-modal {
   position: fixed; inset: 0; z-index: 2000; padding: 1rem;
   background: rgba(0,0,0,.65); backdrop-filter: blur(4px);
@@ -317,7 +260,7 @@
 .sn-root .sn-modal-box {
   background: var(--bg-primary); color: var(--text-primary);
   border: 1px solid var(--border); border-radius: var(--radius-lg);
-  width: 100%; max-width: 600px; max-height: 90vh; max-height: 90dvh;
+  width: 100%; max-width: 650px; max-height: 90vh; max-height: 90dvh;
   display: flex; flex-direction: column; overflow: hidden;
   box-shadow: 0 20px 50px rgba(0,0,0,.3);
 }
@@ -327,8 +270,6 @@
 .sn-root .sn-modal-body { padding: 1.5rem; overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1; min-height: 0; }
 .sn-root .sn-modal-foot { padding: 1rem 1.5rem; border-top: 1px solid var(--border-light); display: flex; justify-content: flex-end; gap: 10px; background: var(--bg-secondary); }
 
-
-/* Toast */
 .sn-root .sn-toast {
   position: fixed; left: 50%; bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
   transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
@@ -338,98 +279,7 @@
 }
 .sn-root .sn-toast.is-on { opacity: 1; transform: translate(-50%, 0); }
 
-
-/* ==========================================================================
-   RESPONSIVE
-   ========================================================================== */
-/* Mid widths: drop low-priority columns instead of forcing sideways scroll */
-@media (min-width: 721px) and (max-width: 1100px) {
-  .sn-root .sn-hide-m { display: none; }
-}
-
-
-/* Tablet & phone: sidebar becomes a drawer */
-@media (max-width: 900px) {
-  #snera-admin { flex-direction: column; }
-
-
-  .sn-root .sn-sidebar {
-    position: fixed; top: 0; left: 0; bottom: 0; height: auto;
-    width: 280px; max-width: 85vw; z-index: 1100;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-    transform: translateX(-105%); visibility: hidden;
-    transition: transform .3s cubic-bezier(.4,0,.2,1), visibility .3s;
-    box-shadow: 10px 0 30px rgba(0,0,0,.4);
-  }
-  .sn-root .sn-sidebar.is-open { transform: none; visibility: visible; }
-
-
-  .sn-root .sn-mobile-bar {
-    display: flex; align-items: center; justify-content: space-between; gap: 8px;
-    height: 56px; padding: 0 .5rem 0 1rem; width: 100%;
-    background: var(--sidebar-bg); border-bottom: 1px solid rgba(255,255,255,.08);
-    position: sticky; top: var(--sn-offset); z-index: 120;
-  }
-  .sn-root .sn-mobile-brand { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--gold-light); letter-spacing: .05em; }
-
-
-  .sn-root .sn-topbar { position: static; min-height: 56px; padding: .5rem 1rem; }
-  .sn-root .sn-topbar h2 { font-size: 19px; }
-  .sn-root .sn-body { padding: 1rem; }
-  .sn-root .sn-metrics { gap: .85rem; }
-
-
-  /* 16px prevents iOS zoom-on-focus */
-  .sn-root .sn-input, .sn-root .sn-select, .sn-root .sn-textarea { font-size: 16px; }
-}
-
-
-/* Phone: tables turn into stacked cards, no sideways scrolling */
-@media (max-width: 720px) {
-  .sn-root .sn-table { min-width: 0; display: block; }
-  .sn-root .sn-table thead { display: none; }
-  .sn-root .sn-table tbody { display: block; }
-  .sn-root .sn-table tr { display: block; padding: .5rem 1rem; border-bottom: 1px solid var(--border); }
-  .sn-root .sn-table tbody tr:last-child { border-bottom: 0; }
-  .sn-root .sn-table td {
-    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-    padding: .55rem 0; border: 0; text-align: right;
-  }
-  .sn-root .sn-table td::before {
-    content: attr(data-label); flex-shrink: 0; text-align: left;
-    font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted);
-  }
-  .sn-root .sn-table td[colspan] { display: block; text-align: center; padding: 1.25rem 0; }
-  .sn-root .sn-table td[colspan]::before { display: none; }
-  .sn-root .sn-table tbody tr:hover td { background: transparent; }
-  .sn-root .sn-actions { justify-content: flex-end; }
-  .sn-root .sn-table td .sn-select { max-width: 150px; min-height: 40px; padding: .4rem .6rem; }
-}
-
-
-@media (max-width: 550px) {
-  .sn-root .sn-metrics { grid-template-columns: 1fr; }
-  .sn-root .sn-row2 { grid-template-columns: 1fr; gap: 0; }
-  .sn-root .sn-card-head { flex-direction: column; align-items: stretch; gap: .75rem; padding: 1rem; }
-  .sn-root .sn-card-head .sn-btn { width: 100%; }
-  .sn-root .sn-card-pad { padding: 1rem; }
-  .sn-root .sn-filters { flex-direction: column; }
-  .sn-root .sn-filters .sn-input, .sn-root .sn-filters .sn-select, .sn-root .sn-filters .sn-btn { width: 100%; }
-  .sn-root .sn-modal { padding: 0; align-items: flex-end; }
-  .sn-root .sn-modal-box { max-width: none; border-radius: var(--radius-lg) var(--radius-lg) 0 0; max-height: 92vh; max-height: 92dvh; }
-  .sn-root .sn-modal-body { padding: 1rem; }
-  .sn-root .sn-modal-foot { padding: .85rem 1rem calc(.85rem + env(safe-area-inset-bottom, 0px)); }
-  .sn-root .sn-modal-foot .sn-btn { flex: 1; }
-}
-
-
-@media (prefers-reduced-motion: reduce) {
-  .sn-root *, .sn-root *::before, .sn-root *::after { animation: none !important; transition: none !important; }
-}
-
-/* ==========================================================================
-   LOGIN GATE  – shown before dashboard, scoped to #sn-gate only
-   ========================================================================== */
+/* Login gate */
 #sn-gate {
   display:none; align-items:center; justify-content:center;
   min-height:100vh; min-height:100dvh; width:100%;
@@ -476,22 +326,60 @@
   padding:.65rem 1rem; display:none; margin:0;
 }
 .sn-gate-error.is-shown { display:block; }
+
+/* Image gallery preview grid */
+.sn-img-preview-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.sn-img-preview-item { width: 60px; height: 75px; border-radius: 6px; border: 1px solid var(--border); object-fit: cover; }
+
+@media (max-width: 900px) {
+  #snera-admin { flex-direction: column; }
+  .sn-root .sn-sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; height: auto;
+    width: 280px; max-width: 85vw; z-index: 1100;
+    transform: translateX(-105%); visibility: hidden;
+    transition: transform .3s cubic-bezier(.4,0,.2,1), visibility .3s;
+    box-shadow: 10px 0 30px rgba(0,0,0,.4);
+  }
+  .sn-root .sn-sidebar.is-open { transform: none; visibility: visible; }
+  .sn-root .sn-mobile-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    height: 56px; padding: 0 1rem; width: 100%;
+    background: var(--sidebar-bg); border-bottom: 1px solid rgba(255,255,255,.08);
+    position: sticky; top: var(--sn-offset); z-index: 120;
+  }
+  .sn-root .sn-mobile-brand { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--gold-light); }
+  .sn-root .sn-topbar { position: static; min-height: 56px; padding: .5rem 1rem; }
+  .sn-root .sn-body { padding: 1rem; }
+  .sn-root .sn-input, .sn-root .sn-select, .sn-root .sn-textarea { font-size: 16px; }
+}
+@media (max-width: 720px) {
+  .sn-root .sn-table { min-width: 0; display: block; }
+  .sn-root .sn-table thead { display: none; }
+  .sn-root .sn-table tbody { display: block; }
+  .sn-root .sn-table tr { display: block; padding: .5rem 1rem; border-bottom: 1px solid var(--border); }
+  .sn-root .sn-table td {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: .55rem 0; border: 0; text-align: right;
+  }
+  .sn-root .sn-table td::before {
+    content: attr(data-label); flex-shrink: 0; text-align: left;
+    font-size: 11.5px; font-weight: 700; text-transform: uppercase; color: var(--text-muted);
+  }
+  .sn-root .sn-row2, .sn-root .sn-row3 { grid-template-columns: 1fr; gap: 0; }
+}
 </style>
 
-
-<!-- ======================================================================
-     LOGIN GATE — shown by JS when no admin session exists
-     ====================================================================== -->
+<!-- LOGIN GATE -->
 <div id="sn-gate">
   <div class="sn-gate-card">
     <div class="sn-gate-logo">Snera Store <small>Admin Portal</small></div>
     <p id="sn-gate-error" class="sn-gate-error" role="alert"></p>
     <form id="sn-gate-form" onsubmit="SneraAdmin.doLogin(event)">
-      <div class="sn-gate-field" style="margin-bottom:.85rem;">
+      <div class="sn-gate-field">
         <label for="sn-gate-email">Admin Email</label>
         <input type="email" id="sn-gate-email" autocomplete="username" required placeholder="you@snerastore.com">
       </div>
-      <div class="sn-gate-field" style="margin-bottom:1.25rem;">
+      <div class="sn-gate-field">
         <label for="sn-gate-pw">Password</label>
         <input type="password" id="sn-gate-pw" autocomplete="current-password" required placeholder="••••••••">
       </div>
@@ -500,15 +388,9 @@
   </div>
 </div>
 
-
-<!-- ======================================================================
-     DASHBOARD
-     ====================================================================== -->
+<!-- DASHBOARD CONTAINER -->
 <div id="snera-admin" class="sn-root" data-theme="light">
-
-
   <div class="sn-backdrop" id="sn-backdrop" onclick="SneraAdmin.closeSidebar()"></div>
-
 
   <!-- Sidebar -->
   <aside class="sn-sidebar" id="sn-sidebar" aria-label="Admin navigation">
@@ -517,17 +399,17 @@
       <div class="sn-status"><span class="sn-dot" id="sn-db-dot"></span><span id="sn-db-text">Connecting...</span></div>
     </div>
 
-
     <nav class="sn-nav">
-      <button type="button" class="sn-nav-item is-active" data-section="dashboard"  onclick="SneraAdmin.show('dashboard')"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
-      <button type="button" class="sn-nav-item" data-section="categories" onclick="SneraAdmin.show('categories')"><i class="ti ti-category"></i> Category Manager</button>
-      <button type="button" class="sn-nav-item" data-section="products"   onclick="SneraAdmin.show('products')"><i class="ti ti-box"></i> Products Catalog</button>
-      <button type="button" class="sn-nav-item" data-section="orders"     onclick="SneraAdmin.show('orders')"><i class="ti ti-shopping-cart"></i> Orders &amp; Sales</button>
-      <button type="button" class="sn-nav-item" data-section="customers"  onclick="SneraAdmin.show('customers')"><i class="ti ti-users"></i> Customers</button>
-      <button type="button" class="sn-nav-item" data-section="settings"   onclick="SneraAdmin.show('settings')"><i class="ti ti-settings"></i> Store Settings</button>
-      <button type="button" class="sn-nav-item" data-section="setup"      onclick="SneraAdmin.show('setup')"><i class="ti ti-database"></i> Database &amp; RLS Setup</button>
+      <button type="button" class="sn-nav-item is-active" data-section="dashboard" onclick="SneraAdmin.show('dashboard')"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+      <button type="button" class="sn-nav-item" data-section="categories" onclick="SneraAdmin.show('categories')"><i class="ti ti-category"></i> Categories</button>
+      <button type="button" class="sn-nav-item" data-section="products" onclick="SneraAdmin.show('products')"><i class="ti ti-box"></i> Products Catalog</button>
+      <button type="button" class="sn-nav-item" data-section="orders" onclick="SneraAdmin.show('orders')"><i class="ti ti-shopping-cart"></i> Orders &amp; Sales</button>
+      <button type="button" class="sn-nav-item" data-section="coupons" onclick="SneraAdmin.show('coupons')"><i class="ti ti-ticket"></i> Coupons</button>
+      <button type="button" class="sn-nav-item" data-section="customers" onclick="SneraAdmin.show('customers')"><i class="ti ti-users"></i> Customers</button>
+      <button type="button" class="sn-nav-item" data-section="reviews" onclick="SneraAdmin.show('reviews')"><i class="ti ti-star"></i> Reviews Moderation</button>
+      <button type="button" class="sn-nav-item" data-section="settings" onclick="SneraAdmin.show('settings')"><i class="ti ti-settings"></i> Store Settings</button>
+      <button type="button" class="sn-nav-item" data-section="setup" onclick="SneraAdmin.show('setup')"><i class="ti ti-database"></i> Database &amp; RLS Setup</button>
     </nav>
-
 
     <div class="sn-side-foot">
       <div class="sn-avatar" id="sn-user-avatar">?</div>
@@ -535,37 +417,27 @@
         <span id="sn-user-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Admin</span>
         <small id="sn-user-email" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</small>
       </div>
-      <button type="button" title="Sign out" aria-label="Sign out"
-        onclick="SneraAdmin.doSignOut()"
-        style="background:none;border:0;cursor:pointer;color:rgba(255,255,255,.55);font-size:20px;padding:4px;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:color .2s;"
-        onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.55)'">
+      <button type="button" title="Sign out" aria-label="Sign out" onclick="SneraAdmin.doSignOut()" style="background:none;border:0;cursor:pointer;color:rgba(255,255,255,.55);font-size:20px;">
         <i class="ti ti-logout"></i>
       </button>
     </div>
   </aside>
 
-
   <!-- Main -->
   <main class="sn-main">
-
-
-    <!-- Phone/tablet bar (the only hamburger) -->
     <div class="sn-mobile-bar">
       <div class="sn-mobile-brand">Snera Store</div>
-      <button type="button" class="sn-burger" onclick="SneraAdmin.toggleSidebar()" aria-label="Open navigation" aria-controls="sn-sidebar"><i class="ti ti-menu-2"></i></button>
+      <button type="button" class="sn-burger" onclick="SneraAdmin.toggleSidebar()"><i class="ti ti-menu-2"></i></button>
     </div>
-
 
     <header class="sn-topbar">
       <h2 id="sn-page-title">Dashboard Overview</h2>
-      <button type="button" class="sn-btn sn-btn-icon" onclick="SneraAdmin.toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
+      <button type="button" class="sn-btn sn-btn-icon" onclick="SneraAdmin.toggleTheme()" title="Toggle theme">
         <i class="ti ti-moon" id="sn-theme-icon"></i>
       </button>
     </header>
 
-
     <div class="sn-body">
-
 
       <!-- 1. DASHBOARD -->
       <section class="sn-section is-shown" id="sn-sec-dashboard">
@@ -583,11 +455,18 @@
             <div class="sn-metric-icon"><i class="ti ti-shirt"></i></div>
           </div>
           <div class="sn-metric">
-            <div><div class="sn-metric-label">Categories</div><div class="sn-metric-value" id="sn-stat-categories">0</div><div class="sn-metric-sub">Product collections</div></div>
+            <div><div class="sn-metric-label">Categories</div><div class="sn-metric-value" id="sn-stat-categories">0</div><div class="sn-metric-sub">Collections</div></div>
             <div class="sn-metric-icon"><i class="ti ti-category"></i></div>
           </div>
         </div>
 
+        <!-- Low Stock Warning Box -->
+        <div id="sn-low-stock-alert" style="display:none; background:rgba(217,119,6,0.1); border:1px solid var(--warning); border-radius:var(--radius-md); padding:1rem 1.25rem; margin-bottom:1.5rem;">
+          <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:var(--warning);">
+            <i class="ti ti-alert-triangle" style="font-size:20px;"></i> Low Inventory Warning
+          </div>
+          <p id="sn-low-stock-msg" style="font-size:13px; color:var(--text-secondary); margin-top:4px;"></p>
+        </div>
 
         <div class="sn-card">
           <div class="sn-card-head">
@@ -596,13 +475,12 @@
           </div>
           <div class="sn-table-wrap">
             <table class="sn-table">
-              <thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th><th class="sn-hide-m">Date</th></tr></thead>
+              <thead><tr><th>Order ID</th><th>Customer</th><th>Total</th><th>Status</th><th class="sn-hide-m">Date</th></tr></thead>
               <tbody id="sn-dash-orders"><tr><td colspan="5">Fetching live orders...</td></tr></tbody>
             </table>
           </div>
         </div>
       </section>
-
 
       <!-- 2. CATEGORIES -->
       <section class="sn-section" id="sn-sec-categories">
@@ -610,38 +488,36 @@
           <div class="sn-card-head">
             <div>
               <h3>Category &amp; Display Control</h3>
-              <p>Manage saree categories and choose which collections show on the Shop and Home pages.</p>
+              <p>Manage saree categories and choose which collections show on Shop and Home pages.</p>
             </div>
-            <button type="button" class="sn-btn sn-btn-primary" onclick="SneraAdmin.openCategory()"><i class="ti ti-plus"></i> Add New Category</button>
+            <button type="button" class="sn-btn sn-btn-primary" onclick="SneraAdmin.openCategory()"><i class="ti ti-plus"></i> Add Category</button>
           </div>
           <div class="sn-table-wrap">
             <table class="sn-table">
-              <thead><tr><th>Category Name</th><th class="sn-hide-m">Slug</th><th>Show on Shop</th><th>Show on Home</th><th class="sn-hide-m">Display Order</th><th>Status</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Category Name</th><th class="sn-hide-m">Slug</th><th>Show on Shop</th><th>Show on Home</th><th>Order</th><th>Status</th><th>Actions</th></tr></thead>
               <tbody id="sn-cat-body"><tr><td colspan="7">Loading categories...</td></tr></tbody>
             </table>
           </div>
         </div>
       </section>
 
-
       <!-- 3. PRODUCTS -->
       <section class="sn-section" id="sn-sec-products">
         <div class="sn-filters">
           <input type="search" class="sn-input" id="sn-prod-search" placeholder="Search sarees by name..." oninput="SneraAdmin.filterProducts()" style="flex:1 1 200px; min-width:0;">
           <select class="sn-select" id="sn-prod-cat" onchange="SneraAdmin.filterProducts()"><option value="">All Categories</option></select>
-          <button type="button" class="sn-btn sn-btn-primary" onclick="SneraAdmin.openProduct()"><i class="ti ti-plus"></i> Add New Product</button>
+          <button type="button" class="sn-btn sn-btn-primary" onclick="SneraAdmin.openProduct()"><i class="ti ti-plus"></i> Add Product</button>
         </div>
         <div class="sn-card">
-          <div class="sn-card-head"><h3>Saree Products</h3></div>
+          <div class="sn-card-head"><h3>Saree Catalog</h3></div>
           <div class="sn-table-wrap">
             <table class="sn-table">
-              <thead><tr><th>Image</th><th>Title</th><th class="sn-hide-m">Category</th><th>Price</th><th class="sn-hide-m">Stock</th><th>Status</th><th>Actions</th></tr></thead>
-              <tbody id="sn-prod-body"><tr><td colspan="7">Loading product catalog...</td></tr></tbody>
+              <thead><tr><th>Image</th><th>Title</th><th class="sn-hide-m">Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="sn-prod-body"><tr><td colspan="7">Loading products...</td></tr></tbody>
             </table>
           </div>
         </div>
       </section>
-
 
       <!-- 4. ORDERS -->
       <section class="sn-section" id="sn-sec-orders">
@@ -649,606 +525,558 @@
           <select class="sn-select" id="sn-order-filter" onchange="SneraAdmin.filterOrders()">
             <option value="">All Order Statuses</option>
             <option value="pending">Pending</option>
+            <option value="paid">Paid</option>
             <option value="processing">Processing</option>
             <option value="shipped">Shipped</option>
             <option value="delivered">Delivered</option>
             <option value="cancelled">Cancelled</option>
+            <option value="refunded">Refunded</option>
           </select>
         </div>
         <div class="sn-card">
           <div class="sn-card-head"><h3>Customer Orders</h3></div>
           <div class="sn-table-wrap">
             <table class="sn-table">
-              <thead><tr><th>Order ID</th><th>Customer Name</th><th class="sn-hide-m">Phone / Email</th><th>Total Amount</th><th>Status</th><th class="sn-hide-m">Date</th><th>Update Status</th></tr></thead>
-              <tbody id="sn-orders-body"><tr><td colspan="7">No orders found.</td></tr></tbody>
+              <thead><tr><th>Order ID</th><th>Customer</th><th class="sn-hide-m">Contact</th><th>Total</th><th>Status</th><th class="sn-hide-m">Date</th><th>Actions</th></tr></thead>
+              <tbody id="sn-orders-body"><tr><td colspan="7">Loading orders...</td></tr></tbody>
             </table>
           </div>
         </div>
       </section>
 
-
-      <!-- 5. CUSTOMERS -->
-      <section class="sn-section" id="sn-sec-customers">
+      <!-- 5. COUPONS -->
+      <section class="sn-section" id="sn-sec-coupons">
         <div class="sn-card">
-          <div class="sn-card-head"><h3>Registered Customers</h3></div>
+          <div class="sn-card-head">
+            <div>
+              <h3>Coupons &amp; Discounts</h3>
+              <p>Create and manage promo discount codes for customer checkout.</p>
+            </div>
+            <button type="button" class="sn-btn sn-btn-primary" onclick="SneraAdmin.openCoupon()"><i class="ti ti-plus"></i> Add Coupon</button>
+          </div>
           <div class="sn-table-wrap">
             <table class="sn-table">
-              <thead><tr><th>Customer</th><th class="sn-hide-m">Email</th><th>Phone</th><th>Orders</th><th>Joined</th></tr></thead>
-              <tbody id="sn-cust-body"><tr><td colspan="5">No customer records yet.</td></tr></tbody>
+              <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Min Order</th><th>Uses</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="sn-coupon-body"><tr><td colspan="7">Loading coupons...</td></tr></tbody>
             </table>
           </div>
         </div>
       </section>
 
+      <!-- 6. CUSTOMERS -->
+      <section class="sn-section" id="sn-sec-customers">
+        <div class="sn-card">
+          <div class="sn-card-head"><h3>Customer Directory</h3></div>
+          <div class="sn-table-wrap">
+            <table class="sn-table">
+              <thead><tr><th>Customer Name</th><th>Email</th><th>Phone</th><th>Joined</th></tr></thead>
+              <tbody id="sn-cust-body"><tr><td colspan="4">Loading customers...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
 
-      <!-- 6. SETTINGS -->
+      <!-- 7. REVIEWS -->
+      <section class="sn-section" id="sn-sec-reviews">
+        <div class="sn-card">
+          <div class="sn-card-head"><h3>Reviews Moderation</h3></div>
+          <div class="sn-table-wrap">
+            <table class="sn-table">
+              <thead><tr><th>Customer</th><th>Rating</th><th>Comment</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="sn-rev-body"><tr><td colspan="5">Loading reviews...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. SETTINGS -->
       <section class="sn-section" id="sn-sec-settings">
         <div class="sn-card">
-          <div class="sn-card-head"><h3>Store Credentials &amp; Configuration</h3></div>
+          <div class="sn-card-head"><h3>Store Configuration &amp; Settings</h3></div>
           <div class="sn-card-pad">
-            <form onsubmit="SneraAdmin.saveSettings(event)">
-              <div class="sn-field">
-                <label for="sn-set-url">Supabase Project URL</label>
-                <input type="text" class="sn-input sn-w-full" id="sn-set-url" placeholder="https://xyzcompany.supabase.co">
-              </div>
-              <div class="sn-field">
-                <label for="sn-set-key">Supabase Anon Key</label>
-                <input type="password" class="sn-input sn-w-full" id="sn-set-key" placeholder="eyJhbGciOi...">
-              </div>
+            <form onsubmit="SneraAdmin.saveStoreSettings(event)">
               <div class="sn-row2">
                 <div class="sn-field">
-                  <label for="sn-set-name">Store Name</label>
-                  <input type="text" class="sn-input sn-w-full" id="sn-set-name" value="Snera Store">
+                  <label>Store Name</label>
+                  <input type="text" class="sn-input sn-w-full" id="sn-set-store-name" value="Snera Store">
                 </div>
                 <div class="sn-field">
-                  <label for="sn-set-email">Support Email</label>
-                  <input type="email" class="sn-input sn-w-full" id="sn-set-email" placeholder="support@snerastore.com">
+                  <label>Support Email</label>
+                  <input type="email" class="sn-input sn-w-full" id="sn-set-support-email" placeholder="support@snerastore.com">
                 </div>
               </div>
-              <button type="submit" class="sn-btn sn-btn-primary">Save Configuration</button>
+
+              <div class="sn-row3">
+                <div class="sn-field">
+                  <label>GST Rate (%)</label>
+                  <input type="number" step="0.01" class="sn-input sn-w-full" id="sn-set-gst-rate" value="5">
+                </div>
+                <div class="sn-field">
+                  <label>Free Shipping Threshold (₹)</label>
+                  <input type="number" class="sn-input sn-w-full" id="sn-set-ship-thresh" value="999">
+                </div>
+                <div class="sn-field">
+                  <label>Return Window (Days)</label>
+                  <input type="number" class="sn-input sn-w-full" id="sn-set-return-days" value="7">
+                </div>
+              </div>
+
+              <div class="sn-field" style="margin-top:0.5rem;">
+                <label>Enable Cash on Delivery (COD)</label>
+                <label class="sn-toggle" style="margin-top:4px;"><input type="checkbox" id="sn-set-cod-enable" checked><span class="sn-slider"></span></label>
+              </div>
+
+              <button type="submit" class="sn-btn sn-btn-primary" style="margin-top:1rem;">Save Settings</button>
             </form>
           </div>
         </div>
       </section>
 
-
-      <!-- 7. SETUP -->
+      <!-- 9. SETUP -->
       <section class="sn-section" id="sn-sec-setup">
         <div class="sn-card">
-          <div class="sn-card-head"><h3>Database Schema &amp; RLS Security Script</h3></div>
+          <div class="sn-card-head"><h3>Database Schema &amp; RLS Script</h3></div>
           <div class="sn-card-pad">
-            <p style="color: var(--text-secondary); margin-bottom: 1rem;">Run these queries in your <strong>Supabase SQL Editor</strong> to create the tables with Row-Level Security.</p>
-<pre class="sn-code">-- 1. CATEGORIES
-create table if not exists categories (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  slug text unique not null,
-  description text,
-  image_url text,
-  show_in_shop boolean default true,
-  show_in_home boolean default true,
-  display_order integer default 0,
-  status text default 'active',
-  created_at timestamptz default now()
-);
-
-
--- 2. PRODUCTS
-create table if not exists products (
-  id uuid primary key default gen_random_uuid(),
-  name text not null,
-  description text,
-  price numeric(10,2) not null default 0,
-  original_price numeric(10,2),
-  stock integer default 0,
-  sku text,
-  category_id uuid references categories(id) on delete set null,
-  category_name text,
-  fabric text,
-  color text,
-  occasion text,
-  image_url text,
-  is_featured boolean default false,
-  status text default 'active',
-  created_at timestamptz default now()
-);
-
-
--- 3. ORDERS
-create table if not exists orders (
-  id uuid primary key default gen_random_uuid(),
-  customer_name text not null,
-  customer_email text,
-  customer_phone text,
-  shipping_address text,
-  total_amount numeric(10,2) not null default 0,
-  status text default 'pending',
-  items jsonb default '[]'::jsonb,
-  created_at timestamptz default now()
-);
-
-
--- 4. ADMIN USER FUNCTION & ROW LEVEL SECURITY
-create table if not exists admin_users (
-  user_id uuid primary key references auth.users(id) on delete cascade,
-  created_at timestamptz default now()
-);
-
-create or replace function public.is_admin()
-returns boolean language sql security definer as $$
-  select exists (
-    select 1 from public.admin_users where user_id = auth.uid()
-  ) or exists (
-    select 1 from public.user_profiles where id = auth.uid() and is_admin = true
-  );
-$$;
-
-alter table categories enable row level security;
-alter table products enable row level security;
-alter table orders enable row level security;
-
--- Public read policies
-create policy "Public Read Active Categories" on categories for select using (status = 'active' or public.is_admin());
-create policy "Public Read Active Products" on products for select using (status = 'active' or public.is_admin());
-
--- Admin full write access policies
-create policy "Admin All Categories" on categories for all to authenticated using (public.is_admin()) with check (public.is_admin());
-create policy "Admin All Products"   on products   for all to authenticated using (public.is_admin()) with check (public.is_admin());
-create policy "Admin All Orders"     on orders     for all to authenticated using (public.is_admin()) with check (public.is_admin());</pre>
+            <p style="color:var(--text-secondary); margin-bottom:1rem;">Run `snera-store/migration.sql` in your <strong>Supabase SQL Editor</strong> to apply full tables &amp; RLS.</p>
           </div>
         </div>
       </section>
-
 
     </div>
   </main>
 </div>
 
-
-<!-- Modal + toast portal. Moved to <body> by JS so Odoo wrappers (transforms, overflow) can't clip it. -->
+<!-- PORTAL MODALS -->
 <div id="snera-portal" class="sn-root" data-theme="light">
-  <div class="sn-modal" id="sn-cat-modal" role="dialog" aria-modal="true" aria-labelledby="sn-cat-title">
+
+  <!-- PRODUCT MODAL -->
+  <div class="sn-modal" id="sn-prod-modal" role="dialog" aria-modal="true">
     <div class="sn-modal-box">
       <div class="sn-modal-head">
-        <h3 id="sn-cat-title">Add New Category</h3>
-        <button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.closeCategory()" aria-label="Close">✕</button>
+        <h3 id="sn-prod-modal-title">Add New Product</h3>
+        <button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.closeProduct()">✕</button>
       </div>
-      <form class="sn-modal-form" id="sn-cat-form" onsubmit="SneraAdmin.saveCategory(event)">
+      <form class="sn-modal-form" id="sn-prod-form" onsubmit="SneraAdmin.saveProduct(event)">
         <div class="sn-modal-body">
-          <input type="hidden" id="sn-cat-id">
-          <div class="sn-field"><label for="sn-cat-name">Category Name *</label><input type="text" class="sn-input sn-w-full" id="sn-cat-name" required placeholder="e.g. Kanjeevaram Silk"></div>
-          <div class="sn-field"><label for="sn-cat-slug">Category Slug</label><input type="text" class="sn-input sn-w-full" id="sn-cat-slug" placeholder="e.g. kanjeevaram-silk"></div>
-          <div class="sn-field"><label for="sn-cat-desc">Description</label><textarea class="sn-textarea sn-w-full" id="sn-cat-desc" rows="3"></textarea></div>
-          <div class="sn-field"><label for="sn-cat-image">Banner Image URL</label><input type="url" class="sn-input sn-w-full" id="sn-cat-image" placeholder="https://..."></div>
+          <input type="hidden" id="sn-prod-id">
+          <div class="sn-field"><label>Product Name *</label><input type="text" class="sn-input sn-w-full" id="sn-prod-name" required></div>
           <div class="sn-row2">
-            <div class="sn-field"><label>Show on Shop Page Filter</label><label class="sn-toggle" style="margin-top:4px;"><input type="checkbox" id="sn-cat-shop" checked><span class="sn-slider"></span></label></div>
-            <div class="sn-field"><label>Show on Home Page Grid</label><label class="sn-toggle" style="margin-top:4px;"><input type="checkbox" id="sn-cat-home" checked><span class="sn-slider"></span></label></div>
+            <div class="sn-field"><label>Price (₹) *</label><input type="number" step="0.01" class="sn-input sn-w-full" id="sn-prod-price" required></div>
+            <div class="sn-field"><label>Original Price (₹)</label><input type="number" step="0.01" class="sn-input sn-w-full" id="sn-prod-orig-price"></div>
           </div>
           <div class="sn-row2">
-            <div class="sn-field"><label for="sn-cat-order">Display Order</label><input type="number" class="sn-input sn-w-full" id="sn-cat-order" value="0"></div>
-            <div class="sn-field"><label for="sn-cat-status">Status</label>
-              <select class="sn-select sn-w-full" id="sn-cat-status"><option value="active">Active</option><option value="inactive">Inactive</option></select>
-            </div>
+            <div class="sn-field"><label>Stock *</label><input type="number" class="sn-input sn-w-full" id="sn-prod-stock" required value="1"></div>
+            <div class="sn-field"><label>SKU</label><input type="text" class="sn-input sn-w-full" id="sn-prod-sku" placeholder="SNR-SAREE-001"></div>
+          </div>
+          <div class="sn-row2">
+            <div class="sn-field"><label>Category</label><select class="sn-select sn-w-full" id="sn-prod-cat-select"></select></div>
+            <div class="sn-field"><label>Fabric</label><input type="text" class="sn-input sn-w-full" id="sn-prod-fabric" placeholder="Pure Kanjeevaram Silk"></div>
+          </div>
+          <div class="sn-row3">
+            <div class="sn-field"><label>Color</label><input type="text" class="sn-input sn-w-full" id="sn-prod-color" placeholder="Crimson Red"></div>
+            <div class="sn-field"><label>Occasion</label><input type="text" class="sn-input sn-w-full" id="sn-prod-occasion" placeholder="Bridal / Wedding"></div>
+            <div class="sn-field"><label>Status</label><select class="sn-select sn-w-full" id="sn-prod-status"><option value="active">Active</option><option value="draft">Draft</option></select></div>
+          </div>
+          <div class="sn-field">
+            <label>Product Main &amp; Gallery Images Upload</label>
+            <input type="file" class="sn-input sn-w-full" id="sn-prod-files" multiple accept="image/*" onchange="SneraAdmin.handleImageUpload(event)">
+            <div id="sn-prod-img-previews" class="sn-img-preview-grid"></div>
+          </div>
+          <div class="sn-row2" style="margin-top:0.5rem;">
+            <div class="sn-field"><label>Free Shipping</label><label class="sn-toggle"><input type="checkbox" id="sn-prod-freeship" checked><span class="sn-slider"></span></label></div>
+            <div class="sn-field"><label>Featured Product</label><label class="sn-toggle"><input type="checkbox" id="sn-prod-featured"><span class="sn-slider"></span></label></div>
           </div>
         </div>
         <div class="sn-modal-foot">
-          <button type="button" class="sn-btn sn-btn-outline" onclick="SneraAdmin.closeCategory()">Cancel</button>
-          <button type="submit" class="sn-btn sn-btn-primary">Save Category</button>
+          <button type="button" class="sn-btn sn-btn-outline" onclick="SneraAdmin.closeProduct()">Cancel</button>
+          <button type="submit" class="sn-btn sn-btn-primary">Save Product</button>
         </div>
       </form>
     </div>
   </div>
+
+  <!-- ORDER DETAILS MODAL -->
+  <div class="sn-modal" id="sn-order-modal" role="dialog" aria-modal="true">
+    <div class="sn-modal-box">
+      <div class="sn-modal-head">
+        <h3 id="sn-order-modal-title">Order Details</h3>
+        <button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.closeOrderModal()">✕</button>
+      </div>
+      <div class="sn-modal-body" id="sn-order-modal-body"></div>
+      <div class="sn-modal-foot">
+        <button type="button" class="sn-btn sn-btn-outline" onclick="SneraAdmin.closeOrderModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COUPON MODAL -->
+  <div class="sn-modal" id="sn-coupon-modal" role="dialog" aria-modal="true">
+    <div class="sn-modal-box">
+      <div class="sn-modal-head">
+        <h3 id="sn-coupon-modal-title">Add Coupon</h3>
+        <button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.closeCoupon()">✕</button>
+      </div>
+      <form class="sn-modal-form" onsubmit="SneraAdmin.saveCoupon(event)">
+        <div class="sn-modal-body">
+          <input type="hidden" id="sn-coup-id">
+          <div class="sn-field"><label>Coupon Code *</label><input type="text" class="sn-input sn-w-full" id="sn-coup-code" required placeholder="WELCOME10" style="text-transform:uppercase;"></div>
+          <div class="sn-row2">
+            <div class="sn-field"><label>Discount Type</label><select class="sn-select sn-w-full" id="sn-coup-type"><option value="percent">Percentage (%)</option><option value="flat">Flat Amount (₹)</option></select></div>
+            <div class="sn-field"><label>Value *</label><input type="number" step="0.01" class="sn-input sn-w-full" id="sn-coup-val" required></div>
+          </div>
+          <div class="sn-row2">
+            <div class="sn-field"><label>Min Order Value (₹)</label><input type="number" class="sn-input sn-w-full" id="sn-coup-min" value="0"></div>
+            <div class="sn-field"><label>Max Uses (0 = unlimited)</label><input type="number" class="sn-input sn-w-full" id="sn-coup-uses" value="0"></div>
+          </div>
+        </div>
+        <div class="sn-modal-foot">
+          <button type="button" class="sn-btn sn-btn-outline" onclick="SneraAdmin.closeCoupon()">Cancel</button>
+          <button type="submit" class="sn-btn sn-btn-primary">Save Coupon</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="sn-toast" id="sn-toast" role="status"></div>
 </div>
 
-
 <script>
 (function () {
-  /* ── Project config ────────────────────────────────────────────────────────
-     ONLY the anon (public) key lives here. Service-role key must NEVER appear
-     in browser code. Rotate keys in Supabase → Settings → API → Reveal / Roll.
-     ────────────────────────────────────────────────────────────────────────── */
   var DEFAULT_URL = 'https://yduueujrykugmzvbnndu.supabase.co';
   var DEFAULT_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkdXVldWpyeWt1Z216dmJuG5kdSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzA3MDAwMDAwLCJleHAiOjIwMjI1NzYwMDB9.REPLACE_WITH_REAL_ANON_KEY';
-  /* ↑ Paste the ANON key from Supabase → Settings → API → anon/public.        */
-
 
   var TITLES = {
-    dashboard: 'Dashboard Overview', categories: 'Category & Display Control',
-    products: 'Saree Products Catalog', orders: 'Customer Orders & Sales',
-    customers: 'Customer Directory', settings: 'Store Settings', setup: 'Database & RLS Setup'
+    dashboard: 'Dashboard Overview', categories: 'Categories',
+    products: 'Saree Catalog', orders: 'Orders & Sales',
+    coupons: 'Coupons & Discounts', customers: 'Customer Directory',
+    reviews: 'Reviews Moderation', settings: 'Store Settings', setup: 'Database Setup'
   };
 
-
   var root, portal, db = null;
-  var cats = [], prods = [], orders = [];
-
+  var cats = [], prods = [], orders = [], coupons = [], customers = [], reviews = [];
+  var uploadImgUrls = [];
 
   function $(id) { return document.getElementById(id); }
-  function esc(v) {
-    return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
+  function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function money(n) { return '₹' + (Number(n) || 0).toLocaleString('en-IN'); }
   function dateStr(d) { return d ? new Date(d).toLocaleDateString('en-IN') : '-'; }
   function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
-  function toast(msg) {
-    var t = $('sn-toast'); t.textContent = msg; t.classList.add('is-on');
-    clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('is-on'); }, 2800);
-  }
+  function toast(msg) { var t = $('sn-toast'); t.textContent = msg; t.classList.add('is-on'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('is-on'); }, 2800); }
   function badgeFor(status) {
-    var map = { active: 'success', delivered: 'success', shipped: 'info', processing: 'info', pending: 'warning', cancelled: 'danger', inactive: 'danger' };
+    var map = { active: 'success', paid: 'success', delivered: 'success', shipped: 'info', processing: 'info', pending: 'warning', cancelled: 'danger', refunded: 'danger' };
     return '<span class="sn-badge sn-badge-' + (map[status] || 'info') + '">' + esc(status || '-') + '</span>';
   }
-  function empty(cols, msg) { return '<tr><td colspan="' + cols + '">' + esc(msg) + '</td></tr>'; }
 
-
-  /* ---------- Odoo header offset: keeps sticky bars below Odoo's fixed header ---------- */
-  var ticking = false;
-  function measureOffset() {
-    ticking = false;
-    var h = document.querySelector('header#top') || document.querySelector('#wrapwrap > header') || document.querySelector('header.o_header_standard');
-    var off = 0;
-    if (h) {
-      var pos = getComputedStyle(h).position;
-      if (pos === 'fixed' || pos === 'sticky') off = Math.max(0, Math.round(h.getBoundingClientRect().bottom));
-    }
-    root.style.setProperty('--sn-offset', off + 'px');
-  }
-  function queueMeasure() { if (!ticking) { ticking = true; requestAnimationFrame(measureOffset); } }
-
-
-  /* ---------- Full-width breakout: cancels Odoo's container/section side padding ---------- */
-  function fullBleed() {
-    root.style.width = 'auto'; root.style.maxWidth = 'none'; root.style.marginLeft = '0px';
-    var left = root.getBoundingClientRect().left;
-    var vw = document.documentElement.clientWidth;
-    root.style.marginLeft = (-left) + 'px';
-    root.style.width = vw + 'px';
-  }
-
-
-  /* ---------- Navigation ---------- */
-  function show(id) {
-    root.querySelectorAll('.sn-section').forEach(function (s) { s.classList.remove('is-shown'); });
-    root.querySelectorAll('.sn-nav-item').forEach(function (n) { n.classList.toggle('is-active', n.getAttribute('data-section') === id); });
-    var t = $('sn-sec-' + id); if (t) t.classList.add('is-shown');
-    $('sn-page-title').textContent = TITLES[id] || 'Admin Dashboard';
-    closeSidebar();
-    if (window.innerWidth <= 900) {
-      var top = root.getBoundingClientRect().top + window.scrollY - (parseInt(root.style.getPropertyValue('--sn-offset')) || 0);
-      window.scrollTo({ top: Math.max(0, top), behavior: 'auto' });
-    }
-  }
-  function toggleSidebar() { $('sn-sidebar').classList.contains('is-open') ? closeSidebar() : openSidebar(); }
-  function openSidebar() { $('sn-sidebar').classList.add('is-open'); $('sn-backdrop').classList.add('is-open'); }
-  function closeSidebar() { $('sn-sidebar').classList.remove('is-open'); $('sn-backdrop').classList.remove('is-open'); }
-
-
-  function toggleTheme() {
-    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    root.setAttribute('data-theme', next); portal.setAttribute('data-theme', next);
-    $('sn-theme-icon').className = next === 'dark' ? 'ti ti-sun' : 'ti ti-moon';
-  }
-
-
-  /* ---------- Auth & Supabase ---------- */
+  /* Auth & Session */
   async function checkAdminStatus(user) {
     if (!user) return false;
     try {
-      // 1. Check admin_users table first
       var res1 = await db.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
       if (res1.data) return true;
-
-      // 2. Fall back to user_profiles.is_admin
       var res2 = await db.from('user_profiles').select('is_admin').eq('id', user.id).maybeSingle();
       if (res2.data && res2.data.is_admin === true) return true;
-    } catch (e) {
-      console.warn('Admin check warning:', e);
-    }
+    } catch (e) {}
     return false;
   }
 
   function showGate(errText) {
     var errEl = $('sn-gate-error');
-    if (errText) {
-      errEl.textContent = errText;
-      errEl.classList.add('is-shown');
-    } else {
-      errEl.classList.remove('is-shown');
-    }
-    $('sn-gate').classList.add('is-shown');
-    root.style.display = 'none';
+    if (errText) { errEl.textContent = errText; errEl.classList.add('is-shown'); }
+    else { errEl.classList.remove('is-shown'); }
+    $('sn-gate').classList.add('is-shown'); root.style.display = 'none';
   }
 
-  function hideGate() {
-    $('sn-gate').classList.remove('is-shown');
-    root.style.display = 'flex';
-  }
+  function hideGate() { $('sn-gate').classList.remove('is-shown'); root.style.display = 'flex'; }
 
   async function checkUserSession() {
     if (!db) return;
     try {
       var sessionRes = await db.auth.getSession();
       var session = sessionRes.data ? sessionRes.data.session : null;
-
-      if (!session) {
-        showGate();
-        return;
-      }
-
+      if (!session) { showGate(); return; }
       var isAdmin = await checkAdminStatus(session.user);
-      if (!isAdmin) {
-        await db.auth.signOut();
-        showGate('Access Denied: Account is not flagged as an admin.');
-        return;
-      }
-
-      // Update sidebar user display
+      if (!isAdmin) { await db.auth.signOut(); showGate('Access Denied: Account is not flagged as an admin.'); return; }
       var email = session.user.email || 'admin@snerastore.com';
       $('sn-user-email').textContent = email;
       $('sn-user-name').textContent = email.split('@')[0];
       $('sn-user-avatar').textContent = email.charAt(0).toUpperCase();
-
-      hideGate();
-      load();
-    } catch (e) {
-      console.error('Session check failed:', e);
-      showGate('Failed to verify session.');
-    }
+      hideGate(); load();
+    } catch (e) { showGate('Failed to verify session.'); }
   }
 
   async function doLogin(e) {
     e.preventDefault();
-    var btn = $('sn-gate-btn');
-    var email = $('sn-gate-email').value.trim();
-    var password = $('sn-gate-pw').value;
-
-    btn.disabled = true;
-    btn.textContent = 'Authenticating...';
-    $('sn-gate-error').classList.remove('is-shown');
-
+    var btn = $('sn-gate-btn'), email = $('sn-gate-email').value.trim(), password = $('sn-gate-pw').value;
+    btn.disabled = true; btn.textContent = 'Authenticating...';
     try {
       var res = await db.auth.signInWithPassword({ email: email, password: password });
       if (res.error) throw res.error;
-
       var isAdmin = await checkAdminStatus(res.data.user);
-      if (!isAdmin) {
-        await db.auth.signOut();
-        throw new Error('Access Denied: Account is not flagged as an admin.');
-      }
-
-      var userEmail = res.data.user.email || email;
-      $('sn-user-email').textContent = userEmail;
-      $('sn-user-name').textContent = userEmail.split('@')[0];
-      $('sn-user-avatar').textContent = userEmail.charAt(0).toUpperCase();
-
-      hideGate();
-      toast('Welcome back, Admin');
-      load();
-    } catch (err) {
-      showGate(err.message || 'Login failed.');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Sign In to Admin';
-    }
+      if (!isAdmin) { await db.auth.signOut(); throw new Error('Access Denied: Account is not flagged as an admin.'); }
+      hideGate(); toast('Welcome back, Admin'); load();
+    } catch (err) { showGate(err.message || 'Login failed.'); }
+    finally { btn.disabled = false; btn.textContent = 'Sign In to Admin'; }
   }
 
-  async function doSignOut() {
-    if (db) {
-      await db.auth.signOut();
-    }
-    showGate();
-    toast('Signed out successfully');
-  }
+  async function doSignOut() { if (db) await db.auth.signOut(); showGate(); toast('Signed out successfully'); }
 
   function initDb() {
     var url = store('snera_sb_url') || DEFAULT_URL, key = store('snera_sb_key') || DEFAULT_KEY;
-    $('sn-set-url').value = url; $('sn-set-key').value = key;
     try {
       if (!window.supabase) throw new Error('Supabase library not loaded');
       db = window.supabase.createClient(url, key);
       $('sn-db-dot').classList.add('is-on'); $('sn-db-text').textContent = 'Connected';
-    } catch (e) {
-      console.error('Supabase error:', e);
-      $('sn-db-dot').classList.remove('is-on'); $('sn-db-text').textContent = 'Offline';
-    }
+    } catch (e) { $('sn-db-dot').classList.remove('is-on'); $('sn-db-text').textContent = 'Offline'; }
   }
-
 
   async function load() {
     if (!db) return;
     try {
-      var c = await db.from('categories').select('*').order('display_order', { ascending: true });
-      cats = c.data || [];
-      var p = await db.from('products').select('*');
-      prods = p.data || [];
-      var o = await db.from('orders').select('*').order('created_at', { ascending: false });
-      orders = o.data || [];
-    } catch (err) { console.log('Supabase fetch notice:', err); }
-    renderCategories(); filterProducts(); filterOrders(); renderDash(); stats();
+      var c = await db.from('categories').select('*').order('display_order', { ascending: true }); cats = c.data || [];
+      var p = await db.from('products').select('*'); prods = p.data || [];
+      var o = await db.from('orders').select('*').order('created_at', { ascending: false }); orders = o.data || [];
+      var cp = await db.from('coupons').select('*'); coupons = cp.data || [];
+      var cust = await db.from('user_profiles').select('*'); customers = cust.data || [];
+      var rev = await db.from('reviews').select('*'); reviews = rev.data || [];
+    } catch (err) {}
+    renderCategories(); filterProducts(); filterOrders(); renderCoupons(); renderCustomers(); renderReviews(); renderDash(); checkLowStock();
   }
 
+  function checkLowStock() {
+    var lowItems = prods.filter(function(p) { return Number(p.stock) <= 3; });
+    var alertEl = $('sn-low-stock-alert');
+    if (lowItems.length > 0) {
+      alertEl.style.display = 'block';
+      $('sn-low-stock-msg').textContent = lowItems.length + ' saree product(s) have 3 or fewer pieces remaining in inventory.';
+    } else {
+      alertEl.style.display = 'none';
+    }
+  }
 
-  function stats() {
+  function renderDash() {
     $('sn-stat-categories').textContent = cats.length;
     $('sn-stat-products').textContent = prods.length;
     $('sn-stat-orders').textContent = orders.length;
-    $('sn-stat-revenue').textContent = money(orders.reduce(function (s, o) { return s + (Number(o.total_amount) || 0); }, 0));
+    $('sn-stat-revenue').textContent = money(orders.reduce(function (s, o) { return s + (Number(o.total) || Number(o.total_amount) || 0); }, 0));
+    $('sn-dash-orders').innerHTML = orders.length ? orders.slice(0, 5).map(function (o) {
+      return '<tr><td data-label="Order">#' + esc(o.order_id || String(o.id).slice(0, 8)) + '</td><td data-label="Customer">' + esc(o.customer_name) + '</td>' +
+        '<td data-label="Total">' + money(o.total || o.total_amount) + '</td><td data-label="Status">' + badgeFor(o.status) + '</td>' +
+        '<td data-label="Date" class="sn-hide-m">' + dateStr(o.created_at) + '</td></tr>';
+    }).join('') : '<tr><td colspan="5">No recent orders recorded.</td></tr>';
   }
 
+  /* Navigation & UI */
+  function show(id) {
+    root.querySelectorAll('.sn-section').forEach(function (s) { s.classList.remove('is-shown'); });
+    root.querySelectorAll('.sn-nav-item').forEach(function (n) { n.classList.toggle('is-active', n.getAttribute('data-section') === id); });
+    var t = $('sn-sec-' + id); if (t) t.classList.add('is-shown');
+    $('sn-page-title').textContent = TITLES[id] || 'Admin Dashboard';
+    closeSidebar();
+  }
+  function toggleSidebar() { $('sn-sidebar').classList.contains('is-open') ? closeSidebar() : openSidebar(); }
+  function openSidebar() { $('sn-sidebar').classList.add('is-open'); $('sn-backdrop').classList.add('is-open'); }
+  function closeSidebar() { $('sn-sidebar').classList.remove('is-open'); $('sn-backdrop').classList.remove('is-open'); }
+  function toggleTheme() {
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next); portal.setAttribute('data-theme', next);
+    $('sn-theme-icon').className = next === 'dark' ? 'ti ti-sun' : 'ti ti-moon';
+  }
 
-  /* ---------- Categories ---------- */
+  /* Categories */
   function renderCategories() {
     var body = $('sn-cat-body');
-    var sel = $('sn-prod-cat'), keep = sel.value;
-    sel.innerHTML = '<option value="">All Categories</option>' + cats.map(function (c) {
-      return '<option value="' + esc(c.id) + '">' + esc(c.name) + '</option>';
-    }).join('');
-    sel.value = keep;
-
-
-    if (!cats.length) { body.innerHTML = empty(7, 'No categories yet. Tap "Add New Category" to create one.'); return; }
+    var sel = $('sn-prod-cat-select');
+    if (sel) sel.innerHTML = '<option value="">Select Category</option>' + cats.map(function(c) { return '<option value="' + c.id + '">' + esc(c.name) + '</option>'; }).join('');
+    if (!cats.length) { body.innerHTML = '<tr><td colspan="7">No categories found.</td></tr>'; return; }
     body.innerHTML = cats.map(function (c) {
-      var id = esc(c.id);
       return '<tr>' +
         '<td data-label="Category"><strong>' + esc(c.name) + '</strong></td>' +
         '<td data-label="Slug" class="sn-hide-m"><code>' + esc(c.slug || '-') + '</code></td>' +
-        '<td data-label="Show on Shop"><label class="sn-toggle"><input type="checkbox" ' + (c.show_in_shop ? 'checked' : '') + ' onchange="SneraAdmin.toggleCat(\'' + id + '\',\'show_in_shop\',this.checked)" aria-label="Show on shop"><span class="sn-slider"></span></label></td>' +
-        '<td data-label="Show on Home"><label class="sn-toggle"><input type="checkbox" ' + (c.show_in_home ? 'checked' : '') + ' onchange="SneraAdmin.toggleCat(\'' + id + '\',\'show_in_home\',this.checked)" aria-label="Show on home"><span class="sn-slider"></span></label></td>' +
-        '<td data-label="Order" class="sn-hide-m">' + esc(c.display_order || 0) + '</td>' +
+        '<td data-label="Show on Shop">' + (c.show_in_shop ? 'Yes' : 'No') + '</td>' +
+        '<td data-label="Show on Home">' + (c.show_in_home ? 'Yes' : 'No') + '</td>' +
+        '<td data-label="Order">' + (c.display_order || 0) + '</td>' +
         '<td data-label="Status">' + badgeFor(c.status) + '</td>' +
-        '<td data-label="Actions"><div class="sn-actions"><button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.editCategory(\'' + id + '\')">Edit</button></div></td>' +
+        '<td data-label="Actions"><button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.editCategory(\'' + c.id + '\')">Edit</button></td>' +
       '</tr>';
     }).join('');
   }
-
-
-  function openCategory() {
-    $('sn-cat-form').reset(); $('sn-cat-id').value = '';
-    $('sn-cat-title').textContent = 'Add New Category';
-    $('sn-cat-modal').classList.add('is-open');
-  }
-  function editCategory(id) {
-    var c = cats.find(function (x) { return String(x.id) === String(id); }); if (!c) return;
-    $('sn-cat-id').value = c.id; $('sn-cat-name').value = c.name || ''; $('sn-cat-slug').value = c.slug || '';
-    $('sn-cat-desc').value = c.description || ''; $('sn-cat-image').value = c.image_url || '';
-    $('sn-cat-shop').checked = !!c.show_in_shop; $('sn-cat-home').checked = !!c.show_in_home;
-    $('sn-cat-order').value = c.display_order || 0; $('sn-cat-status').value = c.status || 'active';
-    $('sn-cat-title').textContent = 'Edit Category';
-    $('sn-cat-modal').classList.add('is-open');
-  }
+  function openCategory() { $('sn-cat-modal').classList.add('is-open'); }
   function closeCategory() { $('sn-cat-modal').classList.remove('is-open'); }
 
-
-  async function saveCategory(e) {
+  /* Products & Storage Upload */
+  async function handleImageUpload(e) {
+    var files = e.target.files; if (!files || !files.length || !db) return;
+    toast('Uploading image(s)...');
+    for (var i = 0; i < files.length; i++) {
+      var file = files[i];
+      var ext = file.name.split('.').pop();
+      var path = 'saree_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7) + '.' + ext;
+      var up = await db.storage.from('product-images').upload(path, file);
+      if (up.data) {
+        var pub = db.storage.from('product-images').getPublicUrl(path);
+        uploadImgUrls.push(pub.data.publicUrl);
+      }
+    }
+    renderImgPreviews(); toast('Image upload complete');
+  }
+  function renderImgPreviews() {
+    $('sn-prod-img-previews').innerHTML = uploadImgUrls.map(function(u) {
+      return '<img src="' + esc(u) + '" class="sn-img-preview-item">';
+    }).join('');
+  }
+  function filterProducts() {
+    var q = $('sn-prod-search').value.toLowerCase();
+    var list = prods.filter(function(p) { return !q || String(p.name || '').toLowerCase().indexOf(q) > -1; });
+    $('sn-prod-body').innerHTML = list.map(function(p) {
+      var img = p.image_url || (p.images && p.images[0]) ? '<img class="sn-thumb" src="' + esc(p.image_url || p.images[0]) + '">' : '<div class="sn-thumb"></div>';
+      return '<tr><td data-label="Image">' + img + '</td><td data-label="Title"><strong>' + esc(p.name) + '</strong></td>' +
+        '<td data-label="Category" class="sn-hide-m">' + esc(p.category_name || '-') + '</td>' +
+        '<td data-label="Price">' + money(p.price) + '</td><td data-label="Stock">' + (p.stock || 0) + '</td>' +
+        '<td data-label="Status">' + badgeFor(p.status) + '</td>' +
+        '<td data-label="Actions"><button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.editProduct(\'' + p.id + '\')">Edit</button></td></tr>';
+    }).join('');
+  }
+  function openProduct() { uploadImgUrls = []; $('sn-prod-form').reset(); $('sn-prod-id').value = ''; renderImgPreviews(); $('sn-prod-modal').classList.add('is-open'); }
+  function closeProduct() { $('sn-prod-modal').classList.remove('is-open'); }
+  async function saveProduct(e) {
     e.preventDefault();
-    var id = $('sn-cat-id').value, name = $('sn-cat-name').value.trim();
+    var id = $('sn-prod-id').value;
     var payload = {
-      name: name,
-      slug: $('sn-cat-slug').value.trim() || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
-      description: $('sn-cat-desc').value, image_url: $('sn-cat-image').value,
-      show_in_shop: $('sn-cat-shop').checked, show_in_home: $('sn-cat-home').checked,
-      display_order: parseInt($('sn-cat-order').value, 10) || 0, status: $('sn-cat-status').value
+      name: $('sn-prod-name').value.trim(),
+      price: parseFloat($('sn-prod-price').value) || 0,
+      original_price: parseFloat($('sn-prod-orig-price').value) || null,
+      stock: parseInt($('sn-prod-stock').value, 10) || 0,
+      sku: $('sn-prod-sku').value.trim(),
+      category_id: $('sn-prod-cat-select').value || null,
+      fabric: $('sn-prod-fabric').value.trim(),
+      color: $('sn-prod-color').value.trim(),
+      occasion: $('sn-prod-occasion').value.trim(),
+      status: $('sn-prod-status').value,
+      free_shipping: $('sn-prod-freeship').checked,
+      is_featured: $('sn-prod-featured').checked,
+      images: uploadImgUrls,
+      image_url: uploadImgUrls[0] || null
     };
     if (db) {
-      var r = id ? await db.from('categories').update(payload).eq('id', id) : await db.from('categories').insert([payload]);
-      if (r.error) { toast('Could not save: ' + r.error.message); return; }
+      var r = id ? await db.from('products').update(payload).eq('id', id) : await db.from('products').insert([payload]);
+      if (r.error) { toast('Error saving: ' + r.error.message); return; }
       await load();
-    } else {
-      if (id) { var i = cats.findIndex(function (c) { return String(c.id) === id; }); if (i > -1) cats[i] = Object.assign({}, cats[i], payload); }
-      else cats.push(Object.assign({ id: 'cat_' + Date.now() }, payload));
-      renderCategories(); stats();
     }
-    closeCategory(); toast('Category saved');
+    closeProduct(); toast('Product saved');
   }
 
-
-  async function toggleCat(id, field, value) {
-    var c = cats.find(function (x) { return String(x.id) === String(id); }); if (c) c[field] = value;
-    if (db) {
-      var r = await db.from('categories').update((function () { var o = {}; o[field] = value; return o; })()).eq('id', id);
-      if (r.error) toast('Could not update: ' + r.error.message);
-    }
-  }
-
-
-  /* ---------- Products ---------- */
-  function filterProducts() {
-    var q = $('sn-prod-search').value.trim().toLowerCase(), cid = $('sn-prod-cat').value;
-    var list = prods.filter(function (p) {
-      return (!q || String(p.name || '').toLowerCase().indexOf(q) > -1) && (!cid || String(p.category_id) === cid);
-    });
-    var body = $('sn-prod-body');
-    if (!list.length) { body.innerHTML = empty(7, prods.length ? 'No sarees match your search.' : 'No products found in catalog.'); return; }
-    body.innerHTML = list.map(function (p) {
-      var img = p.image_url ? '<img class="sn-thumb" src="' + esc(p.image_url) + '" alt="' + esc(p.name) + '" loading="lazy">' : '<div class="sn-thumb"></div>';
-      return '<tr>' +
-        '<td data-label="Image">' + img + '</td>' +
-        '<td data-label="Title"><strong>' + esc(p.name) + '</strong></td>' +
-        '<td data-label="Category" class="sn-hide-m">' + esc(p.category_name || '-') + '</td>' +
-        '<td data-label="Price">' + money(p.price) + '</td>' +
-        '<td data-label="Stock" class="sn-hide-m">' + esc(p.stock || 0) + '</td>' +
-        '<td data-label="Status">' + badgeFor(p.status) + '</td>' +
-        '<td data-label="Actions"><div class="sn-actions"><button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.openProduct()">Edit</button></div></td>' +
-      '</tr>';
-    }).join('');
-  }
-  function openProduct() { toast('Product editor is not built yet'); }
-
-
-  /* ---------- Orders ---------- */
-  function orderRow(o, full) {
-    var id = esc(o.id), short = esc(String(o.id).slice(0, 8));
-    if (!full) {
-      return '<tr><td data-label="Order">#' + short + '</td><td data-label="Customer">' + esc(o.customer_name) + '</td>' +
-        '<td data-label="Amount">' + money(o.total_amount) + '</td><td data-label="Status">' + badgeFor(o.status) + '</td>' +
-        '<td data-label="Date" class="sn-hide-m">' + dateStr(o.created_at) + '</td></tr>';
-    }
-    var opts = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'].map(function (s) {
-      return '<option value="' + s + '"' + (o.status === s ? ' selected' : '') + '>' + s.charAt(0).toUpperCase() + s.slice(1) + '</option>';
-    }).join('');
-    return '<tr><td data-label="Order">#' + short + '</td><td data-label="Customer">' + esc(o.customer_name) + '</td>' +
-      '<td data-label="Contact" class="sn-hide-m">' + esc(o.customer_phone || o.customer_email || '-') + '</td>' +
-      '<td data-label="Total">' + money(o.total_amount) + '</td><td data-label="Status">' + badgeFor(o.status) + '</td>' +
-      '<td data-label="Date" class="sn-hide-m">' + dateStr(o.created_at) + '</td>' +
-      '<td data-label="Update"><select class="sn-select" aria-label="Update status" onchange="SneraAdmin.setOrderStatus(\'' + id + '\',this.value)">' + opts + '</select></td></tr>';
-  }
-  function renderDash() {
-    $('sn-dash-orders').innerHTML = orders.length ? orders.slice(0, 5).map(function (o) { return orderRow(o, false); }).join('') : empty(5, 'No recent orders recorded.');
-  }
+  /* Orders Management */
   function filterOrders() {
     var s = $('sn-order-filter').value;
     var list = orders.filter(function (o) { return !s || o.status === s; });
-    $('sn-orders-body').innerHTML = list.length ? list.map(function (o) { return orderRow(o, true); }).join('') : empty(7, 'No orders found.');
-  }
-  async function setOrderStatus(id, status) {
-    var o = orders.find(function (x) { return String(x.id) === String(id); }); if (!o) return;
-    if (db) {
-      var r = await db.from('orders').update({ status: status }).eq('id', id);
-      if (r.error) { toast('Could not update: ' + r.error.message); filterOrders(); return; }
-    }
-    o.status = status; filterOrders(); renderDash(); toast('Order status updated');
+    $('sn-orders-body').innerHTML = list.length ? list.map(function (o) {
+      return '<tr><td data-label="Order">#' + esc(o.order_id || String(o.id).slice(0, 8)) + '</td>' +
+        '<td data-label="Customer"><strong>' + esc(o.customer_name) + '</strong></td>' +
+        '<td data-label="Contact" class="sn-hide-m">' + esc(o.customer_phone || o.customer_email || '-') + '</td>' +
+        '<td data-label="Total">' + money(o.total || o.total_amount) + '</td><td data-label="Status">' + badgeFor(o.status) + '</td>' +
+        '<td data-label="Date" class="sn-hide-m">' + dateStr(o.created_at) + '</td>' +
+        '<td data-label="Actions"><button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.viewOrderDetails(\'' + o.id + '\')">View Details</button></td></tr>';
+    }).join('') : '<tr><td colspan="7">No orders found.</td></tr>';
   }
 
+  function viewOrderDetails(id) {
+    var o = orders.find(function(x) { return String(x.id) === String(id); }); if (!o) return;
+    var addr = o.shipping_address || {};
+    var items = o.items || [];
+    var html = `
+      <div style="font-size:13.5px;">
+        <p><strong>Order Number:</strong> #${esc(o.order_id || o.id)}</p>
+        <p><strong>Customer:</strong> ${esc(o.customer_name)} (${esc(o.customer_phone || '-')})</p>
+        <p><strong>Delivery Address:</strong> ${esc(addr.line1 || '')}, ${esc(addr.city || '')}, ${esc(addr.state || '')} - ${esc(addr.pincode || '')}</p>
+        <p><strong>Payment Method:</strong> ${esc((o.payment_method || 'cod').toUpperCase())} (${esc(o.payment_status || 'pending')})</p>
+        <hr style="margin:12px 0; border:0; border-top:1px solid var(--border);">
+        <h4 style="margin-bottom:8px;">Order Line Items:</h4>
+        ${items.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>${esc(i.name)} x${i.quantity || 1}</span><strong>${money(i.total || i.price)}</strong></div>`).join('')}
+        <hr style="margin:12px 0; border:0; border-top:1px solid var(--border);">
+        <p style="font-size:15px; font-weight:700;">Grand Total: ${money(o.total || o.total_amount)}</p>
+      </div>
+    `;
+    $('sn-order-modal-body').innerHTML = html;
+    $('sn-order-modal').classList.add('is-open');
+  }
+  function closeOrderModal() { $('sn-order-modal').classList.remove('is-open'); }
 
-  /* ---------- Settings ---------- */
-  function saveSettings(e) {
+  /* Coupons */
+  function renderCoupons() {
+    $('sn-coupon-body').innerHTML = coupons.length ? coupons.map(function(c) {
+      return '<tr><td><strong>' + esc(c.code) + '</strong></td><td>' + esc(c.type) + '</td><td>' + (c.type === 'percent' ? c.value + '%' : money(c.value)) + '</td>' +
+        '<td>' + money(c.min_order) + '</td><td>' + (c.used_count || 0) + '</td><td>' + badgeFor(c.status) + '</td>' +
+        '<td><button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.deleteCoupon(\'' + c.id + '\')">Delete</button></td></tr>';
+    }).join('') : '<tr><td colspan="7">No coupons active.</td></tr>';
+  }
+  function openCoupon() { $('sn-coupon-modal').classList.add('is-open'); }
+  function closeCoupon() { $('sn-coupon-modal').classList.remove('is-open'); }
+  async function saveCoupon(e) {
     e.preventDefault();
-    store('snera_sb_url', $('sn-set-url').value.trim());
-    store('snera_sb_key', $('sn-set-key').value.trim());
-    toast('Settings saved. Reconnecting...');
+    var payload = {
+      code: $('sn-coup-code').value.trim().toUpperCase(),
+      type: $('sn-coup-type').value,
+      value: parseFloat($('sn-coup-val').value) || 0,
+      min_order: parseFloat($('sn-coup-min').value) || 0,
+      max_uses: parseInt($('sn-coup-uses').value, 10) || 0,
+      status: 'active'
+    };
+    if (db) { await db.from('coupons').insert([payload]); await load(); }
+    closeCoupon(); toast('Coupon created');
+  }
+  async function deleteCoupon(id) {
+    if (db) { await db.from('coupons').delete().eq('id', id); await load(); toast('Coupon deleted'); }
+  }
+
+  /* Customers & Reviews */
+  function renderCustomers() {
+    $('sn-cust-body').innerHTML = customers.length ? customers.map(function(u) {
+      return '<tr><td><strong>' + esc(u.full_name || 'Customer') + '</strong></td><td>' + esc(u.email || '-') + '</td><td>' + esc(u.phone || '-') + '</td><td>' + dateStr(u.created_at) + '</td></tr>';
+    }).join('') : '<tr><td colspan="4">No customer profiles found.</td></tr>';
+  }
+  function renderReviews() {
+    $('sn-rev-body').innerHTML = reviews.length ? reviews.map(function(r) {
+      return '<tr><td>' + esc(r.user_name || 'Guest') + '</td><td>★ ' + (r.rating || 5) + '</td><td>' + esc(r.comment || '-') + '</td><td>' + (r.approved ? 'Approved' : 'Pending') + '</td>' +
+        '<td><button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.toggleReview(\'' + r.id + '\',' + !r.approved + ')">' + (r.approved ? 'Reject' : 'Approve') + '</button></td></tr>';
+    }).join('') : '<tr><td colspan="5">No reviews to moderate.</td></tr>';
+  }
+  async function toggleReview(id, status) {
+    if (db) { await db.from('reviews').update({ approved: status }).eq('id', id); await load(); toast('Review updated'); }
+  }
+
+  /* Save Store Settings */
+  async function saveStoreSettings(e) {
+    e.preventDefault();
+    var payload = {
+      id: 1,
+      store_name: $('sn-set-store-name').value.trim(),
+      support_email: $('sn-set-support-email').value.trim(),
+      gst_rate: parseFloat($('sn-set-gst-rate').value) || 5,
+      free_shipping_threshold: parseFloat($('sn-set-ship-thresh').value) || 999,
+      return_window_days: parseInt($('sn-set-return-days').value, 10) || 7,
+      cod_enabled: $('sn-set-cod-enable').checked
+    };
+    if (db) {
+      await db.from('store_settings').upsert([payload]);
+      toast('Store settings saved successfully');
+    }
+  }
+
+  function boot() {
+    root = $('snera-admin'); portal = $('snera-portal');
+    document.body.appendChild(portal);
     initDb(); checkUserSession();
   }
 
-
-  /* ---------- Boot ---------- */
-  function boot() {
-    root = $('snera-admin'); portal = $('snera-portal');
-    document.body.appendChild(portal);                      // escape Odoo wrappers
-    portal.addEventListener('click', function (e) { if (e.target === $('sn-cat-modal')) closeCategory(); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeCategory(); closeSidebar(); } });
-    window.addEventListener('resize', function () { fullBleed(); queueMeasure(); if (window.innerWidth > 900) closeSidebar(); });
-    window.addEventListener('load', fullBleed);
-    fullBleed();
-    window.addEventListener('scroll', queueMeasure, { passive: true });
-    if (window.ResizeObserver) {
-      var h = document.querySelector('header#top') || document.querySelector('#wrapwrap > header');
-      if (h) new ResizeObserver(queueMeasure).observe(h);
-    }
-    measureOffset(); initDb(); checkUserSession();
-  }
-
-
   window.SneraAdmin = {
     show: show, toggleSidebar: toggleSidebar, closeSidebar: closeSidebar, toggleTheme: toggleTheme,
-    openCategory: openCategory, editCategory: editCategory, closeCategory: closeCategory, saveCategory: saveCategory, toggleCat: toggleCat,
-    filterProducts: filterProducts, openProduct: openProduct,
-    filterOrders: filterOrders, setOrderStatus: setOrderStatus, saveSettings: saveSettings,
+    openCategory: openCategory, closeCategory: closeCategory,
+    filterProducts: filterProducts, openProduct: openProduct, closeProduct: closeProduct, saveProduct: saveProduct, handleImageUpload: handleImageUpload,
+    filterOrders: filterOrders, viewOrderDetails: viewOrderDetails, closeOrderModal: closeOrderModal,
+    openCoupon: openCoupon, closeCoupon: closeCoupon, saveCoupon: saveCoupon, deleteCoupon: deleteCoupon,
+    toggleReview: toggleReview, saveStoreSettings: saveStoreSettings,
     doLogin: doLogin, doSignOut: doSignOut
   };
-
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
