@@ -1,0 +1,843 @@
+<!--
+  SNERA STORE — REAL CHECKOUT PAGE (ODOO EMBED CODE VERSION)
+  Paste this whole block into an Odoo "Embed Code" snippet.
+  - No <html>/<head>/<body> (Odoo already provides them)
+  - Every class is prefixed "sn-chk-" and scoped under ".sn-checkout-root"
+  - JS lives in window.SneraCheckout
+  - Connects to Supabase Edge Functions: create-order, validate-coupon, cancel-order
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<style>
+.sn-checkout-root {
+  --wine: #5B1A3A;
+  --wine-dark: #3E0F28;
+  --wine-light: #7A2E52;
+  --gold: #C9A96E;
+  --gold-dark: #A8893F;
+  --gold-light: #E4D5B0;
+  --ivory: #FAF7F2;
+  --sand: #F0EBE3;
+  --charcoal: #2D2D2D;
+  --dark: #1A1A1A;
+  --gray-light: #C5C0B8;
+  --border: #E5E0D8;
+  --success: #3A7D44;
+  --danger: #C0392B;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
+
+  font-family: var(--font-sans);
+  background-color: var(--ivory);
+  color: var(--charcoal);
+  line-height: 1.6;
+  width: 100%;
+  padding: 2rem 1rem 4rem;
+  box-sizing: border-box;
+}
+
+.sn-checkout-root *, .sn-checkout-root *::before, .sn-checkout-root *::after {
+  box-sizing: border-box;
+}
+
+.sn-chk-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header & Breadcrumb */
+.sn-chk-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+.sn-chk-title {
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  color: var(--wine);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.sn-chk-breadcrumbs {
+  font-size: 0.85rem;
+  color: #777;
+}
+.sn-chk-breadcrumbs a {
+  color: var(--wine);
+  text-decoration: none;
+}
+.sn-chk-breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+/* Main Grid Layout */
+.sn-chk-grid {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .sn-chk-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Card Box */
+.sn-chk-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.sn-chk-card-title {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  color: var(--wine-dark);
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.75rem;
+}
+.sn-chk-card-title i {
+  color: var(--gold);
+}
+
+/* Form Fields */
+.sn-chk-form-group {
+  margin-bottom: 1.1rem;
+}
+.sn-chk-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--charcoal);
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.sn-chk-input, .sn-chk-select, .sn-chk-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: var(--ivory);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--dark);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.sn-chk-input:focus, .sn-chk-select:focus, .sn-chk-textarea:focus {
+  border-color: var(--gold);
+  background: #ffffff;
+}
+
+.sn-chk-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 576px) {
+  .sn-chk-row-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Saved Address Selector */
+.sn-chk-saved-addrs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+.sn-chk-addr-option {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem;
+  cursor: pointer;
+  background: var(--ivory);
+  transition: all 0.2s;
+  position: relative;
+}
+.sn-chk-addr-option.is-selected {
+  border-color: var(--wine);
+  background: #ffffff;
+  box-shadow: 0 0 0 1px var(--wine);
+}
+.sn-chk-addr-option strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--wine-dark);
+}
+.sn-chk-addr-option p {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* Serviceability status badge */
+.sn-chk-pincode-status {
+  font-size: 0.8rem;
+  margin-top: 4px;
+  font-weight: 500;
+}
+.sn-chk-pincode-status.is-valid { color: var(--success); }
+.sn-chk-pincode-status.is-invalid { color: var(--danger); }
+
+/* Payment Option Radio Cards */
+.sn-chk-pay-option {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  transition: border-color 0.2s;
+}
+.sn-chk-pay-option.is-selected {
+  border-color: var(--wine);
+  background: var(--ivory);
+}
+.sn-chk-pay-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sn-chk-pay-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--dark);
+}
+.sn-chk-pay-sub {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+/* Order Summary Column */
+.sn-chk-summary-card {
+  position: sticky;
+  top: 2rem;
+}
+
+.sn-chk-item-list {
+  max-height: 240px;
+  overflow-y: auto;
+  margin-bottom: 1.25rem;
+  padding-right: 4px;
+}
+.sn-chk-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.6rem 0;
+  border-bottom: 1px dashed var(--border);
+}
+.sn-chk-item-img {
+  width: 50px;
+  height: 65px;
+  object-fit: cover;
+  border-radius: 4px;
+  background: var(--sand);
+}
+.sn-chk-item-info {
+  flex: 1;
+  min-width: 0;
+}
+.sn-chk-item-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sn-chk-item-meta {
+  font-size: 0.78rem;
+  color: #777;
+}
+.sn-chk-item-price {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--wine);
+}
+
+/* Coupon Row */
+.sn-chk-coupon-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1.25rem;
+}
+.sn-chk-btn-apply {
+  background: var(--wine);
+  color: #fff;
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 0 1.25rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+.sn-chk-btn-apply:hover {
+  background: var(--wine-dark);
+}
+
+.sn-chk-coupon-msg {
+  font-size: 0.8rem;
+  margin-top: -0.75rem;
+  margin-bottom: 1rem;
+}
+.sn-chk-coupon-msg.is-success { color: var(--success); }
+.sn-chk-coupon-msg.is-error { color: var(--danger); }
+
+/* Totals Breakdown */
+.sn-chk-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+.sn-chk-line-total {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--wine-dark);
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+/* Primary CTA Button */
+.sn-chk-btn-submit {
+  width: 100%;
+  padding: 0.95rem;
+  background: var(--wine);
+  color: #ffffff;
+  border: 0;
+  border-radius: var(--radius-sm);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  margin-top: 1.25rem;
+  transition: background 0.25s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.sn-chk-btn-submit:hover {
+  background: var(--wine-dark);
+}
+.sn-chk-btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Success Confirmation Screen */
+.sn-chk-success-box {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  text-align: center;
+  max-width: 680px;
+  margin: 2rem auto;
+  box-shadow: var(--shadow-md);
+}
+.sn-chk-success-icon {
+  width: 72px;
+  height: 72px;
+  background: rgba(58, 125, 68, 0.1);
+  color: var(--success);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 1.5rem;
+}
+.sn-chk-order-badge {
+  display: inline-block;
+  background: var(--ivory);
+  border: 1px solid var(--gold-light);
+  color: var(--wine-dark);
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  font-weight: 700;
+  padding: 0.4rem 1.2rem;
+  border-radius: 30px;
+  margin: 1rem 0;
+}
+</style>
+
+<div class="sn-checkout-root" id="sn-checkout-app">
+  <div class="sn-chk-container">
+
+    <!-- Header -->
+    <header class="sn-chk-header">
+      <h1 class="sn-chk-title">Checkout</h1>
+      <div class="sn-chk-breadcrumbs">
+        <a href="/shop">Shop</a> &nbsp;/&nbsp; <a href="/cart">Cart</a> &nbsp;/&nbsp; <span>Checkout</span>
+      </div>
+    </header>
+
+    <!-- VIEW 1: CHECKOUT FORM & SUMMARY -->
+    <div id="sn-chk-view-form">
+      <div class="sn-chk-grid">
+
+        <!-- LEFT COLUMN: Contact, Address, Payment -->
+        <div class="sn-chk-left">
+
+          <!-- 1. Customer Contact -->
+          <div class="sn-chk-card">
+            <h2 class="sn-chk-card-title"><i class="fa fa-user-o"></i> 1. Contact Information</h2>
+            
+            <div id="sn-chk-guest-login-prompt" style="font-size:0.85rem; color:#666; margin-bottom:1rem; display:none;">
+              Already have an account? <a href="/login" style="color:var(--wine); font-weight:600;">Log in for faster checkout</a>
+            </div>
+
+            <div class="sn-chk-row-2">
+              <div class="sn-chk-form-group">
+                <label class="sn-chk-label">Full Name *</label>
+                <input type="text" id="sn-chk-name" class="sn-chk-input" required placeholder="e.g. Ananya Sharma">
+              </div>
+              <div class="sn-chk-form-group">
+                <label class="sn-chk-label">Phone Number *</label>
+                <input type="tel" id="sn-chk-phone" class="sn-chk-input" required placeholder="10-digit mobile number">
+              </div>
+            </div>
+
+            <div class="sn-chk-form-group">
+              <label class="sn-chk-label">Email Address (for order tracking & receipt)</label>
+              <input type="email" id="sn-chk-email" class="sn-chk-input" placeholder="ananya@example.com">
+            </div>
+          </div>
+
+          <!-- 2. Shipping Address -->
+          <div class="sn-chk-card">
+            <h2 class="sn-chk-card-title"><i class="fa fa-map-marker"></i> 2. Delivery Address</h2>
+
+            <!-- Saved Addresses Selector (for logged-in users) -->
+            <div id="sn-chk-saved-section" style="display:none;">
+              <label class="sn-chk-label">Saved Addresses</label>
+              <div class="sn-chk-saved-addrs" id="sn-chk-saved-list"></div>
+            </div>
+
+            <div class="sn-chk-form-group">
+              <label class="sn-chk-label">Pincode *</label>
+              <input type="text" id="sn-chk-pincode" class="sn-chk-input" maxlength="6" placeholder="e.g. 395007" oninput="SneraCheckout.handlePincode(this.value)">
+              <div id="sn-chk-pincode-status" class="sn-chk-pincode-status"></div>
+            </div>
+
+            <div class="sn-chk-form-group">
+              <label class="sn-chk-label">Address (House / Flat No., Building, Street) *</label>
+              <input type="text" id="sn-chk-line1" class="sn-chk-input" required placeholder="e.g. 402, Royal Residency, Mg Road">
+            </div>
+
+            <div class="sn-chk-form-group">
+              <label class="sn-chk-label">Landmark / Locality</label>
+              <input type="text" id="sn-chk-line2" class="sn-chk-input" placeholder="e.g. Near City Mall">
+            </div>
+
+            <div class="sn-chk-row-2">
+              <div class="sn-chk-form-group">
+                <label class="sn-chk-label">City *</label>
+                <input type="text" id="sn-chk-city" class="sn-chk-input" required placeholder="City">
+              </div>
+              <div class="sn-chk-form-group">
+                <label class="sn-chk-label">State *</label>
+                <input type="text" id="sn-chk-state" class="sn-chk-input" required placeholder="State">
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Payment Method -->
+          <div class="sn-chk-card">
+            <h2 class="sn-chk-card-title"><i class="fa fa-credit-card"></i> 3. Payment Method</h2>
+
+            <label class="sn-chk-pay-option is-selected" id="sn-opt-cod" onclick="SneraCheckout.setPaymentMethod('cod')">
+              <div class="sn-chk-pay-left">
+                <input type="radio" name="pay_method" value="cod" checked>
+                <div>
+                  <div class="sn-chk-pay-title">Cash on Delivery (COD)</div>
+                  <div class="sn-chk-pay-sub">Pay in cash when your saree is delivered</div>
+                </div>
+              </div>
+              <i class="fa fa-money" style="font-size:1.4rem; color:var(--wine);"></i>
+            </label>
+
+            <label class="sn-chk-pay-option" id="sn-opt-online" onclick="SneraCheckout.setPaymentMethod('online')">
+              <div class="sn-chk-pay-left">
+                <input type="radio" name="pay_method" value="online">
+                <div>
+                  <div class="sn-chk-pay-title">Online Payment (Razorpay)</div>
+                  <div class="sn-chk-pay-sub">UPI (Google Pay/PhonePe/Paytm), Cards, Netbanking</div>
+                </div>
+              </div>
+              <i class="fa fa-shield" style="font-size:1.4rem; color:var(--gold);"></i>
+            </label>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: Order Summary -->
+        <div class="sn-chk-right">
+          <div class="sn-chk-card sn-chk-summary-card">
+            <h2 class="sn-chk-card-title"><i class="fa fa-shopping-bag"></i> Order Summary</h2>
+
+            <!-- Items list preview -->
+            <div class="sn-chk-item-list" id="sn-chk-cart-items">
+              <!-- Rendered dynamically -->
+            </div>
+
+            <!-- Coupon promo box -->
+            <div class="sn-chk-coupon-row">
+              <input type="text" id="sn-chk-coupon-code" class="sn-chk-input" placeholder="Promo / Coupon code" style="text-transform:uppercase;">
+              <button type="button" class="sn-chk-btn-apply" onclick="SneraCheckout.applyCoupon()">Apply</button>
+            </div>
+            <div id="sn-chk-coupon-msg" class="sn-chk-coupon-msg"></div>
+
+            <!-- Breakdown Lines -->
+            <div class="sn-chk-line">
+              <span>Items Subtotal</span>
+              <span id="sn-sum-subtotal">₹0</span>
+            </div>
+            <div class="sn-chk-line" id="sn-row-discount" style="display:none; color:var(--success);">
+              <span>Discount</span>
+              <span id="sn-sum-discount">-₹0</span>
+            </div>
+            <div class="sn-chk-line">
+              <span>GST (5% Excluded)</span>
+              <span id="sn-sum-gst">₹0</span>
+            </div>
+            <div class="sn-chk-line">
+              <span>Shipping Fee</span>
+              <span id="sn-sum-shipping">Free</span>
+            </div>
+            <div class="sn-chk-line sn-chk-line-total">
+              <span>Grand Total</span>
+              <span id="sn-sum-total">₹0</span>
+            </div>
+
+            <button type="button" class="sn-chk-btn-submit" id="sn-chk-btn-place" onclick="SneraCheckout.placeOrder()">
+              Place Order <i class="fa fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VIEW 2: ORDER SUCCESS CONFIRMATION -->
+    <div id="sn-chk-view-success" style="display:none;">
+      <div class="sn-chk-success-box">
+        <div class="sn-chk-success-icon"><i class="fa fa-check"></i></div>
+        <h2 style="font-family:var(--font-serif); font-size:2rem; color:var(--wine-dark);">Order Confirmed!</h2>
+        <p style="color:#666; margin-top:0.5rem;">Thank you for shopping with Snera Store. Your order has been placed successfully.</p>
+        
+        <div class="sn-chk-order-badge" id="sn-success-order-id">SN-2026-000000</div>
+        
+        <p style="font-size:0.9rem; color:#555; max-width:480px; margin:1rem auto 2rem;">
+          We will process and dispatch your handcrafted saree soon. A confirmation message has been logged for tracking.
+        </p>
+
+        <a href="/shop" class="sn-chk-btn-submit" style="display:inline-flex; width:auto; padding:0.8rem 2rem; margin:0 auto; text-decoration:none;">
+          Continue Shopping
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function() {
+  const EDGE_BASE = 'https://yduueujrykugmzvbnndu.supabase.co/functions/v1';
+
+  let cart = [];
+  let couponData = null;
+  let selectedPaymentMethod = 'cod';
+  let isPlacing = false;
+
+  function $(id) { return document.getElementById(id); }
+  function money(n) { return '₹' + (Number(n) || 0).toLocaleString('en-IN'); }
+
+  // 1. Load cart from localStorage
+  function loadCart() {
+    try {
+      const stored = localStorage.getItem('snera_cart');
+      cart = stored ? JSON.parse(stored) : [];
+    } catch(e) {
+      cart = [];
+    }
+  }
+
+  // 2. Render summary & calculate totals
+  function renderSummary() {
+    const listEl = $('sn-chk-cart-items');
+    if (!cart.length) {
+      listEl.innerHTML = '<p style="font-size:0.9rem; color:#777; padding:1rem 0;">Your cart is empty.</p>';
+      $('sn-chk-btn-place').disabled = true;
+      return;
+    }
+
+    listEl.innerHTML = cart.map(item => {
+      const img = item.image || item.image_url || 'https://via.placeholder.com/60x80';
+      return `
+        <div class="sn-chk-item">
+          <img src="${img}" alt="${item.name || 'Saree'}" class="sn-chk-item-img">
+          <div class="sn-chk-item-info">
+            <div class="sn-chk-item-name">${item.name || 'Handloom Saree'}</div>
+            <div class="sn-chk-item-meta">Qty: ${item.quantity || 1}</div>
+          </div>
+          <div class="sn-chk-item-price">${money((item.price || 0) * (item.quantity || 1))}</div>
+        </div>
+      `;
+    }).join('');
+
+    // Totals calculation
+    let subtotal = cart.reduce((acc, item) => acc + (Number(item.price) || 0) * (Number(item.quantity) || 1), 0);
+    let discount = couponData ? couponData.discount : 0;
+    if (discount > subtotal) discount = subtotal;
+
+    let discountedSub = subtotal - discount;
+    let gst = Math.round((discountedSub * 0.05) * 100) / 100; // 5% GST excluded
+    let shipping = (subtotal >= 999 || subtotal === 0) ? 0 : 100;
+    let grandTotal = Math.round((discountedSub + gst + shipping) * 100) / 100;
+
+    $('sn-sum-subtotal').textContent = money(subtotal);
+    if (discount > 0) {
+      $('sn-row-discount').style.display = 'flex';
+      $('sn-sum-discount').textContent = '-' + money(discount);
+    } else {
+      $('sn-row-discount').style.display = 'none';
+    }
+    $('sn-sum-gst').textContent = money(gst);
+    $('sn-sum-shipping').textContent = shipping === 0 ? 'FREE' : money(shipping);
+    $('sn-sum-total').textContent = money(grandTotal);
+  }
+
+  // 3. Pincode Auto-fill & Serviceability check
+  async function handlePincode(pin) {
+    const cleanPin = pin.trim();
+    const statusEl = $('sn-chk-pincode-status');
+    if (cleanPin.length !== 6 || !/^\d{6}$/.test(cleanPin)) {
+      statusEl.className = 'sn-chk-pincode-status';
+      statusEl.textContent = '';
+      return;
+    }
+
+    statusEl.textContent = 'Checking pincode delivery serviceability...';
+    try {
+      const res = await fetch(`https://api.postalpincode.in/pincode/${cleanPin}`);
+      const data = await res.json();
+      if (data && data[0] && data[0].Status === 'Success' && data[0].PostOffice?.length) {
+        const po = data[0].PostOffice[0];
+        $('sn-chk-city').value = po.District || po.Division || po.Name;
+        $('sn-chk-state').value = po.State;
+        statusEl.className = 'sn-chk-pincode-status is-valid';
+        statusEl.textContent = `✓ Delivery available to ${po.District}, ${po.State}`;
+      } else {
+        statusEl.className = 'sn-chk-pincode-status is-invalid';
+        statusEl.textContent = 'Invalid pincode or non-serviceable location.';
+      }
+    } catch(e) {
+      statusEl.className = 'sn-chk-pincode-status';
+      statusEl.textContent = '';
+    }
+  }
+
+  // 4. Coupon Application
+  async function applyCoupon() {
+    const code = $('sn-chk-coupon-code').value.trim();
+    const msgEl = $('sn-chk-coupon-msg');
+    if (!code) {
+      msgEl.className = 'sn-chk-coupon-msg is-error';
+      msgEl.textContent = 'Please enter a coupon code';
+      return;
+    }
+
+    const subtotal = cart.reduce((acc, item) => acc + (Number(item.price) || 0) * (Number(item.quantity) || 1), 0);
+
+    msgEl.textContent = 'Validating code...';
+    try {
+      const res = await fetch(`${EDGE_BASE}/validate-coupon`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, subtotal })
+      });
+      const data = await res.json();
+      if (data.valid) {
+        couponData = data.coupon;
+        msgEl.className = 'sn-chk-coupon-msg is-success';
+        msgEl.textContent = `✓ Coupon "${couponData.code}" applied! (${money(couponData.discount)} off)`;
+        renderSummary();
+      } else {
+        couponData = null;
+        msgEl.className = 'sn-chk-coupon-msg is-error';
+        msgEl.textContent = data.message || 'Invalid coupon code';
+        renderSummary();
+      }
+    } catch(e) {
+      msgEl.className = 'sn-chk-coupon-msg is-error';
+      msgEl.textContent = 'Failed to validate coupon.';
+    }
+  }
+
+  // 5. Payment method toggle
+  function setPaymentMethod(method) {
+    selectedPaymentMethod = method;
+    $('sn-opt-cod').classList.toggle('is-selected', method === 'cod');
+    $('sn-opt-online').classList.toggle('is-selected', method === 'online');
+    const radioCod = $('sn-opt-cod').querySelector('input');
+    const radioOnline = $('sn-opt-online').querySelector('input');
+    if (radioCod) radioCod.checked = (method === 'cod');
+    if (radioOnline) radioOnline.checked = (method === 'online');
+  }
+
+  // 6. Place Order Submission
+  async function placeOrder() {
+    if (isPlacing) return;
+
+    const name = $('sn-chk-name').value.trim();
+    const phone = $('sn-chk-phone').value.trim();
+    const email = $('sn-chk-email').value.trim();
+    const pincode = $('sn-chk-pincode').value.trim();
+    const line1 = $('sn-chk-line1').value.trim();
+    const line2 = $('sn-chk-line2').value.trim();
+    const city = $('sn-chk-city').value.trim();
+    const state = $('sn-chk-state').value.trim();
+
+    if (!name || !phone || !pincode || !line1 || !city || !state) {
+      alert('Please fill in all required delivery fields.');
+      return;
+    }
+
+    if (!cart.length) {
+      alert('Your cart is empty.');
+      return;
+    }
+
+    const payload = {
+      items: cart.map(i => ({ id: i.id, quantity: i.quantity || 1 })),
+      customer_name: name,
+      customer_email: email,
+      customer_phone: phone,
+      shipping_address: { line1, line2, city, state, pincode },
+      payment_method: selectedPaymentMethod,
+      coupon_code: couponData ? couponData.code : null
+    };
+
+    const btn = $('sn-chk-btn-place');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Processing Order...';
+    isPlacing = true;
+
+    try {
+      const res = await fetch(`${EDGE_BASE}/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Order creation failed');
+      }
+
+      // If COD -> Success immediately
+      if (selectedPaymentMethod === 'cod') {
+        showSuccess(data.order_id);
+        return;
+      }
+
+      // If Online -> Open Razorpay Modal
+      if (selectedPaymentMethod === 'online' && data.razorpay_order_id) {
+        const options = {
+          key: data.razorpay_key_id,
+          amount: Math.round(data.total * 100),
+          currency: 'INR',
+          name: 'Snera Store',
+          description: `Order #${data.order_id}`,
+          order_id: data.razorpay_order_id,
+          prefill: {
+            name: name,
+            email: email,
+            contact: phone
+          },
+          theme: { color: '#5B1A3A' },
+          handler: function(response) {
+            showSuccess(data.order_id);
+          },
+          modal: {
+            ondismiss: function() {
+              btn.disabled = false;
+              btn.innerHTML = 'Place Order <i class="fa fa-arrow-right"></i>';
+              isPlacing = false;
+              alert('Payment cancelled. You can retry or choose Cash on Delivery.');
+            }
+          }
+        };
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      }
+    } catch(err) {
+      alert(err.message || 'An error occurred while placing your order.');
+      btn.disabled = false;
+      btn.innerHTML = 'Place Order <i class="fa fa-arrow-right"></i>';
+      isPlacing = false;
+    }
+  }
+
+  // 7. Show Success View & Clear Cart ONLY AFTER confirmed
+  function showSuccess(orderId) {
+    $('sn-chk-view-form').style.display = 'none';
+    $('sn-chk-view-success').style.display = 'block';
+    $('sn-success-order-id').textContent = orderId || 'SN-2026-000000';
+
+    // Clear cart only after confirmed
+    localStorage.removeItem('snera_cart');
+    cart = [];
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Initialize
+  function init() {
+    loadCart();
+    renderSummary();
+  }
+
+  window.SneraCheckout = {
+    handlePincode,
+    applyCoupon,
+    setPaymentMethod,
+    placeOrder
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
