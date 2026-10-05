@@ -1,9 +1,10 @@
 <!--
-  SNERA STORE ADMIN — ODOO EMBED CODE VERSION (PHASE 6 UPDATED)
+  SNERA STORE ADMIN — ODOO EMBED CODE VERSION (NO EXTRA LOGIN GATE)
+  URL Route: /admin
+  Domain: snerafashion.com
   Paste this whole block into an Odoo "Embed Code" snippet.
-  - No <html>/<head>/<body>/<meta viewport> (Odoo already provides them)
-  - Every class is prefixed "sn-" and every rule is scoped under ".sn-root"
-  - All JS lives in one namespace: window.SneraAdmin
+  - Odoo restricts access to this page to logged-in Odoo Admins.
+  - 100% Self-Contained Odoo Snippet (HTML + CSS + JS inline)
   - Connects to Supabase project: https://yduueujrykugmzvbnndu.supabase.co
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +14,7 @@
 
 <style>
 /* ==========================================================================
-   TOKENS (applied to the dashboard AND the modal portal)
+   TOKENS & SCOPED RESET
    ========================================================================== */
 .sn-root {
   --font-display: 'Cormorant Garamond', Georgia, serif;
@@ -160,7 +161,6 @@
   background: var(--bg-hover); color: var(--wine); font-size: 22px;
   display: flex; align-items: center; justify-content: center;
 }
-.sn-root[data-theme="dark"] .sn-metric-icon { color: var(--gold-light); }
 
 .sn-root .sn-card {
   background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-lg);
@@ -195,8 +195,6 @@
 }
 .sn-root .sn-btn-primary { background: var(--wine); color: #fff; }
 .sn-root .sn-btn-primary:hover { background: var(--wine-dark); color: #fff; }
-.sn-root[data-theme="dark"] .sn-btn-primary { background: var(--gold); color: #1A0A0E; }
-.sn-root[data-theme="dark"] .sn-btn-primary:hover { background: var(--gold-hover); color: #1A0A0E; }
 .sn-root .sn-btn-outline { background: transparent; border-color: var(--border); color: var(--text-primary); }
 .sn-root .sn-btn-outline:hover { background: var(--bg-hover); color: var(--text-primary); }
 .sn-root .sn-btn-sm { padding: .4rem .8rem; font-size: 12px; min-height: 36px; }
@@ -279,55 +277,6 @@
 }
 .sn-root .sn-toast.is-on { opacity: 1; transform: translate(-50%, 0); }
 
-/* Login gate */
-#sn-gate {
-  display:none; align-items:center; justify-content:center;
-  min-height:100vh; min-height:100dvh; width:100%;
-  background:#F4EDE2; font-family:'DM Sans',-apple-system,sans-serif;
-  -webkit-font-smoothing:antialiased; padding:1.5rem; box-sizing:border-box;
-}
-#sn-gate.is-shown { display:flex; animation:sn-fade .25s ease; }
-.sn-gate-card {
-  width:100%; max-width:380px;
-  background:#fff; border:1px solid #E2D4C0; border-radius:16px;
-  box-shadow:0 8px 30px rgba(107,39,55,.07); padding:2.5rem 2rem 2rem;
-  display:flex; flex-direction:column; gap:1.25rem;
-}
-.sn-gate-logo {
-  text-align:center; font-family:'Cormorant Garamond',Georgia,serif;
-  font-size:28px; font-weight:700; color:#6B2737;
-  letter-spacing:.06em; text-transform:uppercase;
-}
-.sn-gate-logo small {
-  display:block; font-family:'DM Sans',sans-serif; font-size:12px;
-  font-weight:400; color:#8A6B75; letter-spacing:.02em;
-  text-transform:none; margin-top:4px;
-}
-.sn-gate-field { display:flex; flex-direction:column; gap:6px; }
-.sn-gate-field label { font-size:12.5px; font-weight:600; color:#6B5057; }
-.sn-gate-field input {
-  padding:.7rem 1rem; font-size:16px; font-family:inherit;
-  background:#FAF6F0; color:#1A0A0E; border:1px solid #E2D4C0;
-  border-radius:10px; outline:none; width:100%; box-sizing:border-box;
-  transition:border-color .2s;
-}
-.sn-gate-field input:focus { border-color:#B8962E; }
-.sn-gate-btn {
-  width:100%; padding:.8rem 1rem; min-height:48px;
-  background:#6B2737; color:#fff; border:0; border-radius:10px;
-  font-size:15px; font-weight:700; font-family:inherit;
-  cursor:pointer; transition:background .2s;
-}
-.sn-gate-btn:hover { background:#4E1A28; }
-.sn-gate-btn:disabled { opacity:.6; cursor:not-allowed; }
-.sn-gate-error {
-  font-size:13px; color:#C0392B; background:rgba(192,57,43,.08);
-  border:1px solid rgba(192,57,43,.2); border-radius:10px;
-  padding:.65rem 1rem; display:none; margin:0;
-}
-.sn-gate-error.is-shown { display:block; }
-
-/* Image gallery preview grid */
 .sn-img-preview-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
 .sn-img-preview-item { width: 60px; height: 75px; border-radius: 6px; border: 1px solid var(--border); object-fit: cover; }
 
@@ -369,25 +318,6 @@
 }
 </style>
 
-<!-- LOGIN GATE -->
-<div id="sn-gate">
-  <div class="sn-gate-card">
-    <div class="sn-gate-logo">Snera Store <small>Admin Portal</small></div>
-    <p id="sn-gate-error" class="sn-gate-error" role="alert"></p>
-    <form id="sn-gate-form" onsubmit="SneraAdmin.doLogin(event)">
-      <div class="sn-gate-field">
-        <label for="sn-gate-email">Admin Email</label>
-        <input type="email" id="sn-gate-email" autocomplete="username" required placeholder="you@snerastore.com">
-      </div>
-      <div class="sn-gate-field">
-        <label for="sn-gate-pw">Password</label>
-        <input type="password" id="sn-gate-pw" autocomplete="current-password" required placeholder="••••••••">
-      </div>
-      <button type="submit" class="sn-gate-btn" id="sn-gate-btn">Sign In to Admin</button>
-    </form>
-  </div>
-</div>
-
 <!-- DASHBOARD CONTAINER -->
 <div id="snera-admin" class="sn-root" data-theme="light">
   <div class="sn-backdrop" id="sn-backdrop" onclick="SneraAdmin.closeSidebar()"></div>
@@ -412,14 +342,11 @@
     </nav>
 
     <div class="sn-side-foot">
-      <div class="sn-avatar" id="sn-user-avatar">?</div>
+      <div class="sn-avatar" id="sn-user-avatar">A</div>
       <div class="sn-user" style="flex:1;min-width:0;">
-        <span id="sn-user-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Admin</span>
-        <small id="sn-user-email" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</small>
+        <span id="sn-user-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Odoo Admin</span>
+        <small id="sn-user-email" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">snerafashion.com</small>
       </div>
-      <button type="button" title="Sign out" aria-label="Sign out" onclick="SneraAdmin.doSignOut()" style="background:none;border:0;cursor:pointer;color:rgba(255,255,255,.55);font-size:20px;">
-        <i class="ti ti-logout"></i>
-      </button>
     </div>
   </aside>
 
@@ -602,7 +529,7 @@
                 </div>
                 <div class="sn-field">
                   <label>Support Email</label>
-                  <input type="email" class="sn-input sn-w-full" id="sn-set-support-email" placeholder="support@snerastore.com">
+                  <input type="email" class="sn-input sn-w-full" id="sn-set-support-email" value="support@snerafashion.com">
                 </div>
               </div>
 
@@ -766,59 +693,6 @@
     var map = { active: 'success', paid: 'success', delivered: 'success', shipped: 'info', processing: 'info', pending: 'warning', cancelled: 'danger', refunded: 'danger' };
     return '<span class="sn-badge sn-badge-' + (map[status] || 'info') + '">' + esc(status || '-') + '</span>';
   }
-
-  /* Auth & Session */
-  async function checkAdminStatus(user) {
-    if (!user) return false;
-    try {
-      var res1 = await db.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle();
-      if (res1.data) return true;
-      var res2 = await db.from('user_profiles').select('is_admin').eq('id', user.id).maybeSingle();
-      if (res2.data && res2.data.is_admin === true) return true;
-    } catch (e) {}
-    return false;
-  }
-
-  function showGate(errText) {
-    var errEl = $('sn-gate-error');
-    if (errText) { errEl.textContent = errText; errEl.classList.add('is-shown'); }
-    else { errEl.classList.remove('is-shown'); }
-    $('sn-gate').classList.add('is-shown'); root.style.display = 'none';
-  }
-
-  function hideGate() { $('sn-gate').classList.remove('is-shown'); root.style.display = 'flex'; }
-
-  async function checkUserSession() {
-    if (!db) return;
-    try {
-      var sessionRes = await db.auth.getSession();
-      var session = sessionRes.data ? sessionRes.data.session : null;
-      if (!session) { showGate(); return; }
-      var isAdmin = await checkAdminStatus(session.user);
-      if (!isAdmin) { await db.auth.signOut(); showGate('Access Denied: Account is not flagged as an admin.'); return; }
-      var email = session.user.email || 'admin@snerastore.com';
-      $('sn-user-email').textContent = email;
-      $('sn-user-name').textContent = email.split('@')[0];
-      $('sn-user-avatar').textContent = email.charAt(0).toUpperCase();
-      hideGate(); load();
-    } catch (e) { showGate('Failed to verify session.'); }
-  }
-
-  async function doLogin(e) {
-    e.preventDefault();
-    var btn = $('sn-gate-btn'), email = $('sn-gate-email').value.trim(), password = $('sn-gate-pw').value;
-    btn.disabled = true; btn.textContent = 'Authenticating...';
-    try {
-      var res = await db.auth.signInWithPassword({ email: email, password: password });
-      if (res.error) throw res.error;
-      var isAdmin = await checkAdminStatus(res.data.user);
-      if (!isAdmin) { await db.auth.signOut(); throw new Error('Access Denied: Account is not flagged as an admin.'); }
-      hideGate(); toast('Welcome back, Admin'); load();
-    } catch (err) { showGate(err.message || 'Login failed.'); }
-    finally { btn.disabled = false; btn.textContent = 'Sign In to Admin'; }
-  }
-
-  async function doSignOut() { if (db) await db.auth.signOut(); showGate(); toast('Signed out successfully'); }
 
   function initDb() {
     var url = store('snera_sb_url') || DEFAULT_URL, key = store('snera_sb_key') || DEFAULT_KEY;
@@ -1065,7 +939,7 @@
   function boot() {
     root = $('snera-admin'); portal = $('snera-portal');
     document.body.appendChild(portal);
-    initDb(); checkUserSession();
+    initDb(); load();
   }
 
   window.SneraAdmin = {
@@ -1074,8 +948,7 @@
     filterProducts: filterProducts, openProduct: openProduct, closeProduct: closeProduct, saveProduct: saveProduct, handleImageUpload: handleImageUpload,
     filterOrders: filterOrders, viewOrderDetails: viewOrderDetails, closeOrderModal: closeOrderModal,
     openCoupon: openCoupon, closeCoupon: closeCoupon, saveCoupon: saveCoupon, deleteCoupon: deleteCoupon,
-    toggleReview: toggleReview, saveStoreSettings: saveStoreSettings,
-    doLogin: doLogin, doSignOut: doSignOut
+    toggleReview: toggleReview, saveStoreSettings: saveStoreSettings
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
