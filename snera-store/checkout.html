@@ -45,11 +45,48 @@
   max-width: 100%;
   padding: 2rem 1rem 4rem;
   box-sizing: border-box;
-  overflow-x: clip;
+  overflow-x: hidden;
 }
 
 .sn-checkout-root *, .sn-checkout-root *::before, .sn-checkout-root *::after {
   box-sizing: border-box;
+}
+
+/* Odoo font override — Odoo injects its own font-family on body/h1/h2/p/a/etc */
+.sn-checkout-root,
+.sn-checkout-root h1,
+.sn-checkout-root h2,
+.sn-checkout-root h3,
+.sn-checkout-root p,
+.sn-checkout-root a,
+.sn-checkout-root ul,
+.sn-checkout-root li,
+.sn-checkout-root span,
+.sn-checkout-root label,
+.sn-checkout-root div,
+.sn-checkout-root input,
+.sn-checkout-root select,
+.sn-checkout-root textarea,
+.sn-checkout-root button {
+  font-family: var(--font-sans) !important;
+}
+.sn-checkout-root h1,
+.sn-checkout-root h2,
+.sn-checkout-root h3 {
+  font-family: var(--font-serif) !important;
+  line-height: 1.25;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.sn-checkout-root p {
+  margin-top: 0;
+}
+.sn-checkout-root a {
+  color: var(--wine);
+  text-decoration: none;
+}
+.sn-checkout-root a:hover {
+  text-decoration: underline;
 }
 
 .sn-chk-container {

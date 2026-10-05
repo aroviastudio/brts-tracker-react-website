@@ -1,0 +1,1521 @@
+<!--
+  SNERA STORE ADMIN — ODOO EMBED CODE VERSION
+  URL Route: /admin
+  Domain: snerafashion.com
+  - 100% Self-Contained Odoo Snippet (Style + Markup + Script)
+  - Scoped strictly under .sn-root / #snera-admin
+  - Full-bleed width integration inside Odoo
+  - Connects to Supabase project: https://yduueujrykugmzvbnndu.supabase.co
+  - Direct management: Categories, Sarees, Orders, Coupons, Reviews, Store Settings
+  - Mobile responsive (320px to 1920px), tap targets >= 44px
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+/* ==========================================================================
+   SNERA ADMIN DESIGN SYSTEM — SCOPED UNDER .sn-root
+   ========================================================================== */
+.sn-root {
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'SFMono-Regular', Consolas, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  --wine: #6B2737;
+  --wine-dark: #4E1A28;
+  --wine-light: #8B3A4D;
+  --gold: #B8962E;
+  --gold-light: #D4AF5A;
+  --gold-hover: #E2C374;
+  --success: #1A7A56;
+  --warning: #D97706;
+  --danger: #C0392B;
+  --info: #2563EB;
+
+  --sn-offset: 0px;
+
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+
+.sn-root[data-theme="light"] {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #FAF6F0;
+  --bg-tertiary: #F4EDE2;
+  --bg-hover: #F8EFF2;
+  --border: #E2D4C0;
+  --border-light: #EFE4D6;
+  --text-primary: #1A0A0E;
+  --text-secondary: #6B5057;
+  --text-muted: #8A6B75;
+  --card-shadow: 0 8px 30px rgba(107,39,55,.04), 0 2px 8px rgba(0,0,0,.02);
+  --header-bg: rgba(255,255,255,.95);
+  --sidebar-bg: #4E1A28;
+  --sidebar-text: rgba(255,255,255,.78);
+  --sidebar-active-bg: rgba(255,255,255,.12);
+}
+
+.sn-root[data-theme="dark"] {
+  --bg-primary: #18090C;
+  --bg-secondary: #221014;
+  --bg-tertiary: #0F0406;
+  --bg-hover: #2B161B;
+  --border: #381B22;
+  --border-light: #4A2830;
+  --text-primary: #F7EAEB;
+  --text-secondary: #C8ACAF;
+  --text-muted: #9C7F82;
+  --card-shadow: 0 10px 40px rgba(0,0,0,.4);
+  --header-bg: rgba(24,9,12,.95);
+  --sidebar-bg: #0F0406;
+  --sidebar-text: rgba(247,234,235,.78);
+  --sidebar-active-bg: rgba(184,150,46,.18);
+}
+
+.sn-root *, .sn-root *::before, .sn-root *::after {
+  box-sizing: border-box;
+}
+
+/* Odoo font override */
+.sn-root,
+.sn-root h1, .sn-root h2, .sn-root h3, .sn-root h4,
+.sn-root p, .sn-root a, .sn-root ul, .sn-root li,
+.sn-root span, .sn-root small, .sn-root label, .sn-root div,
+.sn-root input, .sn-root select, .sn-root textarea,
+.sn-root button, .sn-root table, .sn-root th, .sn-root td {
+  font-family: var(--font-body) !important;
+}
+.sn-root h1, .sn-root h2, .sn-root h3 {
+  font-family: var(--font-display) !important;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.sn-root code, .sn-root pre {
+  font-family: var(--font-mono) !important;
+}
+.sn-root p { margin-top: 0; margin-bottom: 0.5rem; }
+.sn-root p:last-child { margin-bottom: 0; }
+.sn-root button, .sn-root input, .sn-root select, .sn-root textarea {
+  font-family: inherit;
+  margin: 0;
+}
+.sn-root label { display: block; }
+.sn-root code {
+  font-family: var(--font-mono) !important;
+  font-size: 12px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.sn-root img { max-width: 100%; height: auto; }
+
+@media (max-width: 720px) {
+  .sn-root .sn-hide-m { display: none !important; }
+}
+
+#snera-admin {
+  display: flex;
+  width: 100%;
+  min-height: 600px;
+  min-height: calc(100vh - var(--sn-offset));
+  min-height: calc(100dvh - var(--sn-offset));
+  background: var(--bg-tertiary);
+  position: relative;
+  overflow-x: hidden;
+  isolation: isolate;
+}
+
+.sn-root .sn-sidebar {
+  width: 250px;
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  position: -webkit-sticky;
+  position: sticky;
+  top: var(--sn-offset);
+  align-self: flex-start;
+  height: calc(100vh - var(--sn-offset));
+  height: calc(100dvh - var(--sn-offset));
+  overflow-y: auto;
+  z-index: 110;
+}
+.sn-root .sn-side-brand {
+  padding: 1.5rem 1.5rem 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  margin-bottom: .75rem;
+}
+.sn-root .sn-brand-name {
+  font-family: var(--font-display) !important;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--gold-light);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sn-root .sn-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: rgba(255,255,255,.6);
+  margin-top: 4px;
+}
+.sn-root .sn-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--danger);
+  display: inline-block;
+  flex-shrink: 0;
+}
+.sn-root .sn-dot.is-on { background: #10B981; }
+
+.sn-root .sn-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 .75rem;
+  flex: 1;
+}
+.sn-root .sn-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: .75rem 1rem;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  color: var(--sidebar-text);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: background .2s, color .2s;
+}
+.sn-root .sn-nav-item:hover { background: rgba(255,255,255,.06); color: #fff; }
+.sn-root .sn-nav-item.is-active { background: var(--sidebar-active-bg); color: var(--gold-light); font-weight: 600; }
+.sn-root .sn-nav-item i { font-size: 20px; flex-shrink: 0; }
+
+.sn-root .sn-side-foot {
+  padding: 1.25rem;
+  border-top: 1px solid rgba(255,255,255,.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sn-root .sn-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--gold-light);
+  color: var(--wine-dark);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display) !important;
+  font-size: 14px;
+}
+.sn-root .sn-user { display: flex; flex-direction: column; min-width: 0; }
+.sn-root .sn-user span { font-weight: 600; color: #fff; font-size: 13px; }
+.sn-root .sn-user small { color: rgba(255,255,255,.6); font-size: 11px; }
+
+.sn-root .sn-mobile-bar { display: none; }
+.sn-root .sn-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1090;
+  background: rgba(0,0,0,.6);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .25s ease, visibility .25s;
+}
+.sn-root .sn-backdrop.is-open { opacity: 1; visibility: visible; }
+
+.sn-root .sn-burger {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: rgba(255,255,255,.95);
+  font-size: 26px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sn-root .sn-main {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-tertiary);
+}
+.sn-root .sn-topbar {
+  min-height: 64px;
+  padding: .5rem 1.5rem;
+  background: var(--header-bg);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: -webkit-sticky;
+  position: sticky;
+  top: var(--sn-offset);
+  z-index: 100;
+}
+.sn-root .sn-topbar h2 {
+  font-family: var(--font-display) !important;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 0;
+}
+.sn-root .sn-body { padding: 1.5rem; flex: 1; min-width: 0; }
+
+.sn-root .sn-section { display: none; }
+.sn-root .sn-section.is-shown { display: block; animation: sn-fade .25s ease; }
+@keyframes sn-fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+.sn-root .sn-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.sn-root .sn-metric {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+.sn-root .sn-metric > div:first-child { min-width: 0; }
+.sn-root .sn-metric-label { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; font-weight: 600; }
+.sn-root .sn-metric-value { font-family: var(--font-display) !important; font-size: 26px; font-weight: 700; color: var(--text-primary); margin: 4px 0; overflow-wrap: anywhere; }
+.sn-root .sn-metric-sub { font-size: 11.5px; color: var(--text-secondary); }
+.sn-root .sn-metric-icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: var(--bg-hover);
+  color: var(--wine);
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sn-root .sn-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  min-width: 0;
+}
+.sn-root .sn-card-head {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.sn-root .sn-card-head h3 { font-family: var(--font-display) !important; font-size: 20px; font-weight: 600; color: var(--text-primary); }
+.sn-root .sn-card-head p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.sn-root .sn-card-pad { padding: 1.5rem; }
+
+.sn-root .sn-filters { display: flex; gap: 12px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.sn-root .sn-input, .sn-root .sn-select, .sn-root .sn-textarea {
+  display: block;
+  padding: .65rem 1rem;
+  min-height: 44px;
+  max-width: 100%;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  line-height: 1.4;
+  outline: none;
+  box-shadow: none;
+  transition: border-color .2s;
+}
+.sn-root .sn-textarea { resize: vertical; }
+.sn-root .sn-input:focus, .sn-root .sn-select:focus, .sn-root .sn-textarea:focus { border-color: var(--gold); }
+.sn-root .sn-w-full { width: 100%; }
+
+.sn-root .sn-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: .65rem 1.25rem;
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+  white-space: nowrap;
+}
+.sn-root .sn-btn-primary { background: var(--wine); color: #fff; }
+.sn-root .sn-btn-primary:hover { background: var(--wine-dark); color: #fff; }
+.sn-root .sn-btn-outline { background: transparent; border-color: var(--border); color: var(--text-primary); }
+.sn-root .sn-btn-outline:hover { background: var(--bg-hover); color: var(--text-primary); }
+.sn-root .sn-btn-sm { padding: .4rem .8rem; font-size: 12px; min-height: 36px; }
+.sn-root .sn-btn-icon { width: 44px; padding: 0; background: var(--bg-primary); border-color: var(--border); color: var(--text-primary); font-size: 18px; }
+
+.sn-root .sn-field { margin-bottom: 1.25rem; min-width: 0; }
+.sn-root .sn-field > label { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+.sn-root .sn-row2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.sn-root .sn-row3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+
+.sn-root .sn-toggle { position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer; }
+.sn-root .sn-toggle input { opacity: 0; width: 0; height: 0; }
+.sn-root .sn-slider {
+  position: absolute; inset: 0; background: var(--border); border-radius: 24px; transition: .25s;
+}
+.sn-root .sn-slider::before {
+  position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+  background: white; border-radius: 50%; transition: .25s; box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+.sn-root .sn-toggle input:checked + .sn-slider { background: var(--wine); }
+.sn-root .sn-toggle input:checked + .sn-slider::before { transform: translateX(20px); }
+
+.sn-root .sn-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
+.sn-root .sn-table { width: 100%; border-collapse: collapse; font-size: 13.5px; text-align: left; }
+.sn-root .sn-table th {
+  padding: .75rem 1rem; font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em;
+  font-weight: 700; color: var(--text-muted); background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.sn-root .sn-table td { padding: .85rem 1rem; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+.sn-root .sn-table tr:last-child td { border-bottom: 0; }
+.sn-root .sn-table tr:hover td { background: var(--bg-hover); }
+
+.sn-root .sn-badge {
+  display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: var(--radius-full);
+  font-size: 11.5px; font-weight: 600; text-transform: capitalize;
+}
+.sn-root .sn-badge-success { background: rgba(26,122,86,.12); color: var(--success); }
+.sn-root .sn-badge-warning { background: rgba(217,119,6,.12); color: var(--warning); }
+.sn-root .sn-badge-danger { background: rgba(192,57,43,.12); color: var(--danger); }
+.sn-root .sn-badge-info { background: rgba(37,99,235,.12); color: var(--info); }
+
+.sn-root .sn-thumb {
+  width: 40px; height: 50px; object-fit: cover; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--bg-secondary); display: block;
+}
+
+/* Modals */
+.sn-root .sn-modal {
+  position: fixed; inset: 0; z-index: 1100;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem; background: rgba(0,0,0,.65); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  opacity: 0; visibility: hidden; transition: opacity .25s ease, visibility .25s;
+}
+.sn-root .sn-modal.is-open { opacity: 1; visibility: visible; }
+.sn-root .sn-modal-box {
+  background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow); width: 100%; max-width: 600px; max-height: 90vh; max-height: 90dvh;
+  display: flex; flex-direction: column; overflow: hidden; transform: scale(.95); transition: transform .25s ease;
+}
+.sn-root .sn-modal.is-open .sn-modal-box { transform: scale(1); }
+.sn-root .sn-modal-head {
+  padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-light);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.sn-root .sn-modal-head h3 { font-family: var(--font-display) !important; font-size: 20px; font-weight: 600; }
+.sn-root .sn-modal-body { padding: 1.5rem; overflow-y: auto; flex: 1; min-width: 0; }
+.sn-root .sn-modal-foot {
+  padding: 1rem 1.5rem; border-top: 1px solid var(--border-light);
+  display: flex; justify-content: flex-end; gap: .75rem; background: var(--bg-secondary);
+}
+
+.sn-root .sn-img-preview-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.sn-root .sn-img-preview-item { width: 50px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border); }
+
+.sn-root .sn-toast {
+  position: fixed; bottom: 20px; right: 20px; z-index: 1200;
+  padding: .75rem 1.25rem; background: var(--sidebar-bg); color: #fff;
+  border: 1px solid var(--gold); border-radius: var(--radius-md); font-size: 13.5px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.3); transform: translateY(100px); opacity: 0;
+  transition: transform .25s, opacity .25s; pointer-events: none;
+}
+.sn-root .sn-toast.is-on { transform: translateY(0); opacity: 1; }
+
+/* Responsive Adjustments */
+@media (max-width: 900px) {
+  .sn-root .sn-sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; height: 100vh; height: 100dvh;
+    transform: translateX(-100%); transition: transform .3s cubic-bezier(.4,0,.2,1);
+    box-shadow: 10px 0 30px rgba(0,0,0,.3); z-index: 1100;
+  }
+  .sn-root .sn-sidebar.is-open { transform: translateX(0); }
+  .sn-root .sn-mobile-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .75rem 1.25rem; background: var(--sidebar-bg); color: #fff;
+    position: -webkit-sticky; position: sticky; top: var(--sn-offset); z-index: 90;
+  }
+  .sn-root .sn-mobile-brand { font-family: var(--font-display) !important; font-size: 20px; font-weight: 700; color: var(--gold-light); }
+  .sn-root .sn-topbar { top: calc(var(--sn-offset) + 54px); }
+}
+
+@media (max-width: 600px) {
+  .sn-root .sn-body { padding: 1rem .75rem; }
+  .sn-root .sn-metrics { grid-template-columns: 1fr; }
+  .sn-root .sn-table thead { display: none; }
+  .sn-root .sn-table tbody { display: block; }
+  .sn-root .sn-table tr { display: block; padding: .65rem .75rem; border-bottom: 1px solid var(--border); margin-bottom: 8px; background: var(--bg-primary); border-radius: 8px; }
+  .sn-root .sn-table td {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: .45rem 0; border: 0; text-align: right;
+  }
+  .sn-root .sn-table td::before {
+    content: attr(data-label); flex-shrink: 0; text-align: left;
+    font-size: 11.5px; font-weight: 700; text-transform: uppercase; color: var(--text-muted);
+  }
+  .sn-root .sn-row2, .sn-root .sn-row3 { grid-template-columns: 1fr; gap: 0; }
+}
+</style>
+
+<!-- DASHBOARD CONTAINER -->
+<div id="snera-admin" class="sn-root" data-theme="light">
+  <div class="sn-backdrop" id="sn-backdrop" onclick="SneraAdmin.closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside class="sn-sidebar" id="sn-sidebar" aria-label="Admin navigation">
+    <div class="sn-side-brand">
+      <div class="sn-brand-name"><i class="ti ti-crown"></i> Snera Store</div>
+      <div class="sn-status"><span class="sn-dot" id="sn-db-dot"></span><span id="sn-db-text">Connecting...</span></div>
+    </div>
+
+    <nav class="sn-nav">
+      <button type="button" class="sn-nav-item is-active" data-section="dashboard" onclick="SneraAdmin.show('dashboard')"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+      <button type="button" class="sn-nav-item" data-section="categories" onclick="SneraAdmin.show('categories')"><i class="ti ti-category"></i> Categories</button>
+      <button type="button" class="sn-nav-item" data-section="products" onclick="SneraAdmin.show('products')"><i class="ti ti-box"></i> Products Catalog</button>
+      <button type="button" class="sn-nav-item" data-section="orders" onclick="SneraAdmin.show('orders')"><i class="ti ti-shopping-cart"></i> Orders &amp; Sales</button>
+      <button type="button" class="sn-nav-item" data-section="coupons" onclick="SneraAdmin.show('coupons')"><i class="ti ti-ticket"></i> Coupons</button>
+      <button type="button" class="sn-nav-item" data-section="customers" onclick="SneraAdmin.show('customers')"><i class="ti ti-users"></i> Customers</button>
+      <button type="button" class="sn-nav-item" data-section="reviews" onclick="SneraAdmin.show('reviews')"><i class="ti ti-star"></i> Reviews Moderation</button>
+      <button type="button" class="sn-nav-item" data-section="settings" onclick="SneraAdmin.show('settings')"><i class="ti ti-settings"></i> Store Settings</button>
+      <button type="button" class="sn-nav-item" data-section="setup" onclick="SneraAdmin.show('setup')"><i class="ti ti-database"></i> Database &amp; SQL</button>
+    </nav>
+
+    <div class="sn-side-foot">
+      <div class="sn-avatar" id="sn-user-avatar">A</div>
+      <div class="sn-user" style="flex:1;min-width:0;">
+        <span id="sn-user-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Odoo Admin</span>
+        <small id="sn-user-email" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">snerafashion.com</small>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="sn-main">
+    <div class="sn-mobile-bar">
+      <div class="sn-mobile-brand">Snera Store Admin</div>
+      <button type="button" class="sn-burger" onclick="SneraAdmin.toggleSidebar()"><i class="ti ti-menu-2"></i></button>
+    </div>
+
+    <header class="sn-topbar">
+      <h2 id="sn-page-title">Dashboard Overview</h2>
+      <button type="button" class="sn-btn sn-btn-icon" onclick="SneraAdmin.toggleTheme()" title="Toggle theme">
+        <i class="ti ti-moon" id="sn-theme-icon"></i>
+      </button>
+    </header>
+
+    <div class="sn-body">
+
+      <!-- 1. DASHBOARD -->
+      <section class="sn-section is-shown" id="sn-sec-dashboard">
+        <div class="sn-metrics">
+          <div class="sn-metric">
+            <div>
+              <div class="sn-metric-label">Total Revenue</div>
+              <div class="sn-metric-value" id="sn-stat-revenue">₹0</div>
+              <div class="sn-metric-sub">Processed sales</div>
+            </div>
+            <div class="sn-metric-icon"><i class="ti ti-currency-rupee"></i></div>
+          </div>
+          <div class="sn-metric">
+            <div>
+              <div class="sn-metric-label">Total Orders</div>
+              <div class="sn-metric-value" id="sn-stat-orders">0</div>
+              <div class="sn-metric-sub">Customer orders</div>
+            </div>
+            <div class="sn-metric-icon"><i class="ti ti-shopping-bag"></i></div>
+          </div>
+          <div class="sn-metric">
+            <div>
+              <div class="sn-metric-label">Active Sarees</div>
+              <div class="sn-metric-value" id="sn-stat-products">0</div>
+              <div class="sn-metric-sub">In inventory</div>
+            </div>
+            <div class="sn-metric-icon"><i class="ti ti-shirt"></i></div>
+          </div>
+          <div class="sn-metric">
+            <div>
+              <div class="sn-metric-label">Categories</div>
+              <div class="sn-metric-value" id="sn-stat-categories">0</div>
+              <div class="sn-metric-sub">Collections</div>
+            </div>
+            <div class="sn-metric-icon"><i class="ti ti-category"></i></div>
+          </div>
+        </div>
+
+        <!-- Low Stock Warning Box -->
+        <div id="sn-low-stock-alert" style="display:none; background:rgba(217,119,6,0.1); border:1px solid var(--warning); border-radius:var(--radius-md); padding:1rem 1.25rem; margin-bottom:1.5rem;">
+          <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:var(--warning);">
+            <i class="ti ti-alert-triangle" style="font-size:20px;"></i> Low Inventory Warning
+          </div>
+          <p id="sn-low-stock-msg" style="font-size:13px; color:var(--text-secondary); margin-top:4px;"></p>
+        </div>
+
+        <div class="sn-card">
+          <div class="sn-card-head">
+            <h3>Recent Store Orders</h3>
+            <button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.show('orders')">View All Orders</button>
+          </div>
+          <div class="sn-table-wrap">
+            <table class="sn-table">
+              <thead><tr><th>Order ID</th><th>Customer</th><th>Total</th><th>Status</th><th class="sn-hide-m">Date</th></tr></thead>
+              <tbody id="sn-dash-orders"><tr><td colspan="5">Fetching live orders...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. CATEGORIES -->
+      <section class="sn-section" id="sn-sec-categories">
+        <div class="sn-card">
+          <div class="sn-card-head">
+            <div>
+              <h3>Category &amp; Display Control</h3>
+              <p>Manage saree categories and choose which collections show on Shop and Home pages.</p>
+            </div>
+            <button type="button" class="sn-btn sn-btn-primary" onclick="SneraAdmin.openCategory()"><i class="ti ti-plus"></i> Add Category</button>
+          </div>
+          <div class="sn-table-wrap">
+            <table class="sn-table">
+              <thead><tr><th>Category Name</th><th class="sn-hide-m">Slug</th><th>Show on Shop</th><th>Show on Home</th><th>Order</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="sn-cat-body"><tr><td colspan="7">Loading categories...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. PRODUCTS -->
+      <section class="sn-section" id="sn-sec-products">
+        <div class="sn-filters">
+          <input type="search" class="sn-input" id="sn-prod-search" placeholder="Search sarees by name..." oninput="SneraAdmin.filterProducts()" style="flex:1 1 200px; min-width:0;">
+          <select class="sn-select" id="sn-prod-cat" onchange="SneraAdmin.filterProducts()"><option value="">All Categories</option></select>
+          <button type="button" class="sn-btn sn-btn-primary" onclick="SneraAdmin.openProduct()"><i class="ti ti-plus"></i> Add Product</button>
+        </div>
+        <div class="sn-card">
+          <div class="sn-card-head"><h3>Saree Catalog</h3></div>
+          <div class="sn-table-wrap">
+            <table class="sn-table">
+              <thead><tr><th>Image</th><th>Title</th><th class="sn-hide-m">Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="sn-prod-body"><tr><td colspan="7">Loading products...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. ORDERS -->
+      <section class="sn-section" id="sn-sec-orders">
+        <div class="sn-filters">
+          <select class="sn-select" id="sn-order-filter" onchange="SneraAdmin.filterOrders()">
+            <option value="">All Order Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="paid">Paid</option>
+            <option value="processing">Processing</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="refunded">Refunded</option>
+          </select>
+        </div>
+        <div class="sn-card">
+          <div class="sn-card-head"><h3>Customer Orders</h3></div>
+          <div class="sn-table-wrap">
+            <table class="sn-table">
+              <thead><tr><th>Order ID</th><th>Customer</th><th class="sn-hide-m">Contact</th><th>Total</th><th>Status</th><th class="sn-hide-m">Date</th><th>Actions</th></tr></thead>
+              <tbody id="sn-orders-body"><tr><td colspan="7">Loading orders...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. COUPONS -->
+      <section class="sn-section" id="sn-sec-coupons">
+        <div class="sn-card">
+          <div class="sn-card-head">
+            <div>
+              <h3>Coupons &amp; Discounts</h3>
+              <p>Create and manage promo discount codes for customer checkout.</p>
+            </div>
+            <button type="button" class="sn-btn sn-btn-primary" onclick="SneraAdmin.openCoupon()"><i class="ti ti-plus"></i> Add Coupon</button>
+          </div>
+          <div class="sn-table-wrap">
+            <table class="sn-table">
+              <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Min Order</th><th>Uses</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="sn-coupon-body"><tr><td colspan="7">Loading coupons...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. CUSTOMERS -->
+      <section class="sn-section" id="sn-sec-customers">
+        <div class="sn-card">
+          <div class="sn-card-head"><h3>Customer Directory</h3></div>
+          <div class="sn-table-wrap">
+            <table class="sn-table">
+              <thead><tr><th>Customer Name</th><th>Email</th><th>Phone</th><th>Joined</th></tr></thead>
+              <tbody id="sn-cust-body"><tr><td colspan="4">Loading customers...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. REVIEWS -->
+      <section class="sn-section" id="sn-sec-reviews">
+        <div class="sn-card">
+          <div class="sn-card-head"><h3>Reviews Moderation</h3></div>
+          <div class="sn-table-wrap">
+            <table class="sn-table">
+              <thead><tr><th>Customer</th><th>Rating</th><th>Comment</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="sn-rev-body"><tr><td colspan="5">Loading reviews...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. SETTINGS -->
+      <section class="sn-section" id="sn-sec-settings">
+        <div class="sn-card">
+          <div class="sn-card-head"><h3>Store Configuration &amp; Settings</h3></div>
+          <div class="sn-card-pad">
+            <form onsubmit="SneraAdmin.saveStoreSettings(event)">
+              <div class="sn-row2">
+                <div class="sn-field">
+                  <label>Store Name</label>
+                  <input type="text" class="sn-input sn-w-full" id="sn-set-store-name" value="Snera Store">
+                </div>
+                <div class="sn-field">
+                  <label>Support Email</label>
+                  <input type="email" class="sn-input sn-w-full" id="sn-set-support-email" value="support@snerafashion.com">
+                </div>
+              </div>
+
+              <div class="sn-row2">
+                <div class="sn-field">
+                  <label>Support Phone</label>
+                  <input type="text" class="sn-input sn-w-full" id="sn-set-support-phone" value="+91 98765 43210">
+                </div>
+                <div class="sn-field">
+                  <label>GST Rate (%)</label>
+                  <input type="number" step="0.01" class="sn-input sn-w-full" id="sn-set-gst-rate" value="5">
+                </div>
+              </div>
+
+              <div class="sn-row2">
+                <div class="sn-field">
+                  <label>Free Shipping Threshold (₹)</label>
+                  <input type="number" class="sn-input sn-w-full" id="sn-set-ship-thresh" value="999">
+                </div>
+                <div class="sn-field">
+                  <label>Return Window (Days)</label>
+                  <input type="number" class="sn-input sn-w-full" id="sn-set-return-days" value="7">
+                </div>
+              </div>
+
+              <div class="sn-row2" style="margin-top:0.75rem;">
+                <div class="sn-field">
+                  <label>Enable Cash on Delivery (COD)</label>
+                  <label class="sn-toggle" style="margin-top:4px;"><input type="checkbox" id="sn-set-cod-enable" checked><span class="sn-slider"></span></label>
+                </div>
+                <div class="sn-field">
+                  <label>Enable Online Payment (Razorpay)</label>
+                  <small style="color:var(--text-muted); display:block; margin-bottom:4px;">When disabled, checkout displays "Coming soon" on Online Payment</small>
+                  <label class="sn-toggle"><input type="checkbox" id="sn-set-online-enable"><span class="sn-slider"></span></label>
+                </div>
+              </div>
+
+              <button type="submit" class="sn-btn sn-btn-primary" style="margin-top:1.25rem;">Save Settings</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. SETUP -->
+      <section class="sn-section" id="sn-sec-setup">
+        <div class="sn-card">
+          <div class="sn-card-head"><h3>Database Schema &amp; RLS Script</h3></div>
+          <div class="sn-card-pad">
+            <p style="color:var(--text-secondary); margin-bottom:1rem;">
+              To configure all tables, RLS policies, storage bucket permissions, and security-definer order placement functions, run the comprehensive script <code>snera-store-final/snera-setup.sql</code> in your <strong>Supabase SQL Editor</strong>.
+            </p>
+            <ul style="padding-left:1.25rem; color:var(--text-secondary); line-height:1.7;">
+              <li>Ensures idempotent setup across all 11 tables</li>
+              <li>Implements atomic server-side price &amp; stock verification in <code>place_order()</code></li>
+              <li>Configures public read access for active sarees while shielding private customer records</li>
+              <li>Sets up the <code>product-images</code> storage bucket with admin upload privileges</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- PORTAL CONTAINER (Modals appended to document.body) -->
+<div id="snera-portal" class="sn-root" data-theme="light">
+
+  <!-- CATEGORY MODAL -->
+  <div class="sn-modal" id="sn-cat-modal" role="dialog" aria-modal="true">
+    <div class="sn-modal-box">
+      <div class="sn-modal-head">
+        <h3 id="sn-cat-modal-title">Add Category</h3>
+        <button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.closeCategory()">✕</button>
+      </div>
+      <form class="sn-modal-form" id="sn-cat-form" onsubmit="SneraAdmin.saveCategory(event)">
+        <div class="sn-modal-body">
+          <input type="hidden" id="sn-cat-id">
+          <div class="sn-field">
+            <label>Category Name *</label>
+            <input type="text" class="sn-input sn-w-full" id="sn-cat-name" required placeholder="e.g. Banarasi Silk">
+          </div>
+          <div class="sn-row2">
+            <div class="sn-field">
+              <label>Slug</label>
+              <input type="text" class="sn-input sn-w-full" id="sn-cat-slug" placeholder="banarasi-silk">
+            </div>
+            <div class="sn-field">
+              <label>Display Order</label>
+              <input type="number" class="sn-input sn-w-full" id="sn-cat-order" value="0">
+            </div>
+          </div>
+          <div class="sn-row2" style="margin-top:0.5rem;">
+            <div class="sn-field">
+              <label>Show on Shop Filter</label>
+              <label class="sn-toggle"><input type="checkbox" id="sn-cat-shop" checked><span class="sn-slider"></span></label>
+            </div>
+            <div class="sn-field">
+              <label>Show on Home Grid</label>
+              <label class="sn-toggle"><input type="checkbox" id="sn-cat-home" checked><span class="sn-slider"></span></label>
+            </div>
+          </div>
+          <div class="sn-field">
+            <label>Status</label>
+            <select class="sn-select sn-w-full" id="sn-cat-status">
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div class="sn-modal-foot">
+          <button type="button" class="sn-btn sn-btn-outline" onclick="SneraAdmin.closeCategory()">Cancel</button>
+          <button type="submit" class="sn-btn sn-btn-primary">Save Category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- PRODUCT MODAL -->
+  <div class="sn-modal" id="sn-prod-modal" role="dialog" aria-modal="true">
+    <div class="sn-modal-box">
+      <div class="sn-modal-head">
+        <h3 id="sn-prod-modal-title">Add New Product</h3>
+        <button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.closeProduct()">✕</button>
+      </div>
+      <form class="sn-modal-form" id="sn-prod-form" onsubmit="SneraAdmin.saveProduct(event)">
+        <div class="sn-modal-body">
+          <input type="hidden" id="sn-prod-id">
+          <div class="sn-field"><label>Product Name *</label><input type="text" class="sn-input sn-w-full" id="sn-prod-name" required placeholder="Royal Banarasi Katan Silk Saree"></div>
+          <div class="sn-row2">
+            <div class="sn-field"><label>Price (₹) *</label><input type="number" step="0.01" class="sn-input sn-w-full" id="sn-prod-price" required></div>
+            <div class="sn-field"><label>Original Price (₹)</label><input type="number" step="0.01" class="sn-input sn-w-full" id="sn-prod-orig-price"></div>
+          </div>
+          <div class="sn-row2">
+            <div class="sn-field"><label>Stock *</label><input type="number" class="sn-input sn-w-full" id="sn-prod-stock" required value="1"></div>
+            <div class="sn-field"><label>SKU</label><input type="text" class="sn-input sn-w-full" id="sn-prod-sku" placeholder="SNR-SAREE-001"></div>
+          </div>
+          <div class="sn-row2">
+            <div class="sn-field"><label>Category</label><select class="sn-select sn-w-full" id="sn-prod-cat-select"></select></div>
+            <div class="sn-field"><label>Fabric</label><input type="text" class="sn-input sn-w-full" id="sn-prod-fabric" placeholder="Pure Kanjeevaram Silk"></div>
+          </div>
+          <div class="sn-row3">
+            <div class="sn-field"><label>Color</label><input type="text" class="sn-input sn-w-full" id="sn-prod-color" placeholder="Crimson Red"></div>
+            <div class="sn-field"><label>Occasion</label><input type="text" class="sn-input sn-w-full" id="sn-prod-occasion" placeholder="Bridal / Wedding"></div>
+            <div class="sn-field"><label>Status</label><select class="sn-select sn-w-full" id="sn-prod-status"><option value="active">Active</option><option value="draft">Draft</option></select></div>
+          </div>
+          <div class="sn-field">
+            <label>Product Main &amp; Gallery Images Upload</label>
+            <input type="file" class="sn-input sn-w-full" id="sn-prod-files" multiple accept="image/*" onchange="SneraAdmin.handleImageUpload(event)">
+            <div id="sn-prod-img-previews" class="sn-img-preview-grid"></div>
+          </div>
+          <div class="sn-row2" style="margin-top:0.5rem;">
+            <div class="sn-field"><label>Free Shipping</label><label class="sn-toggle"><input type="checkbox" id="sn-prod-freeship" checked><span class="sn-slider"></span></label></div>
+            <div class="sn-field"><label>Featured Product</label><label class="sn-toggle"><input type="checkbox" id="sn-prod-featured"><span class="sn-slider"></span></label></div>
+          </div>
+        </div>
+        <div class="sn-modal-foot">
+          <button type="button" class="sn-btn sn-btn-outline" onclick="SneraAdmin.closeProduct()">Cancel</button>
+          <button type="submit" class="sn-btn sn-btn-primary">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ORDER DETAILS MODAL -->
+  <div class="sn-modal" id="sn-order-modal" role="dialog" aria-modal="true">
+    <div class="sn-modal-box">
+      <div class="sn-modal-head">
+        <h3 id="sn-order-modal-title">Order Details</h3>
+        <button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.closeOrderModal()">✕</button>
+      </div>
+      <div class="sn-modal-body" id="sn-order-modal-body"></div>
+      <div class="sn-modal-foot">
+        <button type="button" class="sn-btn sn-btn-outline" onclick="SneraAdmin.closeOrderModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COUPON MODAL -->
+  <div class="sn-modal" id="sn-coupon-modal" role="dialog" aria-modal="true">
+    <div class="sn-modal-box">
+      <div class="sn-modal-head">
+        <h3 id="sn-coupon-modal-title">Add Coupon</h3>
+        <button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.closeCoupon()">✕</button>
+      </div>
+      <form class="sn-modal-form" onsubmit="SneraAdmin.saveCoupon(event)">
+        <div class="sn-modal-body">
+          <input type="hidden" id="sn-coup-id">
+          <div class="sn-field"><label>Coupon Code *</label><input type="text" class="sn-input sn-w-full" id="sn-coup-code" required placeholder="WELCOME10" style="text-transform:uppercase;"></div>
+          <div class="sn-row2">
+            <div class="sn-field"><label>Discount Type</label><select class="sn-select sn-w-full" id="sn-coup-type"><option value="percent">Percentage (%)</option><option value="flat">Flat Amount (₹)</option></select></div>
+            <div class="sn-field"><label>Value *</label><input type="number" step="0.01" class="sn-input sn-w-full" id="sn-coup-val" required></div>
+          </div>
+          <div class="sn-row2">
+            <div class="sn-field"><label>Min Order Value (₹)</label><input type="number" class="sn-input sn-w-full" id="sn-coup-min" value="0"></div>
+            <div class="sn-field"><label>Max Uses (0 = unlimited)</label><input type="number" class="sn-input sn-w-full" id="sn-coup-uses" value="0"></div>
+          </div>
+        </div>
+        <div class="sn-modal-foot">
+          <button type="button" class="sn-btn sn-btn-outline" onclick="SneraAdmin.closeCoupon()">Cancel</button>
+          <button type="submit" class="sn-btn sn-btn-primary">Save Coupon</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="sn-toast" id="sn-toast" role="status"></div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var DEFAULT_URL = 'https://yduueujrykugmzvbnndu.supabase.co';
+  var DEFAULT_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkdXVldWpyeWt1Z216dmJubmR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MDEyNzYsImV4cCI6MjA5NTE3NzI3Nn0.OeMKhnf5cQv5KfSGqdXHZziP-x4MOmlKnV6EFmnmkJs';
+
+  var TITLES = {
+    dashboard: 'Dashboard Overview', categories: 'Categories',
+    products: 'Saree Catalog', orders: 'Orders & Sales',
+    coupons: 'Coupons & Discounts', customers: 'Customer Directory',
+    reviews: 'Reviews Moderation', settings: 'Store Settings', setup: 'Database Setup'
+  };
+
+  var root, portal, db = null;
+  var cats = [], prods = [], orders = [], coupons = [], customers = [], reviews = [];
+  var uploadImgUrls = [];
+
+  function $(id) { return document.getElementById(id); }
+  function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function money(n) { return '₹' + (Number(n) || 0).toLocaleString('en-IN'); }
+  function dateStr(d) { return d ? new Date(d).toLocaleDateString('en-IN') : '-'; }
+  function toast(msg) { var t = $('sn-toast'); if (!t) return; t.textContent = msg; t.classList.add('is-on'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('is-on'); }, 2800); }
+  function badgeFor(status) {
+    var map = { active: 'success', paid: 'success', delivered: 'success', shipped: 'info', processing: 'info', pending: 'warning', cancelled: 'danger', refunded: 'danger' };
+    return '<span class="sn-badge sn-badge-' + (map[status] || 'info') + '">' + esc(status || '-') + '</span>';
+  }
+
+  function initDb() {
+    try {
+      if (!window.supabase) throw new Error('Supabase library not loaded');
+      db = window.supabase.createClient(DEFAULT_URL, DEFAULT_KEY);
+      var dot = $('sn-db-dot');
+      var txt = $('sn-db-text');
+      if (dot) dot.classList.add('is-on');
+      if (txt) txt.textContent = 'Connected';
+    } catch (e) {
+      var d = $('sn-db-dot');
+      var tx = $('sn-db-text');
+      if (d) d.classList.remove('is-on');
+      if (tx) tx.textContent = 'Offline';
+    }
+  }
+
+  async function load() {
+    if (!db) return;
+    try {
+      var c = await db.from('categories').select('*').order('display_order', { ascending: true }); cats = c.data || [];
+      var p = await db.from('products').select('*'); prods = p.data || [];
+      var o = await db.from('orders').select('*').order('created_at', { ascending: false }); orders = o.data || [];
+      var cp = await db.from('coupons').select('*'); coupons = cp.data || [];
+      var cust = await db.from('user_profiles').select('*'); customers = cust.data || [];
+      var rev = await db.from('reviews').select('*'); reviews = rev.data || [];
+
+      var st = await db.from('store_settings').select('*').limit(1).maybeSingle();
+      if (st && st.data) {
+        var s = st.data;
+        if ($('sn-set-store-name')) $('sn-set-store-name').value = s.store_name || 'Snera Store';
+        if ($('sn-set-support-email')) $('sn-set-support-email').value = s.support_email || 'support@snerafashion.com';
+        if ($('sn-set-support-phone')) $('sn-set-support-phone').value = s.support_phone || '+91 98765 43210';
+        if ($('sn-set-gst-rate')) $('sn-set-gst-rate').value = s.gst_rate != null ? s.gst_rate : 5;
+        if ($('sn-set-ship-thresh')) $('sn-set-ship-thresh').value = s.free_shipping_threshold != null ? s.free_shipping_threshold : 999;
+        if ($('sn-set-return-days')) $('sn-set-return-days').value = s.return_window_days != null ? s.return_window_days : 7;
+        if ($('sn-set-cod-enable')) $('sn-set-cod-enable').checked = s.cod_enabled !== false;
+        if ($('sn-set-online-enable')) $('sn-set-online-enable').checked = !!s.online_payment_enabled;
+      }
+    } catch (err) {
+      console.warn('Admin load error:', err);
+    }
+    renderCategories();
+    filterProducts();
+    filterOrders();
+    renderCoupons();
+    renderCustomers();
+    renderReviews();
+    renderDash();
+    checkLowStock();
+  }
+
+  function checkLowStock() {
+    var lowItems = prods.filter(function(p) { return Number(p.stock) <= 3; });
+    var alertEl = $('sn-low-stock-alert');
+    if (alertEl) {
+      if (lowItems.length > 0) {
+        alertEl.style.display = 'block';
+        $('sn-low-stock-msg').textContent = lowItems.length + ' saree product(s) have 3 or fewer pieces remaining in inventory.';
+      } else {
+        alertEl.style.display = 'none';
+      }
+    }
+  }
+
+  function renderDash() {
+    if ($('sn-stat-categories')) $('sn-stat-categories').textContent = cats.length;
+    if ($('sn-stat-products')) $('sn-stat-products').textContent = prods.length;
+    if ($('sn-stat-orders')) $('sn-stat-orders').textContent = orders.length;
+    if ($('sn-stat-revenue')) $('sn-stat-revenue').textContent = money(orders.reduce(function (s, o) { return s + (Number(o.total) || Number(o.total_amount) || 0); }, 0));
+    var tbody = $('sn-dash-orders');
+    if (tbody) {
+      tbody.innerHTML = orders.length ? orders.slice(0, 5).map(function (o) {
+        return '<tr><td data-label="Order">#' + esc(o.order_id || String(o.id).slice(0, 8)) + '</td><td data-label="Customer">' + esc(o.customer_name) + '</td>' +
+          '<td data-label="Total">' + money(o.total || o.total_amount) + '</td><td data-label="Status">' + badgeFor(o.status) + '</td>' +
+          '<td data-label="Date" class="sn-hide-m">' + dateStr(o.created_at) + '</td></tr>';
+      }).join('') : '<tr><td colspan="5">No recent orders recorded.</td></tr>';
+    }
+  }
+
+  /* Navigation & UI */
+  function show(id) {
+    if (!root) return;
+    root.querySelectorAll('.sn-section').forEach(function (s) { s.classList.remove('is-shown'); });
+    root.querySelectorAll('.sn-nav-item').forEach(function (n) { n.classList.toggle('is-active', n.getAttribute('data-section') === id); });
+    var t = $('sn-sec-' + id);
+    if (t) t.classList.add('is-shown');
+    var pt = $('sn-page-title');
+    if (pt) pt.textContent = TITLES[id] || 'Admin Dashboard';
+    closeSidebar();
+  }
+
+  function toggleSidebar() {
+    var sb = $('sn-sidebar');
+    if (sb) { sb.classList.contains('is-open') ? closeSidebar() : openSidebar(); }
+  }
+  function openSidebar() {
+    var sb = $('sn-sidebar'); var bd = $('sn-backdrop');
+    if (sb) sb.classList.add('is-open');
+    if (bd) bd.classList.add('is-open');
+  }
+  function closeSidebar() {
+    var sb = $('sn-sidebar'); var bd = $('sn-backdrop');
+    if (sb) sb.classList.remove('is-open');
+    if (bd) bd.classList.remove('is-open');
+  }
+
+  function toggleTheme() {
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    if (portal) portal.setAttribute('data-theme', next);
+    var ti = $('sn-theme-icon');
+    if (ti) ti.className = next === 'dark' ? 'ti ti-sun' : 'ti ti-moon';
+  }
+
+  /* Categories */
+  function renderCategories() {
+    var body = $('sn-cat-body');
+    var sel = $('sn-prod-cat-select');
+    var filterSel = $('sn-prod-cat');
+    if (sel) sel.innerHTML = '<option value="">Select Category</option>' + cats.map(function(c) { return '<option value="' + c.id + '">' + esc(c.name) + '</option>'; }).join('');
+    if (filterSel) filterSel.innerHTML = '<option value="">All Categories</option>' + cats.map(function(c) { return '<option value="' + c.id + '">' + esc(c.name) + '</option>'; }).join('');
+    if (!body) return;
+    if (!cats.length) { body.innerHTML = '<tr><td colspan="7">No categories found.</td></tr>'; return; }
+    body.innerHTML = cats.map(function (c) {
+      return '<tr>' +
+        '<td data-label="Category"><strong>' + esc(c.name) + '</strong></td>' +
+        '<td data-label="Slug" class="sn-hide-m"><code>' + esc(c.slug || '-') + '</code></td>' +
+        '<td data-label="Show on Shop">' + (c.show_in_shop !== false ? 'Yes' : 'No') + '</td>' +
+        '<td data-label="Show on Home">' + (c.show_in_home !== false ? 'Yes' : 'No') + '</td>' +
+        '<td data-label="Order">' + (c.display_order || 0) + '</td>' +
+        '<td data-label="Status">' + badgeFor(c.status) + '</td>' +
+        '<td data-label="Actions"><button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.editCategory(\'' + c.id + '\')">Edit</button></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  function openCategory() {
+    var form = $('sn-cat-form'); if (form) form.reset();
+    $('sn-cat-id').value = '';
+    $('sn-cat-modal-title').textContent = 'Add Category';
+    $('sn-cat-modal').classList.add('is-open');
+  }
+  function closeCategory() {
+    $('sn-cat-modal').classList.remove('is-open');
+  }
+  function editCategory(id) {
+    var c = cats.find(function(x) { return String(x.id) === String(id); });
+    if (!c) return;
+    $('sn-cat-id').value = c.id;
+    $('sn-cat-name').value = c.name || '';
+    $('sn-cat-slug').value = c.slug || '';
+    $('sn-cat-order').value = c.display_order || 0;
+    $('sn-cat-shop').checked = c.show_in_shop !== false;
+    $('sn-cat-home').checked = c.show_in_home !== false;
+    $('sn-cat-status').value = c.status || 'active';
+    $('sn-cat-modal-title').textContent = 'Edit Category';
+    $('sn-cat-modal').classList.add('is-open');
+  }
+  async function saveCategory(e) {
+    e.preventDefault();
+    var id = $('sn-cat-id').value;
+    var name = $('sn-cat-name').value.trim();
+    var slug = $('sn-cat-slug').value.trim() || name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    var payload = {
+      name: name,
+      slug: slug,
+      display_order: parseInt($('sn-cat-order').value, 10) || 0,
+      show_in_shop: $('sn-cat-shop').checked,
+      show_in_home: $('sn-cat-home').checked,
+      status: $('sn-cat-status').value
+    };
+    if (db) {
+      var r = id ? await db.from('categories').update(payload).eq('id', id) : await db.from('categories').insert([payload]);
+      if (r.error) { toast('Error saving category: ' + r.error.message); return; }
+      await load();
+    }
+    closeCategory();
+    toast('Category saved successfully');
+  }
+
+  /* Products & Storage Upload */
+  async function handleImageUpload(e) {
+    var files = e.target.files; if (!files || !files.length || !db) return;
+    toast('Uploading image(s)...');
+    for (var i = 0; i < files.length; i++) {
+      var file = files[i];
+      var ext = file.name.split('.').pop();
+      var path = 'saree_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7) + '.' + ext;
+      var up = await db.storage.from('product-images').upload(path, file);
+      if (up.data) {
+        var pub = db.storage.from('product-images').getPublicUrl(path);
+        uploadImgUrls.push(pub.data.publicUrl);
+      }
+    }
+    renderImgPreviews();
+    toast('Image upload complete');
+  }
+
+  function renderImgPreviews() {
+    var prev = $('sn-prod-img-previews');
+    if (!prev) return;
+    prev.innerHTML = uploadImgUrls.map(function(u) {
+      return '<img src="' + esc(u) + '" class="sn-img-preview-item">';
+    }).join('');
+  }
+
+  function filterProducts() {
+    var q = ($('sn-prod-search').value || '').toLowerCase();
+    var catFilter = $('sn-prod-cat') ? $('sn-prod-cat').value : '';
+    var list = prods.filter(function(p) {
+      var matchQ = !q || String(p.name || '').toLowerCase().indexOf(q) > -1 || String(p.fabric || '').toLowerCase().indexOf(q) > -1;
+      var matchC = !catFilter || String(p.category_id) === String(catFilter);
+      return matchQ && matchC;
+    });
+    var tbody = $('sn-prod-body');
+    if (!tbody) return;
+    tbody.innerHTML = list.length ? list.map(function(p) {
+      var imgUrl = p.image_url || (Array.isArray(p.images) && p.images[0]) || '';
+      var img = imgUrl ? '<img class="sn-thumb" src="' + esc(imgUrl) + '" alt="' + esc(p.name) + '">' : '<div class="sn-thumb"></div>';
+      return '<tr><td data-label="Image">' + img + '</td><td data-label="Title"><strong>' + esc(p.name) + '</strong></td>' +
+        '<td data-label="Category" class="sn-hide-m">' + esc(p.category_name || '-') + '</td>' +
+        '<td data-label="Price">' + money(p.price) + '</td><td data-label="Stock">' + (p.stock || 0) + '</td>' +
+        '<td data-label="Status">' + badgeFor(p.status) + '</td>' +
+        '<td data-label="Actions"><button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.editProduct(\'' + p.id + '\')">Edit</button></td></tr>';
+    }).join('') : '<tr><td colspan="7">No products found matching filters.</td></tr>';
+  }
+
+  function openProduct() {
+    uploadImgUrls = [];
+    var form = $('sn-prod-form');
+    if (form) form.reset();
+    $('sn-prod-id').value = '';
+    $('sn-prod-modal-title').textContent = 'Add New Saree';
+    renderImgPreviews();
+    $('sn-prod-modal').classList.add('is-open');
+  }
+  function closeProduct() {
+    $('sn-prod-modal').classList.remove('is-open');
+  }
+
+  function editProduct(id) {
+    var p = prods.find(function(x) { return String(x.id) === String(id); });
+    if (!p) return;
+    var form = $('sn-prod-form');
+    if (form) form.reset();
+    $('sn-prod-id').value = p.id;
+    $('sn-prod-name').value = p.name || '';
+    $('sn-prod-price').value = p.price || '';
+    $('sn-prod-orig-price').value = p.original_price || '';
+    $('sn-prod-stock').value = p.stock != null ? p.stock : 1;
+    $('sn-prod-sku').value = p.sku || '';
+    $('sn-prod-cat-select').value = p.category_id || '';
+    $('sn-prod-fabric').value = p.fabric || '';
+    $('sn-prod-color').value = p.color || '';
+    $('sn-prod-occasion').value = p.occasion || '';
+    $('sn-prod-status').value = p.status || 'active';
+    $('sn-prod-freeship').checked = !!p.free_shipping;
+    $('sn-prod-featured').checked = !!p.is_featured;
+    uploadImgUrls = Array.isArray(p.images) ? p.images.slice() : (p.image_url ? [p.image_url] : []);
+    renderImgPreviews();
+    $('sn-prod-modal-title').textContent = 'Edit Saree Product';
+    $('sn-prod-modal').classList.add('is-open');
+  }
+
+  async function saveProduct(e) {
+    e.preventDefault();
+    var id = $('sn-prod-id').value;
+    var catId = $('sn-prod-cat-select').value || null;
+    var matchedCat = cats.find(function(c) { return String(c.id) === String(catId); });
+    var payload = {
+      name: $('sn-prod-name').value.trim(),
+      price: parseFloat($('sn-prod-price').value) || 0,
+      original_price: parseFloat($('sn-prod-orig-price').value) || null,
+      stock: parseInt($('sn-prod-stock').value, 10) || 0,
+      sku: $('sn-prod-sku').value.trim(),
+      category_id: catId,
+      category_name: matchedCat ? matchedCat.name : null,
+      fabric: $('sn-prod-fabric').value.trim(),
+      color: $('sn-prod-color').value.trim(),
+      occasion: $('sn-prod-occasion').value.trim(),
+      status: $('sn-prod-status').value,
+      free_shipping: $('sn-prod-freeship').checked,
+      is_featured: $('sn-prod-featured').checked,
+      images: uploadImgUrls,
+      image_url: uploadImgUrls[0] || null
+    };
+    if (db) {
+      var r = id ? await db.from('products').update(payload).eq('id', id) : await db.from('products').insert([payload]);
+      if (r.error) { toast('Error saving product: ' + r.error.message); return; }
+      await load();
+    }
+    closeProduct();
+    toast('Product saved successfully');
+  }
+
+  /* Orders Management */
+  function filterOrders() {
+    var s = $('sn-order-filter').value;
+    var list = orders.filter(function (o) { return !s || o.status === s; });
+    var tbody = $('sn-orders-body');
+    if (!tbody) return;
+    tbody.innerHTML = list.length ? list.map(function (o) {
+      return '<tr><td data-label="Order">#' + esc(o.order_id || String(o.id).slice(0, 8)) + '</td>' +
+        '<td data-label="Customer"><strong>' + esc(o.customer_name) + '</strong></td>' +
+        '<td data-label="Contact" class="sn-hide-m">' + esc(o.customer_phone || o.customer_email || '-') + '</td>' +
+        '<td data-label="Total">' + money(o.total || o.total_amount) + '</td><td data-label="Status">' + badgeFor(o.status) + '</td>' +
+        '<td data-label="Date" class="sn-hide-m">' + dateStr(o.created_at) + '</td>' +
+        '<td data-label="Actions"><button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.viewOrderDetails(\'' + o.id + '\')">View Details</button></td></tr>';
+    }).join('') : '<tr><td colspan="7">No orders found.</td></tr>';
+  }
+
+  function viewOrderDetails(id) {
+    var o = orders.find(function(x) { return String(x.id) === String(id); });
+    if (!o) return;
+    var addr = o.shipping_address || {};
+    var items = o.items || [];
+    var itemsHtml = items.map(function(i) {
+      return '<div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:13px;">' +
+        '<span>' + esc(i.name) + ' x' + (i.quantity || 1) + '</span>' +
+        '<strong>' + money(i.total || i.price) + '</strong>' +
+      '</div>';
+    }).join('');
+
+    var html = '<div style="font-size:13.5px; line-height:1.6;">' +
+      '<p><strong>Order Number:</strong> #' + esc(o.order_id || o.id) + '</p>' +
+      '<p><strong>Customer Name:</strong> ' + esc(o.customer_name) + '</p>' +
+      '<p><strong>Contact:</strong> ' + esc(o.customer_phone || '-') + ' | ' + esc(o.customer_email || '-') + '</p>' +
+      '<p><strong>Delivery Address:</strong> ' + esc(addr.line1 || '') + ', ' + esc(addr.city || '') + ', ' + esc(addr.state || '') + ' - ' + esc(addr.pincode || '') + '</p>' +
+      '<p><strong>Payment Method:</strong> ' + esc((o.payment_method || 'cod').toUpperCase()) + ' (' + esc(o.payment_status || 'pending') + ')</p>' +
+      '<hr style="margin:12px 0; border:0; border-top:1px solid var(--border);">' +
+      '<h4 style="margin-bottom:8px; font-size:14px;">Items in Order:</h4>' +
+      itemsHtml +
+      '<hr style="margin:12px 0; border:0; border-top:1px solid var(--border);">' +
+      '<p style="font-size:15px; font-weight:700;">Grand Total: ' + money(o.total || o.total_amount) + '</p>' +
+      '<div style="margin-top:16px; padding:12px; background:var(--bg-secondary); border-radius:8px;">' +
+        '<label style="font-size:12px; font-weight:700; text-transform:uppercase; margin-bottom:6px;">Update Order Status:</label>' +
+        '<div style="display:flex; gap:8px;">' +
+          '<select class="sn-select" id="sn-detail-status-select" style="flex:1;">' +
+            '<option value="pending"' + (o.status === 'pending' ? ' selected' : '') + '>Pending</option>' +
+            '<option value="processing"' + (o.status === 'processing' ? ' selected' : '') + '>Processing</option>' +
+            '<option value="shipped"' + (o.status === 'shipped' ? ' selected' : '') + '>Shipped</option>' +
+            '<option value="delivered"' + (o.status === 'delivered' ? ' selected' : '') + '>Delivered</option>' +
+            '<option value="cancelled"' + (o.status === 'cancelled' ? ' selected' : '') + '>Cancelled</option>' +
+          '</select>' +
+          '<button type="button" class="sn-btn sn-btn-primary sn-btn-sm" onclick="SneraAdmin.updateOrderStatus(\'' + o.id + '\')">Update</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+    $('sn-order-modal-body').innerHTML = html;
+    $('sn-order-modal').classList.add('is-open');
+  }
+
+  function closeOrderModal() {
+    $('sn-order-modal').classList.remove('is-open');
+  }
+
+  async function updateOrderStatus(orderId) {
+    var sel = $('sn-detail-status-select');
+    if (!sel || !db) return;
+    var newStatus = sel.value;
+    var r = await db.from('orders').update({ status: newStatus }).eq('id', orderId);
+    if (r.error) {
+      toast('Error updating status: ' + r.error.message);
+      return;
+    }
+    await load();
+    closeOrderModal();
+    toast('Order status updated to ' + newStatus);
+  }
+
+  /* Coupons */
+  function renderCoupons() {
+    var tbody = $('sn-coupon-body');
+    if (!tbody) return;
+    tbody.innerHTML = coupons.length ? coupons.map(function(c) {
+      return '<tr><td><strong>' + esc(c.code) + '</strong></td><td>' + esc(c.type) + '</td><td>' + (c.type === 'percent' ? c.value + '%' : money(c.value)) + '</td>' +
+        '<td>' + money(c.min_order) + '</td><td>' + (c.used_count || 0) + '</td><td>' + badgeFor(c.status) + '</td>' +
+        '<td><button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.deleteCoupon(\'' + c.id + '\')">Delete</button></td></tr>';
+    }).join('') : '<tr><td colspan="7">No coupons active.</td></tr>';
+  }
+
+  function openCoupon() {
+    $('sn-coupon-modal').classList.add('is-open');
+  }
+  function closeCoupon() {
+    $('sn-coupon-modal').classList.remove('is-open');
+  }
+  async function saveCoupon(e) {
+    e.preventDefault();
+    var payload = {
+      code: $('sn-coup-code').value.trim().toUpperCase(),
+      type: $('sn-coup-type').value,
+      value: parseFloat($('sn-coup-val').value) || 0,
+      min_order: parseFloat($('sn-coup-min').value) || 0,
+      max_uses: parseInt($('sn-coup-uses').value, 10) || 0,
+      status: 'active'
+    };
+    if (db) {
+      var r = await db.from('coupons').insert([payload]);
+      if (r.error) { toast('Error saving coupon: ' + r.error.message); return; }
+      await load();
+    }
+    closeCoupon();
+    toast('Coupon created successfully');
+  }
+  async function deleteCoupon(id) {
+    if (!confirm('Are you sure you want to delete this coupon?')) return;
+    if (db) {
+      await db.from('coupons').delete().eq('id', id);
+      await load();
+      toast('Coupon deleted');
+    }
+  }
+
+  /* Customers & Reviews */
+  function renderCustomers() {
+    var tbody = $('sn-cust-body');
+    if (!tbody) return;
+    tbody.innerHTML = customers.length ? customers.map(function(u) {
+      return '<tr><td><strong>' + esc(u.full_name || 'Customer') + '</strong></td><td>' + esc(u.email || '-') + '</td><td>' + esc(u.phone || '-') + '</td><td>' + dateStr(u.created_at) + '</td></tr>';
+    }).join('') : '<tr><td colspan="4">No customer profiles found.</td></tr>';
+  }
+
+  function renderReviews() {
+    var tbody = $('sn-rev-body');
+    if (!tbody) return;
+    tbody.innerHTML = reviews.length ? reviews.map(function(r) {
+      return '<tr><td>' + esc(r.user_name || 'Guest') + '</td><td>★ ' + (r.rating || 5) + '</td><td>' + esc(r.comment || '-') + '</td><td>' + (r.approved ? 'Approved' : 'Pending') + '</td>' +
+        '<td><button type="button" class="sn-btn sn-btn-outline sn-btn-sm" onclick="SneraAdmin.toggleReview(\'' + r.id + '\',' + !r.approved + ')">' + (r.approved ? 'Reject' : 'Approve') + '</button></td></tr>';
+    }).join('') : '<tr><td colspan="5">No reviews to moderate.</td></tr>';
+  }
+
+  async function toggleReview(id, status) {
+    if (db) {
+      await db.from('reviews').update({ approved: status }).eq('id', id);
+      await load();
+      toast('Review updated');
+    }
+  }
+
+  /* Save Store Settings */
+  async function saveStoreSettings(e) {
+    e.preventDefault();
+    var payload = {
+      id: 1,
+      store_name: $('sn-set-store-name').value.trim(),
+      support_email: $('sn-set-support-email').value.trim(),
+      support_phone: $('sn-set-support-phone').value.trim(),
+      gst_rate: parseFloat($('sn-set-gst-rate').value) || 5,
+      free_shipping_threshold: parseFloat($('sn-set-ship-thresh').value) || 999,
+      return_window_days: parseInt($('sn-set-return-days').value, 10) || 7,
+      cod_enabled: $('sn-set-cod-enable').checked,
+      online_payment_enabled: $('sn-set-online-enable').checked
+    };
+    if (db) {
+      var r = await db.from('store_settings').upsert([payload]);
+      if (r.error) {
+        toast('Error saving: ' + r.error.message);
+      } else {
+        toast('Store settings saved successfully');
+      }
+    }
+  }
+
+  function initFullBleed() {
+    var rootEl = $('snera-admin');
+    function adjust() {
+      if (rootEl) {
+        rootEl.style.marginLeft = '0px';
+        rootEl.style.width = '100%';
+        var rect = rootEl.getBoundingClientRect();
+        var cw = document.documentElement.clientWidth;
+        rootEl.style.width = cw + 'px';
+        rootEl.style.marginLeft = (-rect.left) + 'px';
+      }
+      var oH = document.querySelector('header') || document.querySelector('.o_header_standard') || document.querySelector('#top') || document.querySelector('.navbar:not(.sn-navbar)');
+      var h = (oH && oH.offsetHeight) ? oH.offsetHeight : 0;
+      document.documentElement.style.setProperty('--sn-offset', h + 'px');
+      document.documentElement.style.setProperty('--sn-odoo-header-h', h + 'px');
+    }
+    window.addEventListener('resize', adjust);
+    window.addEventListener('orientationchange', adjust);
+    adjust();
+    setTimeout(adjust, 200);
+  }
+
+  function boot() {
+    root = $('snera-admin');
+    portal = $('snera-portal');
+    if (portal && portal.parentElement !== document.body) {
+      document.body.appendChild(portal);
+    }
+    initFullBleed();
+    initDb();
+    load();
+  }
+
+  window.SneraAdmin = {
+    show: show,
+    toggleSidebar: toggleSidebar,
+    openSidebar: openSidebar,
+    closeSidebar: closeSidebar,
+    toggleTheme: toggleTheme,
+    openCategory: openCategory,
+    closeCategory: closeCategory,
+    editCategory: editCategory,
+    saveCategory: saveCategory,
+    filterProducts: filterProducts,
+    openProduct: openProduct,
+    closeProduct: closeProduct,
+    editProduct: editProduct,
+    saveProduct: saveProduct,
+    handleImageUpload: handleImageUpload,
+    filterOrders: filterOrders,
+    viewOrderDetails: viewOrderDetails,
+    closeOrderModal: closeOrderModal,
+    updateOrderStatus: updateOrderStatus,
+    openCoupon: openCoupon,
+    closeCoupon: closeCoupon,
+    saveCoupon: saveCoupon,
+    deleteCoupon: deleteCoupon,
+    toggleReview: toggleReview,
+    saveStoreSettings: saveStoreSettings
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+</script>

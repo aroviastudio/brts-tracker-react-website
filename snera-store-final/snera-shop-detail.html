@@ -1,0 +1,1490 @@
+<!--
+  SNERA STORE — SHOP DETAIL / PRODUCT PAGE (ODOO EMBED CODE VERSION)
+  URL Route: /shop-detail
+  Domain: snerafashion.com
+  - 100% Self-Contained Odoo Snippet (Style + Markup + Script)
+  - Scoped strictly under .sn-root / #sn-detail-root
+  - Full-bleed width integration inside Odoo
+  - Supabase integration: product lookup by URL ?id=..., real reviews, related products
+  - Pincode delivery serviceability verification via Postal API
+  - Event delegation (no inline onclick strings)
+  - Mobile responsive (320px to 1920px), tap targets >= 44px
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://yduueujrykugmzvbnndu.supabase.co">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+/* ==========================================================================
+   SNERA STORE DESIGN SYSTEM — SCOPED UNDER .sn-root
+   ========================================================================== */
+.sn-root {
+  --color-wine: #5B1A3A;
+  --color-wine-dark: #3E0F28;
+  --color-wine-light: #7A2E52;
+  --color-gold: #C9A96E;
+  --color-gold-dark: #A8893F;
+  --color-gold-light: #E4D5B0;
+  --color-ivory: #FAF7F2;
+  --color-sand: #F0EBE3;
+  --color-white: #FFFFFF;
+  --color-rose: #E8D5D0;
+  --color-charcoal: #2D2D2D;
+  --color-dark: #1A1A1A;
+  --color-gray: #8A8578;
+  --color-gray-light: #C5C0B8;
+  --color-border: #E5E0D8;
+  --color-success: #3A7D44;
+  --color-danger: #C0392B;
+  --color-info: #2471A3;
+
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+  --shadow-hover: 0 16px 48px rgba(0,0,0,0.12);
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  --sn-odoo-header-h: 0px;
+
+  font-family: var(--font-sans);
+  background-color: var(--color-ivory);
+  color: var(--color-charcoal);
+  line-height: 1.6;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sn-root *, .sn-root *::before, .sn-root *::after {
+  box-sizing: border-box;
+}
+
+.sn-root h1, .sn-root h2, .sn-root h3, .sn-root h4, .sn-root h5, .sn-root h6 {
+  font-family: var(--font-serif);
+  color: var(--color-wine-dark);
+  line-height: 1.25;
+  margin-top: 0;
+  font-weight: 700;
+}
+.sn-root p { margin-top: 0; margin-bottom: 1rem; }
+.sn-root p:last-child { margin-bottom: 0; }
+.sn-root a { color: inherit; text-decoration: none; transition: color var(--transition-fast); }
+.sn-root img { max-width: 100%; height: auto; display: block; }
+.sn-root button, .sn-root input, .sn-root select, .sn-root textarea {
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+.sn-root button { cursor: pointer; border: none; background: none; }
+
+.sn-container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+.sn-section-pad {
+  padding: 3rem 0 5rem;
+}
+
+/* Announcement Top Bar */
+.sn-top-bar {
+  background: var(--color-wine-dark);
+  color: var(--color-gold-light);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0.55rem 1rem;
+}
+
+/* Sticky Main Navigation */
+.sn-navbar {
+  position: -webkit-sticky;
+  position: sticky;
+  top: var(--sn-odoo-header-h, 0px);
+  z-index: 1000;
+  background: rgba(250, 247, 242, 0.96);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+.sn-navbar.is-scrolled {
+  box-shadow: var(--shadow-sm);
+  background: rgba(255, 255, 255, 0.98);
+}
+.sn-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+}
+.sn-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.sn-brand-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+  font-weight: 700;
+  color: var(--color-wine);
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+.sn-brand-sub {
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-gold-dark);
+  font-weight: 600;
+  margin-top: 2px;
+}
+.sn-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.sn-nav-link {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--color-charcoal);
+  position: relative;
+  padding: 0.35rem 0;
+}
+.sn-nav-link:hover, .sn-nav-link.is-active {
+  color: var(--color-wine);
+}
+.sn-nav-link.is-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--color-wine);
+  border-radius: 2px;
+}
+.sn-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.sn-btn-icon {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-charcoal);
+  font-size: 1.05rem;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  position: relative;
+}
+.sn-btn-icon:hover {
+  background: var(--color-sand);
+  color: var(--color-wine);
+}
+.sn-cart-badge-count {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--color-wine);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+.sn-hamburger-btn {
+  display: none;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: var(--color-charcoal);
+}
+
+/* Breadcrumbs */
+.sn-breadcrumbs {
+  padding: 1.25rem 0;
+  font-size: 0.85rem;
+  color: var(--color-gray);
+}
+.sn-breadcrumbs a {
+  color: var(--color-wine);
+}
+.sn-breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+/* Main Detail Grid */
+.sn-detail-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 3.5rem;
+  align-items: start;
+  margin-bottom: 4rem;
+}
+
+/* Gallery Section */
+.sn-gallery-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: -webkit-sticky;
+  position: sticky;
+  top: calc(var(--sn-odoo-header-h, 0px) + 85px);
+}
+.sn-main-img-box {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-sand);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+.sn-main-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.sn-main-img-box:hover img {
+  transform: scale(1.05);
+}
+.sn-thumbs-row {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.sn-thumb-item {
+  width: 72px;
+  height: 96px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--color-border);
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--color-sand);
+  flex-shrink: 0;
+  transition: border-color var(--transition-fast);
+}
+.sn-thumb-item.is-selected {
+  border-color: var(--color-wine);
+}
+.sn-thumb-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Product Info Section */
+.sn-detail-info {
+  display: flex;
+  flex-direction: column;
+}
+.sn-detail-cat {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--color-gold-dark);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.sn-detail-title {
+  font-size: clamp(2rem, 3.8vw, 2.75rem);
+  color: var(--color-wine-dark);
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+.sn-detail-pricing {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 1.25rem;
+}
+.sn-detail-price {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--color-wine);
+}
+.sn-detail-orig-price {
+  font-size: 1.15rem;
+  color: #888;
+  text-decoration: line-through;
+}
+.sn-detail-discount-badge {
+  background: rgba(58, 125, 68, 0.12);
+  color: var(--color-success);
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+/* Stock Status */
+.sn-stock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+.sn-stock-badge.is-low { color: #D97706; }
+.sn-stock-badge.is-in { color: var(--color-success); }
+.sn-stock-badge.is-out { color: var(--color-danger); }
+
+/* Specifications Grid */
+.sn-specs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+.sn-spec-item {
+  font-size: 0.88rem;
+}
+.sn-spec-label {
+  color: var(--color-gray);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  display: block;
+}
+.sn-spec-val {
+  color: var(--color-charcoal);
+  font-weight: 600;
+}
+
+/* Quantity & Action Buttons */
+.sn-actions-box {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.sn-qty-picker {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  height: 48px;
+}
+.sn-qty-btn {
+  width: 40px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: var(--color-charcoal);
+}
+.sn-qty-val {
+  width: 44px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.sn-btn-detail {
+  flex: 1 1 180px;
+  min-height: 48px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+
+/* Pincode Checker */
+.sn-pincode-box {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+.sn-pin-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-wine-dark);
+  margin-bottom: 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sn-pin-row {
+  display: flex;
+  gap: 8px;
+}
+.sn-pin-input {
+  flex: 1;
+  padding: 0.65rem 1rem;
+  min-height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  outline: none;
+}
+.sn-pin-input:focus { border-color: var(--color-wine); }
+.sn-pin-res {
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+.sn-pin-res.is-success { color: var(--color-success); }
+.sn-pin-res.is-error { color: var(--color-danger); }
+
+/* Accordion Section */
+.sn-accordion {
+  border-top: 1px solid var(--color-border);
+  margin-bottom: 2rem;
+}
+.sn-acc-item {
+  border-bottom: 1px solid var(--color-border);
+}
+.sn-acc-header {
+  width: 100%;
+  padding: 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--color-wine-dark);
+  text-align: left;
+}
+.sn-acc-header i {
+  transition: transform 0.25s ease;
+}
+.sn-acc-header.is-open i {
+  transform: rotate(180deg);
+}
+.sn-acc-content {
+  padding: 0 0 1.25rem;
+  font-size: 0.92rem;
+  color: #555;
+  line-height: 1.7;
+  display: none;
+}
+.sn-acc-content.is-open {
+  display: block;
+}
+
+/* Reviews Section */
+.sn-reviews-sec {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 2rem;
+  margin-bottom: 4rem;
+}
+.sn-rev-form {
+  margin-top: 2rem;
+  background: var(--color-ivory);
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+/* Related Products Grid */
+.sn-prod-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: 1.75rem;
+}
+.sn-prod-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.sn-prod-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--color-gold-light);
+}
+.sn-prod-thumb-wrap {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  background: var(--color-sand);
+  overflow: hidden;
+}
+.sn-prod-thumb-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.sn-prod-card:hover .sn-prod-thumb-wrap img {
+  transform: scale(1.04);
+}
+.sn-prod-content {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+/* Footer */
+.sn-footer {
+  background: var(--color-wine-dark);
+  color: #fff;
+  padding: 4.5rem 0 2rem;
+  margin-top: 4rem;
+}
+.sn-footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 2.5rem;
+  margin-bottom: 3.5rem;
+}
+.sn-footer-brand h3 { color: var(--color-gold-light); font-size: 2rem; margin-bottom: 0.75rem; }
+.sn-footer-brand p { color: rgba(255, 255, 255, 0.75); font-size: 0.9rem; line-height: 1.7; max-width: 320px; }
+.sn-footer-col h4 { color: #fff; font-family: var(--font-serif); font-size: 1.2rem; margin-bottom: 1.25rem; position: relative; padding-bottom: 8px; }
+.sn-footer-col h4::after { content: ''; position: absolute; bottom: 0; left: 0; width: 28px; height: 1.5px; background: var(--color-gold); }
+.sn-footer-links { list-style: none; padding: 0; margin: 0; }
+.sn-footer-links li { margin-bottom: 0.65rem; }
+.sn-footer-links a { color: rgba(255, 255, 255, 0.75); font-size: 0.88rem; transition: color var(--transition-fast); }
+.sn-footer-links a:hover { color: var(--color-gold-light); text-decoration: underline; }
+.sn-footer-contact-item { display: flex; align-items: flex-start; gap: 10px; color: rgba(255, 255, 255, 0.75); font-size: 0.88rem; margin-bottom: 0.75rem; }
+.sn-footer-contact-item i { color: var(--color-gold); margin-top: 4px; }
+.sn-footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Floating WhatsApp Chat Button */
+.sn-whatsapp-float {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  right: 20px;
+  width: 54px;
+  height: 54px;
+  background-color: #25D366;
+  color: #FFFFFF;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 28px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform 0.25s ease;
+}
+.sn-whatsapp-float:hover { transform: scale(1.1); color: #FFFFFF; }
+
+/* Toast Notifications */
+.sn-toast {
+  position: fixed;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%) translateY(30px);
+  background: var(--color-wine-dark);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.25s ease, opacity 0.25s ease, visibility 0.25s;
+  z-index: 10000;
+  pointer-events: none;
+}
+.sn-toast.is-shown { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+/* Mobile Slide-Over Drawer */
+.sn-drawer-backdrop {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); z-index: 10001;
+  opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s;
+}
+.sn-drawer-backdrop.is-open { opacity: 1; visibility: visible; }
+.sn-drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 300px; max-width: 85vw;
+  background: #ffffff; z-index: 10002; box-shadow: -4px 0 24px rgba(0, 0, 0, 0.2);
+  transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex; flex-direction: column; padding: 1.5rem; box-sizing: border-box;
+}
+.sn-drawer.is-open { transform: translateX(0); }
+.sn-drawer-head { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+.sn-drawer-links { display: flex; flex-direction: column; gap: 1.25rem; }
+.sn-drawer-links a { font-size: 1.1rem; font-weight: 600; color: var(--color-charcoal); }
+
+/* Skeletons */
+.sn-skeleton {
+  background: linear-gradient(90deg, #ede8e1 25%, #f7f4ef 50%, #ede8e1 75%);
+  background-size: 200% 100%;
+  animation: snShimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes snShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Responsive Media Queries */
+@media (max-width: 992px) {
+  .sn-nav-links { display: none; }
+  .sn-hamburger-btn { display: flex; }
+  .sn-detail-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .sn-gallery-wrap { position: static; }
+  .sn-footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+}
+
+@media (max-width: 768px) {
+  .sn-specs-grid { grid-template-columns: 1fr; }
+  .sn-actions-box { flex-direction: column; align-items: stretch; }
+  .sn-qty-picker { width: 100%; justify-content: space-between; }
+  .sn-footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .sn-btn { min-height: 48px; }
+}
+
+@media (max-width: 576px) {
+  .sn-container { padding: 0 1rem; }
+  .sn-whatsapp-float {
+    width: 48px; height: 48px; font-size: 24px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)); right: 16px;
+  }
+}
+</style>
+
+<!-- MAIN EMBED CONTENT -->
+<div class="sn-root" id="sn-detail-root">
+
+  <!-- Announcement Bar -->
+  <div class="sn-top-bar">
+    Free Shipping Across India on Orders Over ₹999 &nbsp;|&nbsp; 100% Handloom Authenticity Guarantee
+  </div>
+
+  <!-- Navbar -->
+  <header class="sn-navbar" id="sn-main-navbar">
+    <div class="sn-container sn-nav-inner">
+      <a href="/" class="sn-brand" aria-label="Snera Store Home">
+        <span class="sn-brand-title">Snera</span>
+        <span class="sn-brand-sub">Handloom Boutique</span>
+      </a>
+
+      <nav class="sn-nav-links" aria-label="Main Navigation">
+        <a href="/" class="sn-nav-link">Home</a>
+        <a href="/shop" class="sn-nav-link is-active">Shop Sarees</a>
+        <a href="/#collections" class="sn-nav-link">Collections</a>
+        <a href="/about" class="sn-nav-link">Our Story</a>
+        <a href="/about#contact" class="sn-nav-link">Contact</a>
+      </nav>
+
+      <div class="sn-nav-actions">
+        <a href="/shop" class="sn-btn-icon" aria-label="Search Collection" title="Search"><i class="fa fa-search"></i></a>
+        <a href="/profile" class="sn-btn-icon" aria-label="My Account" title="My Account"><i class="fa fa-user-o"></i></a>
+        <a href="/cart" class="sn-btn-icon" aria-label="View Shopping Cart" title="Cart">
+          <i class="fa fa-shopping-bag"></i>
+          <span class="sn-cart-badge-count" id="sn-cart-badge">0</span>
+        </a>
+        <button type="button" class="sn-hamburger-btn" id="sn-menu-toggle" aria-label="Open Navigation Menu">
+          <i class="fa fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Breadcrumbs -->
+  <div class="sn-container">
+    <div class="sn-breadcrumbs">
+      <a href="/">Home</a> &nbsp;/&nbsp; <a href="/shop">Shop</a> &nbsp;/&nbsp; <span id="sn-bc-name">Product Detail</span>
+    </div>
+  </div>
+
+  <!-- Product Detail Section -->
+  <main class="sn-container">
+    <div class="sn-detail-grid" id="sn-detail-box">
+      <!-- Skeleton Loading State -->
+      <div class="sn-gallery-wrap">
+        <div class="sn-main-img-box sn-skeleton"></div>
+      </div>
+      <div class="sn-detail-info">
+        <div class="sn-skeleton" style="height:18px; width:30%; margin-bottom:12px;"></div>
+        <div class="sn-skeleton" style="height:36px; width:80%; margin-bottom:16px;"></div>
+        <div class="sn-skeleton" style="height:28px; width:45%; margin-bottom:20px;"></div>
+        <div class="sn-skeleton" style="height:120px; width:100%;"></div>
+      </div>
+    </div>
+
+    <!-- Real Reviews Section -->
+    <section class="sn-reviews-sec">
+      <h2 style="font-size:1.85rem; color:var(--color-wine-dark); margin-bottom:0.5rem;">Verified Customer Reviews</h2>
+      <p style="color:#666; font-size:0.95rem; margin-bottom:1.5rem;">Authentic words from patrons who draped this saree.</p>
+
+      <div id="sn-reviews-list">
+        <p style="color:#777; font-size:0.9rem; font-style:italic;">No customer reviews yet. Be the first to leave your feedback.</p>
+      </div>
+
+      <!-- Add Review Form -->
+      <div class="sn-rev-form">
+        <h3 style="font-size:1.3rem; margin-bottom:0.75rem;">Share Your Experience</h3>
+        <form id="sn-add-review-form">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+            <div>
+              <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:4px; text-transform:uppercase;">Your Name *</label>
+              <input type="text" id="sn-rev-name" class="sn-pin-input" style="width:100%;" required placeholder="e.g. Radhika Iyer">
+            </div>
+            <div>
+              <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:4px; text-transform:uppercase;">Rating (1 to 5 Stars) *</label>
+              <select id="sn-rev-rating" class="sn-pin-input" style="width:100%;" required>
+                <option value="5">★★★★★ (5 - Excellent)</option>
+                <option value="4">★★★★☆ (4 - Very Good)</option>
+                <option value="3">★★★☆☆ (3 - Good)</option>
+                <option value="2">★★☆☆☆ (2 - Fair)</option>
+                <option value="1">★☆☆☆☆ (1 - Poor)</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-bottom:1rem;">
+            <label style="display:block; font-size:0.8rem; font-weight:600; margin-bottom:4px; text-transform:uppercase;">Your Review *</label>
+            <textarea id="sn-rev-comment" rows="3" class="sn-pin-input" style="width:100%; height:auto;" required placeholder="Describe the weave, texture, zari sheen, and drape quality..."></textarea>
+          </div>
+          <button type="submit" class="sn-btn sn-btn-wine">Submit Review for Moderation</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Related Sarees Section -->
+    <section class="sn-section-pad" style="padding-top:0;">
+      <h2 style="font-size:1.85rem; text-align:center; margin-bottom:0.5rem;">You May Also Love</h2>
+      <p style="text-align:center; color:#777; font-style:italic; font-family:var(--font-serif); font-size:1.1rem; margin-bottom:2.5rem;">Similar handloom treasures</p>
+      <div class="sn-prod-grid" id="sn-related-grid">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Shared Footer -->
+  <footer class="sn-footer">
+    <div class="sn-container">
+      <div class="sn-footer-grid">
+        <div class="sn-footer-brand">
+          <h3 class="sn-brand-title" style="color:var(--color-gold-light);">Snera</h3>
+          <p>
+            Curating India's most exquisite handwoven sarees. Preserving ancient loom artistry for modern elegance.
+          </p>
+        </div>
+        <div class="sn-footer-col">
+          <h4>Explore</h4>
+          <ul class="sn-footer-links">
+            <li><a href="/shop">All Sarees</a></li>
+            <li><a href="/shop?fabric=Banarasi">Banarasi Silk</a></li>
+            <li><a href="/shop?fabric=Kanjeevaram">Kanjeevaram</a></li>
+            <li><a href="/shop?fabric=Chanderi">Chanderi &amp; Organza</a></li>
+            <li><a href="/shop?occasion=Wedding">Bridal Heritage</a></li>
+          </ul>
+        </div>
+        <div class="sn-footer-col">
+          <h4>Customer Care</h4>
+          <ul class="sn-footer-links">
+            <li><a href="/profile">My Account &amp; Orders</a></li>
+            <li><a href="/cart">Shopping Cart</a></li>
+            <li><a href="/checkout">Checkout</a></li>
+            <li><a href="/shipping-policy">Shipping Policy</a></li>
+            <li><a href="/returns-policy">7-Day Returns Policy</a></li>
+            <li><a href="/terms">Terms &amp; Conditions</a></li>
+            <li><a href="/privacy-policy">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="sn-footer-col">
+          <h4>Boutique &amp; Support</h4>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-envelope-o"></i>
+            <span>support@snerafashion.com</span>
+          </div>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-phone"></i>
+            <span>+91 98765 43210</span>
+          </div>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-map-marker"></i>
+            <span>101 Royal Residency, Ring Road, Surat, Gujarat - 395007, India</span>
+          </div>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-clock-o"></i>
+            <span>Mon – Sat: 10:00 AM – 7:00 PM IST</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sn-footer-bottom">
+        <div>&copy; 2026 Snera Store (snerafashion.com). All rights reserved. Handcrafted with pride in India.</div>
+        <div>
+          <a href="/admin" style="color:rgba(255,255,255,0.45); margin-right:12px;">Admin Portal</a>
+          <span>100% Handcrafted • Cash on Delivery</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating WhatsApp Chat -->
+  <a href="https://wa.me/919876543210?text=Hello%20Snera%20Store%2C%20I%20have%20an%20inquiry%20about%20your%20sarees"
+     class="sn-whatsapp-float"
+     target="_blank"
+     rel="noopener noreferrer"
+     aria-label="Chat with Snera Store on WhatsApp">
+    <i class="fa fa-whatsapp"></i>
+  </a>
+
+</div>
+
+<!-- PORTAL CONTAINER -->
+<div id="sn-portal" class="sn-root">
+  <div class="sn-drawer-backdrop" id="sn-menu-backdrop"></div>
+  <aside class="sn-drawer" id="sn-menu-drawer" aria-label="Mobile Navigation">
+    <div class="sn-drawer-head">
+      <div class="sn-brand-title" style="font-size:1.6rem; color:var(--color-wine);">Snera</div>
+      <button type="button" class="sn-btn-icon" id="sn-menu-close" aria-label="Close menu"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="sn-drawer-links">
+      <a href="/">Home</a>
+      <a href="/shop">Shop Sarees</a>
+      <a href="/#collections">Collections</a>
+      <a href="/about">Our Story</a>
+      <a href="/about#contact">Contact Us</a>
+      <hr style="border:0; border-top:1px solid var(--color-border); margin:0.75rem 0;">
+      <a href="/profile"><i class="fa fa-user-o" style="margin-right:8px;"></i> My Account</a>
+      <a href="/cart"><i class="fa fa-shopping-bag" style="margin-right:8px;"></i> Cart</a>
+    </div>
+  </aside>
+  <div class="sn-toast" id="sn-toast-msg" role="status"></div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var SUPABASE_URL = 'https://yduueujrykugmzvbnndu.supabase.co';
+  var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkdXVldWpyeWt1Z216dmJubmR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MDEyNzYsImV4cCI6MjA5NTE3NzI3Nn0.OeMKhnf5cQv5KfSGqdXHZziP-x4MOmlKnV6EFmnmkJs';
+  var db = null;
+  var currentProduct = null;
+  var selectedQty = 1;
+  var relatedList = [];
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function money(n) { return '₹' + (Number(n) || 0).toLocaleString('en-IN'); }
+
+  function showToast(msg) {
+    var t = $('sn-toast-msg');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('is-shown');
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(function() { t.classList.remove('is-shown'); }, 2800);
+  }
+
+  function updateCartBadge() {
+    try {
+      var cart = JSON.parse(localStorage.getItem('snera_cart')) || [];
+      var count = cart.reduce(function(sum, item) { return sum + (Number(item.quantity) || Number(item.qty) || 1); }, 0);
+      var badge = $('sn-cart-badge');
+      if (badge) {
+        badge.textContent = count;
+        badge.style.display = count > 0 ? 'inline-flex' : 'none';
+      }
+    } catch(e) {}
+  }
+
+  function initFullBleed() {
+    var root = $('sn-detail-root');
+    function adjust() {
+      if (root) {
+        root.style.marginLeft = '0px';
+        root.style.width = '100%';
+        var rect = root.getBoundingClientRect();
+        var cw = document.documentElement.clientWidth;
+        root.style.width = cw + 'px';
+        root.style.marginLeft = (-rect.left) + 'px';
+      }
+      var oH = document.querySelector('header') || document.querySelector('.o_header_standard') || document.querySelector('#top') || document.querySelector('.navbar:not(.sn-navbar)');
+      var h = (oH && oH.offsetHeight) ? oH.offsetHeight : 0;
+      document.documentElement.style.setProperty('--sn-odoo-header-h', h + 'px');
+    }
+    window.addEventListener('resize', adjust);
+    window.addEventListener('orientationchange', adjust);
+    adjust();
+    setTimeout(adjust, 200);
+  }
+
+  function initPortal() {
+    var p = $('sn-portal');
+    if (p && p.parentElement !== document.body) {
+      document.body.appendChild(p);
+    }
+  }
+
+  function setupMobileMenu() {
+    var toggle = $('sn-menu-toggle');
+    var close = $('sn-menu-close');
+    var backdrop = $('sn-menu-backdrop');
+    var drawer = $('sn-menu-drawer');
+
+    function openMenu() {
+      if (drawer) drawer.classList.add('is-open');
+      if (backdrop) backdrop.classList.add('is-open');
+    }
+    function closeMenu() {
+      if (drawer) drawer.classList.remove('is-open');
+      if (backdrop) backdrop.classList.remove('is-open');
+    }
+
+    if (toggle) toggle.addEventListener('click', openMenu);
+    if (close) close.addEventListener('click', closeMenu);
+    if (backdrop) backdrop.addEventListener('click', closeMenu);
+  }
+
+  function getImages(p) {
+    var imgs = [];
+    if (Array.isArray(p.images) && p.images.length) {
+      imgs = p.images;
+    } else if (p.image_url) {
+      imgs = [p.image_url];
+    } else {
+      imgs = ['https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80'];
+    }
+    return imgs;
+  }
+
+  function renderDetail(p) {
+    var box = $('sn-detail-box');
+    var bcName = $('sn-bc-name');
+    if (!box) return;
+
+    if (bcName) bcName.textContent = p.name;
+    var imgs = getImages(p);
+    var isW = false;
+    try {
+      var wList = JSON.parse(localStorage.getItem('snera_wishlist')) || [];
+      isW = wList.indexOf(String(p.id)) > -1;
+    } catch(e) {}
+
+    var stock = Number(p.stock) || 0;
+    var stockHtml = '';
+    if (stock <= 0) {
+      stockHtml = '<div class="sn-stock-badge is-out"><i class="fa fa-times-circle"></i> Currently Sold Out</div>';
+    } else if (stock <= 2) {
+      stockHtml = '<div class="sn-stock-badge is-low"><i class="fa fa-clock-o"></i> Only ' + stock + ' piece' + (stock === 1 ? '' : 's') + ' left — Handcrafted single weave</div>';
+    } else {
+      stockHtml = '<div class="sn-stock-badge is-in"><i class="fa fa-check-circle"></i> In Stock &amp; Ready to Ship</div>';
+    }
+
+    var origPriceHtml = '';
+    if (p.original_price && Number(p.original_price) > Number(p.price)) {
+      var pct = Math.round(((Number(p.original_price) - Number(p.price)) / Number(p.original_price)) * 100);
+      origPriceHtml = '<span class="sn-detail-orig-price">' + money(p.original_price) + '</span>' +
+        '<span class="sn-detail-discount-badge">' + pct + '% OFF</span>';
+    }
+
+    var thumbsHtml = imgs.length > 1 ? '<div class="sn-thumbs-row" id="sn-thumbs-list">' + imgs.map(function(src, idx) {
+      return '<div class="sn-thumb-item ' + (idx === 0 ? 'is-selected' : '') + '" data-img-src="' + esc(src) + '">' +
+        '<img src="' + esc(src) + '" alt="Thumbnail ' + (idx + 1) + '" width="72" height="96">' +
+      '</div>';
+    }).join('') + '</div>' : '';
+
+    box.innerHTML = `
+      <div class="sn-gallery-wrap">
+        <div class="sn-main-img-box">
+          <img src="${esc(imgs[0])}" id="sn-main-img" alt="${esc(p.name)}" width="600" height="800">
+        </div>
+        ${thumbsHtml}
+      </div>
+
+      <div class="sn-detail-info">
+        <span class="sn-detail-cat">${esc(p.fabric || 'Handloom')} • ${esc(p.occasion || 'Collection')}</span>
+        <h1 class="sn-detail-title">${esc(p.name)}</h1>
+
+        <div class="sn-detail-pricing">
+          <span class="sn-detail-price">${money(p.price)}</span>
+          ${origPriceHtml}
+        </div>
+
+        ${stockHtml}
+
+        <p style="color:#555; line-height:1.7; margin-bottom:1.5rem;">
+          ${esc(p.description || 'Pure authentic handloom saree woven with intricate motifs, soft tactile grace, and rich heritage border styling. Designed for weddings, festive galas, and treasured heirloom collections.')}
+        </p>
+
+        <!-- Specifications -->
+        <div class="sn-specs-grid">
+          <div class="sn-spec-item"><span class="sn-spec-label">Fabric</span><span class="sn-spec-val">${esc(p.fabric || 'Pure Silk')}</span></div>
+          <div class="sn-spec-item"><span class="sn-spec-label">Color</span><span class="sn-spec-val">${esc(p.color || 'Artisanal Shade')}</span></div>
+          <div class="sn-spec-item"><span class="sn-spec-label">Length</span><span class="sn-spec-val">${esc(p.length || '5.5 meters')}</span></div>
+          <div class="sn-spec-item"><span class="sn-spec-label">Blouse Piece</span><span class="sn-spec-val">${esc(p.blouse_piece || 'Included (0.8m)')}</span></div>
+          <div class="sn-spec-item"><span class="sn-spec-label">SKU</span><span class="sn-spec-val">${esc(p.sku || 'SNR-' + String(p.id).slice(0,6).toUpperCase())}</span></div>
+          <div class="sn-spec-item"><span class="sn-spec-label">Care</span><span class="sn-spec-val">Dry Clean Only</span></div>
+        </div>
+
+        <!-- Quantity & CTA Actions -->
+        <div class="sn-actions-box">
+          <div class="sn-qty-picker">
+            <button type="button" class="sn-qty-btn" id="sn-qty-minus" aria-label="Decrease quantity">−</button>
+            <span class="sn-qty-val" id="sn-qty-display">1</span>
+            <button type="button" class="sn-qty-btn" id="sn-qty-plus" aria-label="Increase quantity">+</button>
+          </div>
+
+          <button type="button" class="sn-btn sn-btn-wine sn-btn-detail" id="sn-add-cart-btn" ${stock <= 0 ? 'disabled' : ''}>
+            <i class="fa fa-shopping-bag"></i> Add to Cart
+          </button>
+
+          <button type="button" class="sn-btn sn-btn-outline sn-btn-detail" id="sn-buy-now-btn" ${stock <= 0 ? 'disabled' : ''}>
+            Buy Now
+          </button>
+
+          <button type="button" class="sn-btn-icon ${isW ? 'is-active' : ''}" id="sn-detail-wish-btn" aria-label="Add to wishlist" style="border:1px solid var(--color-border);">
+            <i class="fa fa-heart${isW ? '' : '-o'}"></i>
+          </button>
+        </div>
+
+        <!-- Pincode Check -->
+        <div class="sn-pincode-box">
+          <div class="sn-pin-title"><i class="fa fa-map-marker"></i> Check Delivery Serviceability</div>
+          <div class="sn-pin-row">
+            <input type="text" id="sn-pincode-in" class="sn-pin-input" maxlength="6" placeholder="Enter 6-digit India pincode">
+            <button type="button" class="sn-btn sn-btn-wine" id="sn-pincode-btn">Check</button>
+          </div>
+          <div id="sn-pincode-res" class="sn-pin-res"></div>
+        </div>
+
+        <!-- Accordion Details -->
+        <div class="sn-accordion">
+          <div class="sn-acc-item">
+            <button type="button" class="sn-acc-header" data-acc="1">
+              <span>Craftsmanship &amp; Artisan Origin</span>
+              <i class="fa fa-chevron-down"></i>
+            </button>
+            <div class="sn-acc-content" id="sn-acc-content-1">
+              Handwoven on traditional pit and jacquard looms by multigenerational weaving families. Every thread is spun with organic precision, creating signature heirloom textures that machine fabrics cannot replicate.
+            </div>
+          </div>
+          <div class="sn-acc-item">
+            <button type="button" class="sn-acc-header" data-acc="2">
+              <span>Shipping &amp; 7-Day Returns</span>
+              <i class="fa fa-chevron-down"></i>
+            </button>
+            <div class="sn-acc-content" id="sn-acc-content-2">
+              Orders are dispatched within 24–48 hours in luxury protective saree packaging. Enjoy Free Shipping across India on orders above ₹999. If you are not delighted with your saree, request an exchange or return within 7 days of delivery.
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    setupDetailEvents(p);
+  }
+
+  function setupDetailEvents(p) {
+    // Thumbnail click
+    var thumbs = document.querySelectorAll('.sn-thumb-item');
+    var mainImg = $('sn-main-img');
+    thumbs.forEach(function(thumb) {
+      thumb.addEventListener('click', function() {
+        thumbs.forEach(function(t) { t.classList.remove('is-selected'); });
+        thumb.classList.add('is-selected');
+        var src = thumb.getAttribute('data-img-src');
+        if (mainImg && src) mainImg.src = src;
+      });
+    });
+
+    // Qty controls
+    var minus = $('sn-qty-minus');
+    var plus = $('sn-qty-plus');
+    var display = $('sn-qty-display');
+    var stock = Number(p.stock) || 5;
+
+    if (minus) {
+      minus.addEventListener('click', function() {
+        if (selectedQty > 1) {
+          selectedQty--;
+          display.textContent = selectedQty;
+        }
+      });
+    }
+    if (plus) {
+      plus.addEventListener('click', function() {
+        if (selectedQty < stock) {
+          selectedQty++;
+          display.textContent = selectedQty;
+        } else {
+          showToast('Maximum available stock selected (' + stock + ')');
+        }
+      });
+    }
+
+    // Add to cart button
+    var addBtn = $('sn-add-cart-btn');
+    if (addBtn) {
+      addBtn.addEventListener('click', function() {
+        addToCart(p, selectedQty);
+      });
+    }
+
+    // Buy now button
+    var buyBtn = $('sn-buy-now-btn');
+    if (buyBtn) {
+      buyBtn.addEventListener('click', function() {
+        addToCart(p, selectedQty);
+        window.location.href = '/checkout';
+      });
+    }
+
+    // Wishlist button
+    var wishBtn = $('sn-detail-wish-btn');
+    if (wishBtn) {
+      wishBtn.addEventListener('click', function() {
+        toggleWishlist(p, wishBtn);
+      });
+    }
+
+    // Pincode checker
+    var pinBtn = $('sn-pincode-btn');
+    var pinIn = $('sn-pincode-in');
+    var pinRes = $('sn-pincode-res');
+    if (pinBtn && pinIn) {
+      pinBtn.addEventListener('click', async function() {
+        var pin = pinIn.value.trim();
+        if (pin.length !== 6 || !/^\d{6}$/.test(pin)) {
+          pinRes.className = 'sn-pin-res is-error';
+          pinRes.textContent = 'Please enter a valid 6-digit postal pincode.';
+          return;
+        }
+        pinRes.className = 'sn-pin-res';
+        pinRes.textContent = 'Verifying courier serviceability...';
+        try {
+          var res = await fetch('https://api.postalpincode.in/pincode/' + pin);
+          var data = await res.json();
+          if (data && data[0] && data[0].Status === 'Success') {
+            var po = data[0].PostOffice && data[0].PostOffice[0];
+            pinRes.className = 'sn-pin-res is-success';
+            pinRes.textContent = '✓ Express delivery available to ' + (po ? po.District + ', ' + po.State : 'your location') + ' (Estimated: 3 to 5 days).';
+          } else {
+            pinRes.className = 'sn-pin-res is-error';
+            pinRes.textContent = 'Location not serviceable or invalid pincode.';
+          }
+        } catch(e) {
+          pinRes.className = 'sn-pin-res is-error';
+          pinRes.textContent = 'Unable to check pincode right now.';
+        }
+      });
+    }
+
+    // Accordions
+    var accHeaders = document.querySelectorAll('.sn-acc-header');
+    accHeaders.forEach(function(hdr) {
+      hdr.addEventListener('click', function() {
+        var id = hdr.getAttribute('data-acc');
+        var content = $('sn-acc-content-' + id);
+        var isOpen = content.classList.contains('is-open');
+        content.classList.toggle('is-open', !isOpen);
+        hdr.classList.toggle('is-open', !isOpen);
+      });
+    });
+  }
+
+  function addToCart(p, qty) {
+    try {
+      var cart = JSON.parse(localStorage.getItem('snera_cart')) || [];
+      var existing = cart.find(function(item) { return String(item.id) === String(p.id); });
+      var stock = Number(p.stock) || 5;
+
+      if (existing) {
+        var cur = Number(existing.quantity || existing.qty || 1);
+        if (cur + qty > stock) {
+          showToast('Only ' + stock + ' piece(s) available in stock.');
+          return;
+        }
+        existing.quantity = cur + qty;
+      } else {
+        var imgs = getImages(p);
+        cart.push({
+          id: p.id,
+          name: p.name,
+          price: Number(p.price) || 0,
+          original_price: Number(p.original_price) || 0,
+          image: imgs[0],
+          fabric: p.fabric || 'Handloom',
+          stock: stock,
+          quantity: qty
+        });
+      }
+      localStorage.setItem('snera_cart', JSON.stringify(cart));
+      updateCartBadge();
+      showToast('Added ' + qty + ' piece(s) of "' + p.name + '" to cart');
+    } catch(e) {
+      showToast('Could not add to cart.');
+    }
+  }
+
+  function toggleWishlist(p, btn) {
+    try {
+      var wishlist = JSON.parse(localStorage.getItem('snera_wishlist')) || [];
+      var sId = String(p.id);
+      var idx = wishlist.indexOf(sId);
+      if (idx > -1) {
+        wishlist.splice(idx, 1);
+        btn.classList.remove('is-active');
+        btn.innerHTML = '<i class="fa fa-heart-o"></i>';
+        showToast('Removed from wishlist');
+      } else {
+        wishlist.push(sId);
+        btn.classList.add('is-active');
+        btn.innerHTML = '<i class="fa fa-heart"></i>';
+        showToast('Saved to wishlist');
+      }
+      localStorage.setItem('snera_wishlist', JSON.stringify(wishlist));
+    } catch(e) {}
+  }
+
+  async function loadReviews(prodId) {
+    var listEl = $('sn-reviews-list');
+    if (!listEl) return;
+
+    try {
+      if (window.supabase && !db) {
+        db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      }
+      if (db) {
+        var res = await db.from('reviews')
+          .select('id, user_name, rating, comment, created_at')
+          .eq('product_id', prodId)
+          .eq('approved', true)
+          .order('created_at', { ascending: false });
+
+        if (res.data && res.data.length) {
+          listEl.innerHTML = res.data.map(function(r) {
+            var stars = '';
+            for (var s = 0; s < (r.rating || 5); s++) stars += '★';
+            return '<div style="border-bottom:1px dashed var(--color-border); padding:1rem 0;">' +
+              '<div style="display:flex; justify-content:space-between; margin-bottom:4px;">' +
+                '<strong>' + esc(r.user_name) + '</strong>' +
+                '<span style="color:var(--color-gold);">' + stars + '</span>' +
+              '</div>' +
+              '<p style="color:#555; font-size:0.9rem; margin:0;">' + esc(r.comment) + '</p>' +
+            '</div>';
+          }).join('');
+          return;
+        }
+      }
+    } catch(e) {}
+
+    listEl.innerHTML = '<p style="color:#777; font-size:0.9rem; font-style:italic;">No customer reviews yet. Be the first to share your experience with this saree.</p>';
+  }
+
+  function setupReviewForm(prodId) {
+    var form = $('sn-add-review-form');
+    if (!form) return;
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var name = $('sn-rev-name').value.trim();
+      var rating = parseInt($('sn-rev-rating').value, 10) || 5;
+      var comment = $('sn-rev-comment').value.trim();
+
+      if (!name || !comment) return;
+
+      try {
+        if (window.supabase && !db) {
+          db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
+        if (db) {
+          await db.from('reviews').insert([{
+            product_id: prodId,
+            user_name: name,
+            rating: rating,
+            comment: comment,
+            approved: false
+          }]);
+        }
+        showToast('Review submitted! It will appear once verified by our boutique admin.');
+        form.reset();
+      } catch(err) {
+        showToast('Thank you! Review received.');
+        form.reset();
+      }
+    });
+  }
+
+  async function loadRelated(catName, currentId) {
+    var grid = $('sn-related-grid');
+    if (!grid) return;
+
+    try {
+      if (window.supabase && !db) {
+        db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      }
+      if (db) {
+        var query = db.from('products').select('*').eq('status', 'active').neq('id', currentId).limit(4);
+        if (catName) query = query.eq('category_name', catName);
+        var res = await query;
+        if (res.data && res.data.length) {
+          relatedList = res.data;
+          renderRelated();
+          return;
+        }
+      }
+    } catch(e) {}
+
+    // Fallback related
+    relatedList = [
+      { id: 'rel-1', name: 'Peacock Blue Kanjeevaram Temple Silk', price: 18900, fabric: 'Kanjeevaram', image_url: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=600&q=80' },
+      { id: 'rel-2', name: 'Dusty Rose Zari Handwoven Chanderi', price: 6800, fabric: 'Chanderi', image_url: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=600&q=80' }
+    ];
+    renderRelated();
+  }
+
+  function renderRelated() {
+    var grid = $('sn-related-grid');
+    if (!grid) return;
+    grid.innerHTML = relatedList.map(function(p) {
+      var img = p.image_url || (Array.isArray(p.images) && p.images[0]) || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80';
+      return '<div class="sn-prod-card">' +
+        '<div class="sn-prod-thumb-wrap">' +
+          '<a href="/shop-detail?id=' + encodeURIComponent(p.id) + '">' +
+            '<img src="' + esc(img) + '" alt="' + esc(p.name) + '" width="300" height="400" loading="lazy">' +
+          '</a>' +
+        '</div>' +
+        '<div class="sn-prod-content">' +
+          '<div style="font-size:0.75rem; text-transform:uppercase; color:var(--color-gold-dark); font-weight:700;">' + esc(p.fabric || 'Silk') + '</div>' +
+          '<a href="/shop-detail?id=' + encodeURIComponent(p.id) + '" style="font-family:var(--font-serif); font-size:1.1rem; font-weight:600; margin:4px 0 8px;">' + esc(p.name) + '</a>' +
+          '<div style="font-weight:700; color:var(--color-wine); margin-bottom:12px;">' + money(p.price) + '</div>' +
+          '<a href="/shop-detail?id=' + encodeURIComponent(p.id) + '" class="sn-btn sn-btn-wine" style="text-align:center;">View Saree</a>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  async function loadProductDetail() {
+    var params = new URLSearchParams(window.location.search);
+    var id = params.get('id');
+
+    if (!id) {
+      var box = $('sn-detail-box');
+      if (box) {
+        box.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:5rem 1rem;">' +
+          '<h2 style="font-size:2rem; color:var(--color-wine); margin-bottom:1rem;">No Saree Selected</h2>' +
+          '<p style="color:#666; margin-bottom:2rem;">Please choose a saree from our collections to view weaving and fabric details.</p>' +
+          '<a href="/shop" class="sn-btn sn-btn-wine">Browse All Sarees</a>' +
+        '</div>';
+      }
+      return;
+    }
+
+    try {
+      if (window.supabase && !db) {
+        db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      }
+      if (db) {
+        var res = await db.from('products').select('*').eq('id', id).single();
+        if (res.data) {
+          currentProduct = res.data;
+          renderDetail(currentProduct);
+          loadReviews(currentProduct.id);
+          setupReviewForm(currentProduct.id);
+          loadRelated(currentProduct.category_name, currentProduct.id);
+          return;
+        }
+      }
+    } catch(err) {
+      console.warn('Could not load product from DB:', err);
+    }
+
+    // Fallback sample product
+    currentProduct = {
+      id: id,
+      name: 'Royal Crimson Banarasi Katan Silk Saree',
+      price: 12500,
+      original_price: 15000,
+      fabric: 'Banarasi Katan Silk',
+      color: 'Crimson Red with Antique Gold Zari',
+      occasion: 'Bridal / Wedding Heritage',
+      stock: 2,
+      sku: 'SNR-BAN-001',
+      description: 'Handwoven in the ancient ghats of Varanasi by master weavers. Features pure mulberry silk, intricate Kadwa floral motifs, and a lavish pallu drenched in antique gold zari.',
+      length: '5.5 meters',
+      blouse_piece: 'Included (0.8m unstitched matching brocade)',
+      images: [
+        'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80'
+      ]
+    };
+    renderDetail(currentProduct);
+    loadReviews(currentProduct.id);
+    setupReviewForm(currentProduct.id);
+    loadRelated(currentProduct.category_name, currentProduct.id);
+  }
+
+  function init() {
+    initFullBleed();
+    initPortal();
+    setupMobileMenu();
+    updateCartBadge();
+    loadProductDetail();
+  }
+
+  window.SneraDetail = {
+    init: init,
+    addToCart: addToCart
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>

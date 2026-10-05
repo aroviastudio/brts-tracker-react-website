@@ -54,13 +54,57 @@
 }
 
 .sn-root *, .sn-root *::before, .sn-root *::after { box-sizing: border-box; }
+
+/* Odoo font override — Odoo injects its own font-family on body/h1/h2/p/a/etc */
+.sn-root,
+.sn-root h1,
+.sn-root h2,
+.sn-root h3,
+.sn-root p,
+.sn-root a,
+.sn-root ul,
+.sn-root li,
+.sn-root span,
+.sn-root small,
+.sn-root label,
+.sn-root div,
+.sn-root input,
+.sn-root select,
+.sn-root textarea,
+.sn-root button,
+.sn-root code,
+.sn-root pre,
+.sn-root table,
+.sn-root th,
+.sn-root td {
+  font-family: var(--font-body) !important;
+}
+.sn-root h1,
+.sn-root h2,
+.sn-root h3 {
+  font-family: var(--font-display) !important;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.sn-root code, .sn-root pre {
+  font-family: var(--font-mono) !important;
+}
+.sn-root p {
+  margin-top: 0;
+}
+
 .sn-root h1, .sn-root h2, .sn-root h3, .sn-root p, .sn-root small,
 .sn-root ul, .sn-root label, .sn-root pre, .sn-root table { margin: 0; padding: 0; }
 .sn-root h2, .sn-root h3 { line-height: 1.25; letter-spacing: normal; }
 .sn-root button, .sn-root input, .sn-root select, .sn-root textarea { font-family: inherit; margin: 0; }
 .sn-root label { display: block; font-weight: inherit; }
-.sn-root code { font-family: var(--font-mono); font-size: 12px; background: var(--bg-secondary); color: var(--text-primary); padding: 2px 6px; border-radius: 4px; }
+.sn-root code { font-family: var(--font-mono) !important; font-size: 12px; background: var(--bg-secondary); color: var(--text-primary); padding: 2px 6px; border-radius: 4px; }
 .sn-root img { max-width: 100%; height: auto; }
+
+/* Hide column on mobile (used in table headers and cells) */
+@media (max-width: 720px) {
+  .sn-root .sn-hide-m { display: none !important; }
+}
 
 #snera-admin {
   display: flex;
@@ -70,7 +114,7 @@
   min-height: calc(100dvh - var(--sn-offset));
   background: var(--bg-tertiary);
   position: relative;
-  overflow-x: clip;
+  overflow-x: hidden;
   isolation: isolate;
 }
 
@@ -296,7 +340,7 @@
     background: var(--sidebar-bg); border-bottom: 1px solid rgba(255,255,255,.08);
     position: sticky; top: var(--sn-offset); z-index: 120;
   }
-  .sn-root .sn-mobile-brand { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--gold-light); }
+  .sn-root .sn-mobile-brand { font-family: var(--font-display) !important; font-size: 20px; font-weight: 700; color: var(--gold-light); }
   .sn-root .sn-topbar { position: static; min-height: 56px; padding: .5rem 1rem; }
   .sn-root .sn-body { padding: 1rem; }
   .sn-root .sn-input, .sn-root .sn-select, .sn-root .sn-textarea { font-size: 16px; }

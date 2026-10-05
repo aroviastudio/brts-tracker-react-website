@@ -1,0 +1,1298 @@
+<!--
+  SNERA STORE — ABOUT US & OUR HERITAGE (ODOO EMBED CODE VERSION)
+  URL Route: /about (and /about#contact)
+  Domain: snerafashion.com
+  - 100% Self-Contained Odoo Snippet (Style + Markup + Script)
+  - Scoped strictly under .sn-root / #sn-about-root
+  - Full-bleed width integration inside Odoo
+  - Mobile responsive (320px to 1920px), tap targets >= 44px
+  - Zero external heavy dependencies (Google Fonts, FA 4.7)
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<style>
+/* ==========================================================================
+   SNERA STORE DESIGN SYSTEM — SCOPED UNDER .sn-root
+   ========================================================================== */
+.sn-root {
+  --color-wine: #5B1A3A;
+  --color-wine-dark: #3E0F28;
+  --color-wine-light: #7A2E52;
+  --color-gold: #C9A96E;
+  --color-gold-dark: #A8893F;
+  --color-gold-light: #E4D5B0;
+  --color-ivory: #FAF7F2;
+  --color-sand: #F0EBE3;
+  --color-white: #FFFFFF;
+  --color-charcoal: #2D2D2D;
+  --color-gray: #8A8578;
+  --color-border: #E5E0D8;
+  --color-success: #3A7D44;
+  --color-danger: #C0392B;
+
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  --sn-odoo-header-h: 0px;
+
+  font-family: var(--font-sans);
+  background-color: var(--color-ivory);
+  color: var(--color-charcoal);
+  line-height: 1.6;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sn-root *, .sn-root *::before, .sn-root *::after {
+  box-sizing: border-box;
+}
+
+/* Odoo override rules */
+.sn-root h1, .sn-root h2, .sn-root h3, .sn-root h4, .sn-root h5, .sn-root h6 {
+  font-family: var(--font-serif) !important;
+  color: var(--color-wine-dark);
+  line-height: 1.25;
+  margin-top: 0;
+  font-weight: 700;
+}
+.sn-root p { margin-top: 0; margin-bottom: 1rem; }
+.sn-root p:last-child { margin-bottom: 0; }
+.sn-root a { color: inherit; text-decoration: none; transition: color var(--transition-fast); }
+.sn-root img { max-width: 100%; height: auto; display: block; }
+.sn-root button, .sn-root input, .sn-root select, .sn-root textarea {
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+.sn-root button { cursor: pointer; border: none; background: none; }
+
+/* Layout Helpers */
+.sn-container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+.sn-section-pad {
+  padding: 4.5rem 0;
+}
+
+/* Top Announcement Bar */
+.sn-top-bar {
+  background: var(--color-wine-dark);
+  color: var(--color-gold-light);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0.55rem 1rem;
+}
+
+/* Navbar */
+.sn-navbar {
+  position: -webkit-sticky;
+  position: sticky;
+  top: var(--sn-odoo-header-h, 0px);
+  z-index: 1000;
+  background: rgba(250, 247, 242, 0.96);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+.sn-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+}
+.sn-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.sn-brand-title {
+  font-family: var(--font-serif);
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-wine);
+  line-height: 1;
+}
+.sn-brand-sub {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-gold-dark);
+  margin-top: 2px;
+}
+.sn-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.sn-nav-link {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--color-charcoal);
+  position: relative;
+  padding: 6px 0;
+}
+.sn-nav-link:hover, .sn-nav-link.is-active {
+  color: var(--color-wine);
+}
+.sn-nav-link.is-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-wine);
+}
+.sn-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.sn-btn-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--color-charcoal);
+  font-size: 1.1rem;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  position: relative;
+}
+.sn-btn-icon:hover {
+  background: var(--color-sand);
+  color: var(--color-wine);
+}
+.sn-cart-badge-count {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--color-wine);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+.sn-hamburger-btn {
+  display: none;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: var(--color-charcoal);
+}
+
+/* Common Buttons */
+.sn-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.75rem 1.75rem;
+  min-height: 46px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  transition: transform var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.sn-btn-wine {
+  background: var(--color-wine);
+  color: #fff;
+}
+.sn-btn-wine:hover {
+  background: var(--color-wine-dark);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(91, 26, 58, 0.25);
+  transform: translateY(-1px);
+}
+.sn-btn-outline {
+  border: 1.5px solid var(--color-wine);
+  color: var(--color-wine);
+  background: transparent;
+}
+.sn-btn-outline:hover {
+  background: var(--color-wine);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* About Hero Header */
+.sn-about-hero {
+  background: linear-gradient(135deg, var(--color-ivory) 0%, var(--color-sand) 100%);
+  padding: 4.5rem 0 3.5rem;
+  text-align: center;
+  border-bottom: 1px solid var(--color-border);
+}
+.sn-about-hero-tag {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--color-gold-dark);
+  margin-bottom: 0.85rem;
+}
+.sn-about-hero-title {
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  font-weight: 700;
+  color: var(--color-wine-dark);
+  line-height: 1.15;
+  margin-bottom: 1.25rem;
+}
+.sn-about-hero-desc {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #555;
+  line-height: 1.8;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Two-column Story Block */
+.sn-story-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3.5rem;
+  align-items: center;
+}
+.sn-story-img-wrap {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  aspect-ratio: 4 / 5;
+  background: var(--color-sand);
+}
+.sn-story-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+.sn-story-img-wrap:hover img {
+  transform: scale(1.02);
+}
+.sn-story-badge {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  background: rgba(255, 255, 255, 0.95);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+.sn-story-badge-num {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-wine);
+  line-height: 1;
+}
+.sn-story-badge-lbl {
+  font-size: 0.75rem;
+  color: var(--color-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+.sn-story-content h2 {
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  margin-bottom: 1.25rem;
+}
+.sn-story-content p {
+  color: #555;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 1.25rem;
+}
+
+/* Values Grid */
+.sn-values-section {
+  background: var(--color-white);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+.sn-section-header {
+  text-align: center;
+  max-width: 650px;
+  margin: 0 auto 3rem;
+}
+.sn-section-header h2 {
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  margin-bottom: 0.75rem;
+}
+.sn-section-header p {
+  color: var(--color-gray);
+  font-size: 1rem;
+}
+.sn-values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 2rem;
+}
+.sn-value-card {
+  background: var(--color-ivory);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 2.25rem 1.75rem;
+  text-align: center;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.sn-value-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+.sn-value-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1.25rem;
+  border-radius: var(--radius-md);
+  background: var(--color-sand);
+  color: var(--color-wine);
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sn-value-card h3 {
+  font-size: 1.35rem;
+  margin-bottom: 0.75rem;
+}
+.sn-value-card p {
+  font-size: 0.92rem;
+  color: #666;
+  line-height: 1.7;
+}
+
+/* Craftsmanship / Process Strip */
+.sn-process-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+.sn-process-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 2rem 1.5rem;
+}
+.sn-process-step {
+  font-family: var(--font-serif);
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--color-gold-light);
+  line-height: 1;
+  margin-bottom: 0.75rem;
+}
+.sn-process-card h4 {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-wine);
+}
+.sn-process-card p {
+  font-size: 0.88rem;
+  color: #666;
+  line-height: 1.65;
+}
+
+/* Contact Us Section */
+.sn-contact-section {
+  background: var(--color-sand);
+  border-top: 1px solid var(--color-border);
+}
+.sn-contact-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 3rem;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 3rem;
+  box-shadow: var(--shadow-sm);
+}
+.sn-contact-info h3 {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+}
+.sn-contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.sn-contact-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-sand);
+  color: var(--color-wine);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.sn-contact-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-gold-dark);
+  margin-bottom: 2px;
+}
+.sn-contact-val {
+  font-size: 0.95rem;
+  color: var(--color-charcoal);
+  line-height: 1.6;
+}
+
+/* Contact Form */
+.sn-contact-form .sn-form-group {
+  margin-bottom: 1.25rem;
+}
+.sn-form-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-charcoal);
+  margin-bottom: 6px;
+}
+.sn-form-input, .sn-form-textarea, .sn-form-select {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  min-height: 46px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-ivory);
+  font-size: 16px;
+  outline: none;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.sn-form-input:focus, .sn-form-textarea:focus, .sn-form-select:focus {
+  border-color: var(--color-wine);
+  background: #ffffff;
+}
+
+/* FAQ Accordion */
+.sn-faq-list {
+  max-width: 820px;
+  margin: 0 auto;
+}
+.sn-faq-item {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+  background: #ffffff;
+  overflow: hidden;
+}
+.sn-faq-question {
+  width: 100%;
+  text-align: left;
+  padding: 1.25rem 1.5rem;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-wine-dark);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  background: transparent;
+}
+.sn-faq-question i {
+  color: var(--color-gold-dark);
+  transition: transform var(--transition-fast);
+  font-size: 1rem;
+}
+.sn-faq-item.is-open .sn-faq-question i {
+  transform: rotate(180deg);
+}
+.sn-faq-answer {
+  display: none;
+  padding: 0 1.5rem 1.5rem;
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  border-top: 1px solid var(--color-border);
+  padding-top: 1rem;
+}
+.sn-faq-item.is-open .sn-faq-answer {
+  display: block;
+}
+
+/* Footer */
+.sn-footer {
+  background: var(--color-wine-dark);
+  color: #fff;
+  padding: 4.5rem 0 2rem;
+  margin-top: 4rem;
+}
+.sn-footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 2.5rem;
+  margin-bottom: 3.5rem;
+}
+.sn-footer-brand h3 {
+  color: var(--color-gold-light);
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+.sn-footer-brand p {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  max-width: 320px;
+}
+.sn-footer-col h4 {
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  margin-bottom: 1.25rem;
+  position: relative;
+  padding-bottom: 8px;
+}
+.sn-footer-col h4::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 28px;
+  height: 1.5px;
+  background: var(--color-gold);
+}
+.sn-footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.sn-footer-links li {
+  margin-bottom: 0.65rem;
+}
+.sn-footer-links a {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.88rem;
+  transition: color var(--transition-fast);
+}
+.sn-footer-links a:hover {
+  color: var(--color-gold-light);
+  text-decoration: underline;
+}
+.sn-footer-contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.88rem;
+  margin-bottom: 0.75rem;
+}
+.sn-footer-contact-item i {
+  color: var(--color-gold);
+  margin-top: 4px;
+}
+.sn-footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Floating WhatsApp Button */
+.sn-whatsapp-float {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  right: 20px;
+  width: 54px;
+  height: 54px;
+  background-color: #25D366;
+  color: #FFFFFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  z-index: 9999;
+  text-decoration: none;
+  transition: transform 0.25s ease;
+}
+.sn-whatsapp-float:hover {
+  transform: scale(1.1);
+  color: #FFFFFF;
+}
+
+/* Toast */
+.sn-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--color-wine-dark);
+  color: #fff;
+  padding: 0.85rem 1.75rem;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.9rem;
+  font-weight: 500;
+  z-index: 10005;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+  border: 1px solid var(--color-gold);
+}
+.sn-toast.is-shown {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Mobile Slide-Over Drawer */
+.sn-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 10001;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s;
+}
+.sn-drawer-backdrop.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+.sn-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 300px;
+  max-width: 85vw;
+  background: #ffffff;
+  z-index: 10002;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.2);
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+.sn-drawer.is-open {
+  transform: translateX(0);
+}
+.sn-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+.sn-drawer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.sn-drawer-links a {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-charcoal);
+}
+
+/* Responsive Rules */
+@media (max-width: 992px) {
+  .sn-nav-links { display: none; }
+  .sn-hamburger-btn { display: flex; }
+  .sn-story-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .sn-process-grid { grid-template-columns: 1fr 1fr; }
+  .sn-contact-grid { grid-template-columns: 1fr; gap: 2rem; padding: 2rem; }
+  .sn-footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+}
+
+@media (max-width: 768px) {
+  .sn-section-pad { padding: 3rem 0; }
+  .sn-about-hero { padding: 3rem 0; }
+  .sn-footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .sn-process-grid { grid-template-columns: 1fr; }
+  .sn-btn { min-height: 48px; }
+}
+
+@media (max-width: 576px) {
+  .sn-container { padding: 0 1rem; }
+  .sn-contact-grid { padding: 1.5rem 1rem; }
+  .sn-whatsapp-float {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    right: 16px;
+  }
+}
+</style>
+
+<!-- MAIN EMBED CONTENT -->
+<div class="sn-root" id="sn-about-root">
+
+  <!-- Announcement Bar -->
+  <div class="sn-top-bar">
+    Free Shipping Across India on Orders Over ₹999 &nbsp;|&nbsp; 100% Handloom Authenticity Guarantee
+  </div>
+
+  <!-- Navbar -->
+  <header class="sn-navbar" id="sn-main-navbar">
+    <div class="sn-container sn-nav-inner">
+      <a href="/" class="sn-brand" aria-label="Snera Store Home">
+        <span class="sn-brand-title">Snera</span>
+        <span class="sn-brand-sub">Handloom Boutique</span>
+      </a>
+
+      <nav class="sn-nav-links" aria-label="Main Navigation">
+        <a href="/" class="sn-nav-link">Home</a>
+        <a href="/shop" class="sn-nav-link">Shop Sarees</a>
+        <a href="/#collections" class="sn-nav-link">Collections</a>
+        <a href="/about" class="sn-nav-link is-active">Our Story</a>
+        <a href="/about#contact" class="sn-nav-link">Contact</a>
+      </nav>
+
+      <div class="sn-nav-actions">
+        <a href="/shop" class="sn-btn-icon" aria-label="Search Collection" title="Search"><i class="fa fa-search"></i></a>
+        <a href="/profile" class="sn-btn-icon" aria-label="My Account" title="My Account"><i class="fa fa-user-o"></i></a>
+        <a href="/cart" class="sn-btn-icon" aria-label="View Shopping Cart" title="Cart">
+          <i class="fa fa-shopping-bag"></i>
+          <span class="sn-cart-badge-count" id="sn-cart-badge">0</span>
+        </a>
+        <button type="button" class="sn-hamburger-btn" id="sn-menu-toggle" aria-label="Open Navigation Menu">
+          <i class="fa fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Header -->
+  <section class="sn-about-hero">
+    <div class="sn-container">
+      <span class="sn-about-hero-tag">Heritage • Artistry • Authenticity</span>
+      <h1 class="sn-about-hero-title">The Art of Handwoven Soul</h1>
+      <p class="sn-about-hero-desc">
+        At Snera Store, every drape is a celebration of centuries-old Indian weaving wisdom. We bridge the timeless artistry of master craftsmen with the elegance of modern connoisseurs.
+      </p>
+    </div>
+  </section>
+
+  <!-- Story & Mission Section -->
+  <section class="sn-section-pad">
+    <div class="sn-container sn-story-grid">
+      <div class="sn-story-img-wrap">
+        <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80"
+             alt="Master Artisan handweaving pure silk saree on traditional loom"
+             width="600"
+             height="750"
+             loading="lazy"
+             decoding="async">
+        <div class="sn-story-badge">
+          <div class="sn-story-badge-num">100%</div>
+          <div class="sn-story-badge-lbl">Authentic Handlooms</div>
+        </div>
+      </div>
+      <div class="sn-story-content">
+        <span class="sn-about-hero-tag">Our Genesis</span>
+        <h2>Woven by Passion, Bound by Heritage</h2>
+        <p>
+          Founded in Gujarat, Snera Store emerged from a reverent admiration for India's indigenous textile heritage. For generations, master weavers have translated poetic folklore into opulent silk tapestries using wooden pit looms, real zari, and meticulous jacquard shuttles.
+        </p>
+        <p>
+          In a world dominated by rapid powerloom replication, we champion slow fashion. By eliminating intermediaries and working hand-in-hand with traditional artisan clusters in Varanasi, Kanchipuram, Chanderi, and Bengal, we ensure fair compensation while offering you unmatched handloom purity.
+        </p>
+        <div style="margin-top:2rem;">
+          <a href="/shop" class="sn-btn sn-btn-wine">Explore Our Sarees</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Values -->
+  <section class="sn-section-pad sn-values-section">
+    <div class="sn-container">
+      <div class="sn-section-header">
+        <span class="sn-about-hero-tag">Our Pillars</span>
+        <h2>What Guides Every Thread</h2>
+        <p>Our commitment to uncompromising quality, fair trade ethics, and artisanal preservation.</p>
+      </div>
+
+      <div class="sn-values-grid">
+        <div class="sn-value-card">
+          <div class="sn-value-icon"><i class="fa fa-certificate"></i></div>
+          <h3>Pure Certified Silks</h3>
+          <p>We source authentic mulberry silk, pure linen yarn, and tested zari with zero synthetic blends.</p>
+        </div>
+
+        <div class="sn-value-card">
+          <div class="sn-value-icon"><i class="fa fa-users"></i></div>
+          <h3>Artisan Empowerment</h3>
+          <p>Direct partnerships with multi-generational weaver families ensure dignified livelihoods and sustainable craft.</p>
+        </div>
+
+        <div class="sn-value-card">
+          <div class="sn-value-icon"><i class="fa fa-leaf"></i></div>
+          <h3>Conscious Slow Fashion</h3>
+          <p>Hand-dyed with natural eco-conscious pigments. Each saree is created patiently to last for generations.</p>
+        </div>
+
+        <div class="sn-value-card">
+          <div class="sn-value-icon"><i class="fa fa-shield"></i></div>
+          <h3>Curated Quality Guarantee</h3>
+          <p>Every piece undergoes a 12-point quality inspection before being wrapped in luxury breathable cotton bags.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Craft Process -->
+  <section class="sn-section-pad">
+    <div class="sn-container">
+      <div class="sn-section-header">
+        <span class="sn-about-hero-tag">From Loom to Wardrobe</span>
+        <h2>The Making of a Snera Saree</h2>
+        <p>An intricate journey requiring up to 180 hours of devoted manual precision.</p>
+      </div>
+
+      <div class="sn-process-grid">
+        <div class="sn-process-card">
+          <div class="sn-process-step">01</div>
+          <h4>Yarn Selection</h4>
+          <p>Hand-spun mulberry silk and organic linen filaments are rigorously tested for tensile strength and luster.</p>
+        </div>
+
+        <div class="sn-process-card">
+          <div class="sn-process-step">02</div>
+          <h4>Artisanal Dyeing</h4>
+          <p>Master dyers hand-blend heritage pigments in small batches to produce our signature jewel and pastel palettes.</p>
+        </div>
+
+        <div class="sn-process-card">
+          <div class="sn-process-step">03</div>
+          <h4>Loom Weaving</h4>
+          <p>Weavers carefully guide traditional shuttles, crafting bootas, zari borders, and intricate pallu motifs.</p>
+        </div>
+
+        <div class="sn-process-card">
+          <div class="sn-process-step">04</div>
+          <h4>Inspection &amp; Finish</h4>
+          <p>Detailed verification of borders, tassels, and drape texture before reaching your doorstep.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Us Section -->
+  <section class="sn-section-pad sn-contact-section" id="contact">
+    <div class="sn-container">
+      <div class="sn-section-header">
+        <span class="sn-about-hero-tag">Customer Concierge</span>
+        <h2>Get in Touch with Snera</h2>
+        <p>Whether you require drape styling advice, bridal consultations, or order inquiries, we are here for you.</p>
+      </div>
+
+      <div class="sn-contact-grid">
+        <div class="sn-contact-info">
+          <h3>Boutique &amp; Support Info</h3>
+          <p style="color:#666; margin-bottom:2rem; font-size:0.95rem;">
+            Visit our flagship boutique in Surat or connect with our customer concierge team via email or WhatsApp.
+          </p>
+
+          <div class="sn-contact-item">
+            <div class="sn-contact-icon"><i class="fa fa-map-marker"></i></div>
+            <div>
+              <div class="sn-contact-label">Boutique Address</div>
+              <div class="sn-contact-val">101 Royal Residency, Ring Road, Surat, Gujarat - 395007, India</div>
+            </div>
+          </div>
+
+          <div class="sn-contact-item">
+            <div class="sn-contact-icon"><i class="fa fa-envelope-o"></i></div>
+            <div>
+              <div class="sn-contact-label">Email Support</div>
+              <div class="sn-contact-val">
+                <a href="mailto:support@snerafashion.com" style="color:var(--color-wine); font-weight:600;">support@snerafashion.com</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="sn-contact-item">
+            <div class="sn-contact-icon"><i class="fa fa-phone"></i></div>
+            <div>
+              <div class="sn-contact-label">Phone &amp; WhatsApp</div>
+              <div class="sn-contact-val">+91 98765 43210 (Mon – Sat, 10:00 AM – 7:00 PM IST)</div>
+            </div>
+          </div>
+
+          <div class="sn-contact-item">
+            <div class="sn-contact-icon"><i class="fa fa-clock-o"></i></div>
+            <div>
+              <div class="sn-contact-label">Boutique Hours</div>
+              <div class="sn-contact-val">Monday – Saturday: 10:00 AM – 7:00 PM IST<br>Sunday: Closed</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sn-contact-form">
+          <form id="sn-about-contact-form">
+            <div class="sn-form-group">
+              <label class="sn-form-label" for="sn-c-name">Your Full Name *</label>
+              <input type="text" class="sn-form-input" id="sn-c-name" required placeholder="e.g. Priya Sharma" autocomplete="name">
+            </div>
+
+            <div class="sn-form-group">
+              <label class="sn-form-label" for="sn-c-contact">Email or Phone Number *</label>
+              <input type="text" class="sn-form-input" id="sn-c-contact" required placeholder="e.g. priya@example.com or 10-digit mobile" autocomplete="email">
+            </div>
+
+            <div class="sn-form-group">
+              <label class="sn-form-label" for="sn-c-subject">Inquiry Type</label>
+              <select class="sn-form-select" id="sn-c-subject">
+                <option value="general">General Saree Inquiry</option>
+                <option value="order">Order Tracking &amp; Delivery</option>
+                <option value="bridal">Bridal &amp; Bulk Trousseau</option>
+                <option value="returns">Exchange &amp; Returns</option>
+              </select>
+            </div>
+
+            <div class="sn-form-group">
+              <label class="sn-form-label" for="sn-c-msg">Your Message *</label>
+              <textarea class="sn-form-textarea" id="sn-c-msg" rows="4" required placeholder="How can our stylists assist you today?"></textarea>
+            </div>
+
+            <button type="submit" class="sn-btn sn-btn-wine" style="width:100%;" id="sn-c-submit">
+              <i class="fa fa-paper-plane-o"></i> Send Message
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="sn-section-pad">
+    <div class="sn-container">
+      <div class="sn-section-header">
+        <span class="sn-about-hero-tag">Frequently Asked Questions</span>
+        <h2>Answers for Saree Lovers</h2>
+        <p>Clear guidance on our weaves, care recommendations, and store policies.</p>
+      </div>
+
+      <div class="sn-faq-list" id="sn-faq-list">
+        <div class="sn-faq-item is-open">
+          <button type="button" class="sn-faq-question">
+            <span>How do I know my saree is 100% authentic handloom?</span>
+            <i class="fa fa-chevron-down"></i>
+          </button>
+          <div class="sn-faq-answer">
+            Every genuine handloom piece carries organic subtleties — gentle slubs in yarn tension, hand-knotted borders, and reversible weft structures that cannot be replicated by automated machines. Additionally, all our silk sarees come with Silk Mark authenticity verification.
+          </div>
+        </div>
+
+        <div class="sn-faq-item">
+          <button type="button" class="sn-faq-question">
+            <span>What are the care instructions for pure Banarasi and Kanjeevaram sarees?</span>
+            <i class="fa fa-chevron-down"></i>
+          </button>
+          <div class="sn-faq-answer">
+            We strongly advise dry clean only for pure silk and zari sarees. Store your sarees wrapped in muslin or breathable pure cotton cloth, away from direct sunlight. Change fold lines every six months to prevent crease damage along zari threads.
+          </div>
+        </div>
+
+        <div class="sn-faq-item">
+          <button type="button" class="sn-faq-question">
+            <span>Do you offer Cash on Delivery (COD) across India?</span>
+            <i class="fa fa-chevron-down"></i>
+          </button>
+          <div class="sn-faq-answer">
+            Yes, Cash on Delivery is gladly available across 19,000+ pincodes in India. Orders over ₹999 qualify for complimentary shipping without any hidden charges.
+          </div>
+        </div>
+
+        <div class="sn-faq-item">
+          <button type="button" class="sn-faq-question">
+            <span>What is your return and exchange policy?</span>
+            <i class="fa fa-chevron-down"></i>
+          </button>
+          <div class="sn-faq-answer">
+            We provide a hassle-free 7-day return window from the day of delivery, provided the saree remains unused, unwashed, and in its original luxury packaging with all tags intact.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="sn-footer">
+    <div class="sn-container">
+      <div class="sn-footer-grid">
+        <div class="sn-footer-brand">
+          <h3>Snera</h3>
+          <p>
+            Curating India's most authentic handloom sarees directly from heritage weaver clusters. Preserving timeless tradition, stitch by stitch.
+          </p>
+        </div>
+
+        <div class="sn-footer-col">
+          <h4>Quick Links</h4>
+          <ul class="sn-footer-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/shop">Shop Sarees</a></li>
+            <li><a href="/#collections">Collections</a></li>
+            <li><a href="/about">Our Story</a></li>
+            <li><a href="/about#contact">Contact Boutique</a></li>
+          </ul>
+        </div>
+
+        <div class="sn-footer-col">
+          <h4>Policies</h4>
+          <ul class="sn-footer-links">
+            <li><a href="/shipping-policy">Shipping Policy</a></li>
+            <li><a href="/returns-policy">Returns &amp; Exchanges</a></li>
+            <li><a href="/privacy-policy">Privacy Policy</a></li>
+            <li><a href="/terms">Terms of Service</a></li>
+          </ul>
+        </div>
+
+        <div class="sn-footer-col">
+          <h4>Boutique Concierge</h4>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-map-marker"></i>
+            <span>101 Royal Residency, Ring Road, Surat, Gujarat - 395007</span>
+          </div>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-envelope-o"></i>
+            <span>support@snerafashion.com</span>
+          </div>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-phone"></i>
+            <span>+91 98765 43210</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sn-footer-bottom">
+        <div>&copy; 2026 Snera Store (snerafashion.com). All rights reserved. Handcrafted with pride in India.</div>
+        <div>
+          <a href="/admin" style="color:rgba(255,255,255,0.45); margin-right:12px;">Admin Portal</a>
+          <span>100% Handcrafted • Cash on Delivery</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating WhatsApp Chat -->
+  <a href="https://wa.me/919876543210?text=Hello%20Snera%20Store%2C%20I%20have%20an%20inquiry%20about%20your%20handloom%20sarees"
+     class="sn-whatsapp-float"
+     target="_blank"
+     rel="noopener noreferrer"
+     aria-label="Chat with Snera Store on WhatsApp">
+    <i class="fa fa-whatsapp"></i>
+  </a>
+
+</div>
+
+<!-- PORTAL CONTAINER (Appended to document.body) -->
+<div id="sn-portal" class="sn-root">
+  <div class="sn-drawer-backdrop" id="sn-menu-backdrop"></div>
+  <aside class="sn-drawer" id="sn-menu-drawer" aria-label="Mobile Navigation">
+    <div class="sn-drawer-head">
+      <div class="sn-brand-title" style="font-size:1.6rem; color:var(--color-wine);">Snera</div>
+      <button type="button" class="sn-btn-icon" id="sn-menu-close" aria-label="Close menu"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="sn-drawer-links">
+      <a href="/">Home</a>
+      <a href="/shop">Shop Sarees</a>
+      <a href="/#collections">Collections</a>
+      <a href="/about">Our Story</a>
+      <a href="/about#contact">Contact Us</a>
+      <hr style="border:0; border-top:1px solid var(--color-border); margin:0.75rem 0;">
+      <a href="/profile"><i class="fa fa-user-o" style="margin-right:8px;"></i> My Account</a>
+      <a href="/cart"><i class="fa fa-shopping-bag" style="margin-right:8px;"></i> Cart</a>
+    </div>
+  </aside>
+  <div class="sn-toast" id="sn-toast-msg" role="status"></div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  function $(id) { return document.getElementById(id); }
+
+  function showToast(msg) {
+    var t = $('sn-toast-msg');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('is-shown');
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(function() { t.classList.remove('is-shown'); }, 2800);
+  }
+
+  function updateCartBadge() {
+    try {
+      var cart = JSON.parse(localStorage.getItem('snera_cart')) || [];
+      var count = cart.reduce(function(sum, item) { return sum + (Number(item.quantity) || Number(item.qty) || 1); }, 0);
+      var badge = $('sn-cart-badge');
+      if (badge) {
+        badge.textContent = count;
+        badge.style.display = count > 0 ? 'inline-flex' : 'none';
+      }
+    } catch(e) {}
+  }
+
+  function initFullBleed() {
+    var root = $('sn-about-root');
+    function adjust() {
+      if (root) {
+        root.style.marginLeft = '0px';
+        root.style.width = '100%';
+        var rect = root.getBoundingClientRect();
+        var cw = document.documentElement.clientWidth;
+        root.style.width = cw + 'px';
+        root.style.marginLeft = (-rect.left) + 'px';
+      }
+      var oH = document.querySelector('header') || document.querySelector('.o_header_standard') || document.querySelector('#top') || document.querySelector('.navbar:not(.sn-navbar)');
+      var h = (oH && oH.offsetHeight) ? oH.offsetHeight : 0;
+      document.documentElement.style.setProperty('--sn-odoo-header-h', h + 'px');
+    }
+    window.addEventListener('resize', adjust);
+    window.addEventListener('orientationchange', adjust);
+    adjust();
+    setTimeout(adjust, 200);
+  }
+
+  function initPortal() {
+    var p = $('sn-portal');
+    if (p && p.parentElement !== document.body) {
+      document.body.appendChild(p);
+    }
+  }
+
+  function setupMobileMenu() {
+    var toggle = $('sn-menu-toggle');
+    var close = $('sn-menu-close');
+    var backdrop = $('sn-menu-backdrop');
+    var drawer = $('sn-menu-drawer');
+
+    function openMenu() {
+      if (drawer) drawer.classList.add('is-open');
+      if (backdrop) backdrop.classList.add('is-open');
+    }
+    function closeMenu() {
+      if (drawer) drawer.classList.remove('is-open');
+      if (backdrop) backdrop.classList.remove('is-open');
+    }
+
+    if (toggle) toggle.addEventListener('click', openMenu);
+    if (close) close.addEventListener('click', closeMenu);
+    if (backdrop) backdrop.addEventListener('click', closeMenu);
+  }
+
+  function setupFaq() {
+    var list = $('sn-faq-list');
+    if (!list) return;
+    list.addEventListener('click', function(e) {
+      var btn = e.target.closest('.sn-faq-question');
+      if (!btn) return;
+      var item = btn.closest('.sn-faq-item');
+      if (!item) return;
+      var isOpen = item.classList.contains('is-open');
+      var items = list.querySelectorAll('.sn-faq-item');
+      items.forEach(function(i) { i.classList.remove('is-open'); });
+      if (!isOpen) item.classList.add('is-open');
+    });
+  }
+
+  function setupContactForm() {
+    var form = $('sn-about-contact-form');
+    if (!form) return;
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var btn = $('sn-c-submit');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Sending...';
+      }
+      setTimeout(function() {
+        showToast('Thank you! Your message has been sent to our boutique.');
+        form.reset();
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa fa-paper-plane-o"></i> Send Message';
+        }
+      }, 700);
+    });
+  }
+
+  function init() {
+    initFullBleed();
+    initPortal();
+    setupMobileMenu();
+    updateCartBadge();
+    setupFaq();
+    setupContactForm();
+  }
+
+  window.SneraAbout = {
+    init: init
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>

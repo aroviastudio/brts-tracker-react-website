@@ -1,0 +1,1394 @@
+<!--
+  SNERA STORE — USER PROFILE & MY ACCOUNT PAGE (ODOO EMBED CODE VERSION)
+  URL Route: /profile
+  Domain: snerafashion.com
+  - 100% Self-Contained Odoo Snippet (Style + Markup + Script)
+  - Scoped strictly under .sn-root / #sn-profile-root
+  - Full-bleed width integration inside Odoo
+  - Supabase authentication (Sign In / Sign Up / Sign Out)
+  - Orders tracking, order cancellation with stock restoration via cancel_order() RPC
+  - Wishlist management, saved delivery addresses CRUD, profile settings
+  - Event delegation (no inline onclick strings)
+  - Mobile responsive (320px to 1920px), tap targets >= 44px
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://yduueujrykugmzvbnndu.supabase.co">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+/* ==========================================================================
+   SNERA STORE DESIGN SYSTEM — SCOPED UNDER .sn-root
+   ========================================================================== */
+.sn-root {
+  --color-wine: #5B1A3A;
+  --color-wine-dark: #3E0F28;
+  --color-wine-light: #7A2E52;
+  --color-gold: #C9A96E;
+  --color-gold-dark: #A8893F;
+  --color-gold-light: #E4D5B0;
+  --color-ivory: #FAF7F2;
+  --color-sand: #F0EBE3;
+  --color-white: #FFFFFF;
+  --color-rose: #E8D5D0;
+  --color-charcoal: #2D2D2D;
+  --color-dark: #1A1A1A;
+  --color-gray: #8A8578;
+  --color-gray-light: #C5C0B8;
+  --color-border: #E5E0D8;
+  --color-success: #3A7D44;
+  --color-danger: #C0392B;
+  --color-info: #2471A3;
+
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+  --shadow-hover: 0 16px 48px rgba(0,0,0,0.12);
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  --sn-odoo-header-h: 0px;
+
+  font-family: var(--font-sans);
+  background-color: var(--color-ivory);
+  color: var(--color-charcoal);
+  line-height: 1.6;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sn-root *, .sn-root *::before, .sn-root *::after {
+  box-sizing: border-box;
+}
+
+.sn-root h1, .sn-root h2, .sn-root h3, .sn-root h4, .sn-root h5, .sn-root h6 {
+  font-family: var(--font-serif);
+  color: var(--color-wine-dark);
+  line-height: 1.25;
+  margin-top: 0;
+  font-weight: 700;
+}
+.sn-root p { margin-top: 0; margin-bottom: 1rem; }
+.sn-root p:last-child { margin-bottom: 0; }
+.sn-root a { color: inherit; text-decoration: none; transition: color var(--transition-fast); }
+.sn-root img { max-width: 100%; height: auto; display: block; }
+.sn-root button, .sn-root input, .sn-root select, .sn-root textarea {
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+.sn-root button { cursor: pointer; border: none; background: none; }
+
+.sn-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+.sn-section-pad {
+  padding: 2.5rem 0 5rem;
+}
+
+/* Announcement Top Bar */
+.sn-top-bar {
+  background: var(--color-wine-dark);
+  color: var(--color-gold-light);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0.55rem 1rem;
+}
+
+/* Sticky Main Navigation */
+.sn-navbar {
+  position: -webkit-sticky;
+  position: sticky;
+  top: var(--sn-odoo-header-h, 0px);
+  z-index: 1000;
+  background: rgba(250, 247, 242, 0.96);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+.sn-navbar.is-scrolled {
+  box-shadow: var(--shadow-sm);
+  background: rgba(255, 255, 255, 0.98);
+}
+.sn-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+}
+.sn-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.sn-brand-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+  font-weight: 700;
+  color: var(--color-wine);
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+.sn-brand-sub {
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-gold-dark);
+  font-weight: 600;
+  margin-top: 2px;
+}
+.sn-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.sn-nav-link {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--color-charcoal);
+  position: relative;
+  padding: 0.35rem 0;
+}
+.sn-nav-link:hover, .sn-nav-link.is-active {
+  color: var(--color-wine);
+}
+.sn-nav-link.is-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--color-wine);
+  border-radius: 2px;
+}
+.sn-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.sn-btn-icon {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-charcoal);
+  font-size: 1.05rem;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  position: relative;
+}
+.sn-btn-icon:hover {
+  background: var(--color-sand);
+  color: var(--color-wine);
+}
+.sn-cart-badge-count {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--color-wine);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+.sn-hamburger-btn {
+  display: none;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: var(--color-charcoal);
+}
+
+/* Breadcrumbs */
+.sn-breadcrumbs {
+  padding: 1.25rem 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-gray);
+}
+.sn-breadcrumbs a { color: var(--color-wine); }
+
+/* Buttons */
+.sn-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.75rem 1.5rem;
+  min-height: 46px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: transform var(--transition-fast), background var(--transition-fast);
+  cursor: pointer;
+}
+.sn-btn-wine { background: var(--color-wine); color: #fff; }
+.sn-btn-wine:hover { background: var(--color-wine-dark); color: #fff; }
+.sn-btn-outline { border: 1.5px solid var(--color-wine); color: var(--color-wine); background: transparent; }
+.sn-btn-outline:hover { background: var(--color-wine); color: #fff; }
+.sn-btn-sm { padding: 0.4rem 0.85rem; font-size: 0.82rem; min-height: 36px; }
+
+/* Auth Container (when not logged in) */
+.sn-auth-card {
+  max-width: 480px;
+  margin: 3rem auto;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 2.25rem;
+  box-shadow: var(--shadow-md);
+}
+.sn-auth-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 1.75rem;
+}
+.sn-auth-tab {
+  flex: 1;
+  padding: 0.75rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-gray);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+.sn-auth-tab.is-active {
+  color: var(--color-wine);
+  border-bottom-color: var(--color-wine);
+}
+.sn-form-group {
+  margin-bottom: 1.15rem;
+}
+.sn-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-charcoal);
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.sn-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  min-height: 46px;
+  font-size: 16px;
+  background: var(--color-ivory);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  outline: none;
+}
+.sn-input:focus {
+  border-color: var(--color-gold);
+  background: #ffffff;
+}
+
+/* User Profile Header (when logged in) */
+.sn-user-header {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+.sn-user-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+.sn-user-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--color-wine);
+  color: var(--color-gold-light);
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.sn-user-details h2 {
+  font-size: 1.5rem;
+  margin-bottom: 2px;
+}
+.sn-user-details p {
+  color: #777;
+  font-size: 0.9rem;
+  margin: 0;
+}
+.sn-stats-row {
+  display: flex;
+  gap: 2rem;
+}
+.sn-stat-box {
+  text-align: center;
+}
+.sn-stat-val {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-wine);
+}
+.sn-stat-lbl {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  color: #777;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+/* Profile Navigation Tabs */
+.sn-profile-nav {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.5rem;
+}
+.sn-pnav-btn {
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-gray);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+.sn-pnav-btn:hover { color: var(--color-wine); }
+.sn-pnav-btn.is-active {
+  background: var(--color-wine);
+  color: #fff;
+}
+
+/* Order Cards */
+.sn-order-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.sn-order-header {
+  padding: 1.25rem 1.5rem;
+  background: var(--color-ivory);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.sn-order-body {
+  padding: 1.5rem;
+}
+.sn-order-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.sn-badge-pending { background: rgba(217, 119, 6, 0.12); color: #D97706; }
+.sn-badge-paid { background: rgba(26, 122, 86, 0.12); color: #1A7A56; }
+.sn-badge-processing { background: rgba(37, 99, 235, 0.12); color: #2563EB; }
+.sn-badge-shipped { background: rgba(36, 113, 163, 0.12); color: #2471A3; }
+.sn-badge-delivered { background: rgba(58, 125, 68, 0.15); color: #3A7D44; }
+.sn-badge-cancelled { background: rgba(192, 57, 43, 0.12); color: #C0392B; }
+
+/* Line items list inside orders */
+.sn-order-item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.6rem 0;
+  border-bottom: 1px dashed var(--color-border);
+}
+.sn-order-item-row:last-child { border-bottom: 0; }
+.sn-order-thumb {
+  width: 48px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 4px;
+  background: var(--color-sand);
+}
+
+/* Address Cards Grid */
+.sn-addrs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 1.25rem;
+}
+.sn-addr-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  position: relative;
+}
+
+/* Footer */
+.sn-footer {
+  background: var(--color-wine-dark);
+  color: #fff;
+  padding: 4.5rem 0 2rem;
+  margin-top: 4rem;
+}
+.sn-footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 2.5rem;
+  margin-bottom: 3.5rem;
+}
+.sn-footer-brand h3 { color: var(--color-gold-light); font-size: 2rem; margin-bottom: 0.75rem; }
+.sn-footer-brand p { color: rgba(255, 255, 255, 0.75); font-size: 0.9rem; line-height: 1.7; max-width: 320px; }
+.sn-footer-col h4 { color: #fff; font-family: var(--font-serif); font-size: 1.2rem; margin-bottom: 1.25rem; position: relative; padding-bottom: 8px; }
+.sn-footer-col h4::after { content: ''; position: absolute; bottom: 0; left: 0; width: 28px; height: 1.5px; background: var(--color-gold); }
+.sn-footer-links { list-style: none; padding: 0; margin: 0; }
+.sn-footer-links li { margin-bottom: 0.65rem; }
+.sn-footer-links a { color: rgba(255, 255, 255, 0.75); font-size: 0.88rem; transition: color var(--transition-fast); }
+.sn-footer-links a:hover { color: var(--color-gold-light); text-decoration: underline; }
+.sn-footer-contact-item { display: flex; align-items: flex-start; gap: 10px; color: rgba(255, 255, 255, 0.75); font-size: 0.88rem; margin-bottom: 0.75rem; }
+.sn-footer-contact-item i { color: var(--color-gold); margin-top: 4px; }
+.sn-footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Floating WhatsApp Chat Button */
+.sn-whatsapp-float {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  right: 20px;
+  width: 54px;
+  height: 54px;
+  background-color: #25D366;
+  color: #FFFFFF;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 28px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform 0.25s ease;
+}
+.sn-whatsapp-float:hover { transform: scale(1.1); color: #FFFFFF; }
+
+/* Toast Notifications */
+.sn-toast {
+  position: fixed;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%) translateY(30px);
+  background: var(--color-wine-dark);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.25s ease, opacity 0.25s ease, visibility 0.25s;
+  z-index: 10000;
+  pointer-events: none;
+}
+.sn-toast.is-shown { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+/* Mobile Slide-Over Drawer */
+.sn-drawer-backdrop {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); z-index: 10001;
+  opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s;
+}
+.sn-drawer-backdrop.is-open { opacity: 1; visibility: visible; }
+.sn-drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 300px; max-width: 85vw;
+  background: #ffffff; z-index: 10002; box-shadow: -4px 0 24px rgba(0, 0, 0, 0.2);
+  transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex; flex-direction: column; padding: 1.5rem; box-sizing: border-box;
+}
+.sn-drawer.is-open { transform: translateX(0); }
+.sn-drawer-head { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+.sn-drawer-links { display: flex; flex-direction: column; gap: 1.25rem; }
+.sn-drawer-links a { font-size: 1.1rem; font-weight: 600; color: var(--color-charcoal); }
+
+/* Responsive Media Queries */
+@media (max-width: 992px) {
+  .sn-nav-links { display: none; }
+  .sn-hamburger-btn { display: flex; }
+  .sn-user-header { flex-direction: column; align-items: flex-start; }
+  .sn-footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+}
+
+@media (max-width: 768px) {
+  .sn-footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .sn-btn { min-height: 48px; }
+}
+
+@media (max-width: 576px) {
+  .sn-container { padding: 0 1rem; }
+  .sn-auth-card { padding: 1.5rem 1rem; }
+  .sn-whatsapp-float {
+    width: 48px; height: 48px; font-size: 24px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)); right: 16px;
+  }
+}
+</style>
+
+<!-- MAIN EMBED CONTENT -->
+<div class="sn-root" id="sn-profile-root">
+
+  <!-- Announcement Bar -->
+  <div class="sn-top-bar">
+    Free Shipping Across India on Orders Over ₹999 &nbsp;|&nbsp; 100% Handloom Authenticity Guarantee
+  </div>
+
+  <!-- Navbar -->
+  <header class="sn-navbar" id="sn-main-navbar">
+    <div class="sn-container sn-nav-inner">
+      <a href="/" class="sn-brand" aria-label="Snera Store Home">
+        <span class="sn-brand-title">Snera</span>
+        <span class="sn-brand-sub">Handloom Boutique</span>
+      </a>
+
+      <nav class="sn-nav-links" aria-label="Main Navigation">
+        <a href="/" class="sn-nav-link">Home</a>
+        <a href="/shop" class="sn-nav-link">Shop Sarees</a>
+        <a href="/#collections" class="sn-nav-link">Collections</a>
+        <a href="/about" class="sn-nav-link">Our Story</a>
+        <a href="/about#contact" class="sn-nav-link">Contact</a>
+      </nav>
+
+      <div class="sn-nav-actions">
+        <a href="/shop" class="sn-btn-icon" aria-label="Search Collection" title="Search"><i class="fa fa-search"></i></a>
+        <a href="/profile" class="sn-btn-icon is-active" aria-label="My Account" title="My Account"><i class="fa fa-user"></i></a>
+        <a href="/cart" class="sn-btn-icon" aria-label="View Shopping Cart" title="Cart">
+          <i class="fa fa-shopping-bag"></i>
+          <span class="sn-cart-badge-count" id="sn-cart-badge">0</span>
+        </a>
+        <button type="button" class="sn-hamburger-btn" id="sn-menu-toggle" aria-label="Open Navigation Menu">
+          <i class="fa fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Breadcrumbs -->
+  <div class="sn-container">
+    <div class="sn-breadcrumbs">
+      <a href="/">Home</a> &nbsp;/&nbsp; <span>My Account</span>
+    </div>
+  </div>
+
+  <!-- Main Profile View Area -->
+  <main class="sn-container sn-section-pad" style="padding-top:1rem;">
+
+    <!-- STATE 1: GUEST AUTH FORM (Sign In / Sign Up) -->
+    <div id="sn-view-auth" style="display: none;">
+      <div class="sn-auth-card">
+        <div class="sn-auth-tabs">
+          <div class="sn-auth-tab is-active" id="sn-tab-login">Sign In</div>
+          <div class="sn-auth-tab" id="sn-tab-signup">Create Account</div>
+        </div>
+
+        <!-- Login Form -->
+        <form id="sn-form-login">
+          <div class="sn-form-group">
+            <label class="sn-label" for="sn-login-email">Email Address</label>
+            <input type="email" id="sn-login-email" class="sn-input" required autocomplete="email" placeholder="ananya@example.com">
+          </div>
+          <div class="sn-form-group">
+            <label class="sn-label" for="sn-login-pass">Password</label>
+            <input type="password" id="sn-login-pass" class="sn-input" required autocomplete="current-password" placeholder="••••••••">
+          </div>
+          <button type="submit" class="sn-btn sn-btn-wine" style="width:100%; margin-top:0.5rem;" id="sn-btn-login-submit">
+            Sign In to My Account
+          </button>
+        </form>
+
+        <!-- Sign Up Form -->
+        <form id="sn-form-signup" style="display: none;">
+          <div class="sn-form-group">
+            <label class="sn-label" for="sn-reg-name">Full Name *</label>
+            <input type="text" id="sn-reg-name" class="sn-input" required autocomplete="name" placeholder="e.g. Ananya Sharma">
+          </div>
+          <div class="sn-form-group">
+            <label class="sn-label" for="sn-reg-phone">Phone Number *</label>
+            <input type="tel" id="sn-reg-phone" class="sn-input" required autocomplete="tel" placeholder="10-digit mobile number">
+          </div>
+          <div class="sn-form-group">
+            <label class="sn-label" for="sn-reg-email">Email Address *</label>
+            <input type="email" id="sn-reg-email" class="sn-input" required autocomplete="email" placeholder="ananya@example.com">
+          </div>
+          <div class="sn-form-group">
+            <label class="sn-label" for="sn-reg-pass">Create Password *</label>
+            <input type="password" id="sn-reg-pass" class="sn-input" required minlength="6" autocomplete="new-password" placeholder="Min. 6 characters">
+          </div>
+          <button type="submit" class="sn-btn sn-btn-wine" style="width:100%; margin-top:0.5rem;" id="sn-btn-signup-submit">
+            Create Snera Account
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- STATE 2: LOGGED IN DASHBOARD -->
+    <div id="sn-view-dashboard" style="display: none;">
+
+      <!-- User Greeting & Stats -->
+      <div class="sn-user-header">
+        <div class="sn-user-left">
+          <div class="sn-user-avatar" id="sn-avatar-initial">A</div>
+          <div class="sn-user-details">
+            <h2 id="sn-profile-name">Customer</h2>
+            <p id="sn-profile-email">customer@example.com</p>
+          </div>
+        </div>
+        <div class="sn-stats-row">
+          <div class="sn-stat-box">
+            <div class="sn-stat-val" id="sn-stat-orders-count">0</div>
+            <div class="sn-stat-lbl">Orders</div>
+          </div>
+          <div class="sn-stat-box">
+            <div class="sn-stat-val" id="sn-stat-wishlist-count">0</div>
+            <div class="sn-stat-lbl">Wishlist</div>
+          </div>
+          <div class="sn-stat-box">
+            <div class="sn-stat-val" id="sn-stat-spent-amount">₹0</div>
+            <div class="sn-stat-lbl">Total Spent</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="sn-profile-nav" id="sn-profile-tabs">
+        <button type="button" class="sn-pnav-btn is-active" data-tab="orders"><i class="fa fa-shopping-bag"></i> My Orders</button>
+        <button type="button" class="sn-pnav-btn" data-tab="wishlist"><i class="fa fa-heart"></i> Saved Wishlist</button>
+        <button type="button" class="sn-pnav-btn" data-tab="addresses"><i class="fa fa-map-marker"></i> Delivery Addresses</button>
+        <button type="button" class="sn-pnav-btn" data-tab="settings"><i class="fa fa-cog"></i> Account Settings</button>
+        <button type="button" class="sn-pnav-btn" id="sn-btn-logout" style="margin-left:auto; color:var(--color-danger);"><i class="fa fa-sign-out"></i> Log Out</button>
+      </div>
+
+      <!-- TAB 1: ORDERS LIST -->
+      <div id="sn-tab-content-orders">
+        <div id="sn-orders-list">
+          <p style="color:#777; padding:2rem 0; text-align:center;">Fetching your order history...</p>
+        </div>
+      </div>
+
+      <!-- TAB 2: WISHLIST -->
+      <div id="sn-tab-content-wishlist" style="display: none;">
+        <div id="sn-wishlist-grid" class="sn-addrs-grid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- TAB 3: ADDRESSES -->
+      <div id="sn-tab-content-addresses" style="display: none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+          <h3 style="font-size:1.4rem;">Saved Shipping Addresses</h3>
+          <button type="button" class="sn-btn sn-btn-wine sn-btn-sm" id="sn-btn-add-addr"><i class="fa fa-plus"></i> Add New Address</button>
+        </div>
+        <div id="sn-addresses-list" class="sn-addrs-grid"></div>
+
+        <!-- Add Address Form (Hidden by default) -->
+        <div id="sn-add-addr-modal" style="display:none; background:#fff; border:1px solid var(--color-border); border-radius:var(--radius-md); padding:1.5rem; margin-top:1.5rem;">
+          <h4 style="margin-bottom:1rem;">Add Delivery Address</h4>
+          <form id="sn-form-new-addr">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+              <div><label class="sn-label">Full Name *</label><input type="text" id="sn-new-addr-name" class="sn-input" required></div>
+              <div><label class="sn-label">Phone *</label><input type="tel" id="sn-new-addr-phone" class="sn-input" required></div>
+            </div>
+            <div class="sn-form-group"><label class="sn-label">Street Address *</label><input type="text" id="sn-new-addr-line1" class="sn-input" required></div>
+            <div class="sn-form-group"><label class="sn-label">Landmark / Area</label><input type="text" id="sn-new-addr-line2" class="sn-input"></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin-bottom:1.25rem;">
+              <div><label class="sn-label">City *</label><input type="text" id="sn-new-addr-city" class="sn-input" required></div>
+              <div><label class="sn-label">State *</label><input type="text" id="sn-new-addr-state" class="sn-input" required></div>
+              <div><label class="sn-label">Pincode *</label><input type="text" id="sn-new-addr-pin" class="sn-input" required maxlength="6"></div>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button type="button" class="sn-btn sn-btn-outline" id="sn-cancel-addr-btn">Cancel</button>
+              <button type="submit" class="sn-btn sn-btn-wine">Save Address</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- TAB 4: SETTINGS -->
+      <div id="sn-tab-content-settings" style="display: none;">
+        <div style="background:#fff; border:1px solid var(--color-border); border-radius:var(--radius-md); padding:2rem; max-width:540px;">
+          <h3 style="font-size:1.4rem; margin-bottom:1.25rem;">Update Account Details</h3>
+          <form id="sn-form-profile-update">
+            <div class="sn-form-group">
+              <label class="sn-label">Full Name</label>
+              <input type="text" id="sn-set-name" class="sn-input" required>
+            </div>
+            <div class="sn-form-group">
+              <label class="sn-label">Phone Number</label>
+              <input type="tel" id="sn-set-phone" class="sn-input">
+            </div>
+            <div class="sn-form-group">
+              <label class="sn-label">Email Address (Read-only)</label>
+              <input type="email" id="sn-set-email" class="sn-input" readonly style="opacity:0.7;">
+            </div>
+            <button type="submit" class="sn-btn sn-btn-wine" style="margin-top:0.5rem;">Save Changes</button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Shared Footer -->
+  <footer class="sn-footer">
+    <div class="sn-container">
+      <div class="sn-footer-grid">
+        <div class="sn-footer-brand">
+          <h3 class="sn-brand-title" style="color:var(--color-gold-light);">Snera</h3>
+          <p>
+            Curating India's most exquisite handwoven sarees. Preserving ancient loom artistry for modern elegance.
+          </p>
+        </div>
+        <div class="sn-footer-col">
+          <h4>Explore</h4>
+          <ul class="sn-footer-links">
+            <li><a href="/shop">All Sarees</a></li>
+            <li><a href="/shop?fabric=Banarasi">Banarasi Silk</a></li>
+            <li><a href="/shop?fabric=Kanjeevaram">Kanjeevaram</a></li>
+            <li><a href="/shop?fabric=Chanderi">Chanderi &amp; Organza</a></li>
+            <li><a href="/shop?occasion=Wedding">Bridal Heritage</a></li>
+          </ul>
+        </div>
+        <div class="sn-footer-col">
+          <h4>Customer Care</h4>
+          <ul class="sn-footer-links">
+            <li><a href="/profile">My Account &amp; Orders</a></li>
+            <li><a href="/cart">Shopping Cart</a></li>
+            <li><a href="/checkout">Checkout</a></li>
+            <li><a href="/shipping-policy">Shipping Policy</a></li>
+            <li><a href="/returns-policy">7-Day Returns Policy</a></li>
+            <li><a href="/terms">Terms &amp; Conditions</a></li>
+            <li><a href="/privacy-policy">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="sn-footer-col">
+          <h4>Boutique &amp; Support</h4>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-envelope-o"></i>
+            <span>support@snerafashion.com</span>
+          </div>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-phone"></i>
+            <span>+91 98765 43210</span>
+          </div>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-map-marker"></i>
+            <span>101 Royal Residency, Ring Road, Surat, Gujarat - 395007, India</span>
+          </div>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-clock-o"></i>
+            <span>Mon – Sat: 10:00 AM – 7:00 PM IST</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sn-footer-bottom">
+        <div>&copy; 2026 Snera Store (snerafashion.com). All rights reserved. Handcrafted with pride in India.</div>
+        <div>
+          <a href="/admin" style="color:rgba(255,255,255,0.45); margin-right:12px;">Admin Portal</a>
+          <span>100% Handcrafted • Cash on Delivery</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating WhatsApp Chat -->
+  <a href="https://wa.me/919876543210?text=Hello%20Snera%20Store%2C%20I%20have%20an%20inquiry%20about%20my%20account"
+     class="sn-whatsapp-float"
+     target="_blank"
+     rel="noopener noreferrer"
+     aria-label="Chat with Snera Store on WhatsApp">
+    <i class="fa fa-whatsapp"></i>
+  </a>
+
+</div>
+
+<!-- PORTAL CONTAINER -->
+<div id="sn-portal" class="sn-root">
+  <div class="sn-drawer-backdrop" id="sn-menu-backdrop"></div>
+  <aside class="sn-drawer" id="sn-menu-drawer" aria-label="Mobile Navigation">
+    <div class="sn-drawer-head">
+      <div class="sn-brand-title" style="font-size:1.6rem; color:var(--color-wine);">Snera</div>
+      <button type="button" class="sn-btn-icon" id="sn-menu-close" aria-label="Close menu"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="sn-drawer-links">
+      <a href="/">Home</a>
+      <a href="/shop">Shop Sarees</a>
+      <a href="/#collections">Collections</a>
+      <a href="/about">Our Story</a>
+      <a href="/about#contact">Contact Us</a>
+      <hr style="border:0; border-top:1px solid var(--color-border); margin:0.75rem 0;">
+      <a href="/profile"><i class="fa fa-user-o" style="margin-right:8px;"></i> My Account</a>
+      <a href="/cart"><i class="fa fa-shopping-bag" style="margin-right:8px;"></i> Cart</a>
+    </div>
+  </aside>
+  <div class="sn-toast" id="sn-toast-msg" role="status"></div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var SUPABASE_URL = 'https://yduueujrykugmzvbnndu.supabase.co';
+  var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkdXVldWpyeWt1Z216dmJubmR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MDEyNzYsImV4cCI6MjA5NTE3NzI3Nn0.OeMKhnf5cQv5KfSGqdXHZziP-x4MOmlKnV6EFmnmkJs';
+  var db = null;
+  var currentUser = null;
+  var userOrders = [];
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function money(n) { return '₹' + (Number(n) || 0).toLocaleString('en-IN'); }
+  function dateStr(d) { return d ? new Date(d).toLocaleDateString('en-IN', { year:'numeric', month:'short', day:'numeric' }) : '-'; }
+
+  function showToast(msg) {
+    var t = $('sn-toast-msg');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('is-shown');
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(function() { t.classList.remove('is-shown'); }, 2800);
+  }
+
+  function updateCartBadge() {
+    try {
+      var cart = JSON.parse(localStorage.getItem('snera_cart')) || [];
+      var count = cart.reduce(function(sum, item) { return sum + (Number(item.quantity) || Number(item.qty) || 1); }, 0);
+      var badge = $('sn-cart-badge');
+      if (badge) {
+        badge.textContent = count;
+        badge.style.display = count > 0 ? 'inline-flex' : 'none';
+      }
+    } catch(e) {}
+  }
+
+  function initFullBleed() {
+    var root = $('sn-profile-root');
+    function adjust() {
+      if (root) {
+        root.style.marginLeft = '0px';
+        root.style.width = '100%';
+        var rect = root.getBoundingClientRect();
+        var cw = document.documentElement.clientWidth;
+        root.style.width = cw + 'px';
+        root.style.marginLeft = (-rect.left) + 'px';
+      }
+      var oH = document.querySelector('header') || document.querySelector('.o_header_standard') || document.querySelector('#top') || document.querySelector('.navbar:not(.sn-navbar)');
+      var h = (oH && oH.offsetHeight) ? oH.offsetHeight : 0;
+      document.documentElement.style.setProperty('--sn-odoo-header-h', h + 'px');
+    }
+    window.addEventListener('resize', adjust);
+    window.addEventListener('orientationchange', adjust);
+    adjust();
+    setTimeout(adjust, 200);
+  }
+
+  function initPortal() {
+    var p = $('sn-portal');
+    if (p && p.parentElement !== document.body) {
+      document.body.appendChild(p);
+    }
+  }
+
+  function setupMobileMenu() {
+    var toggle = $('sn-menu-toggle');
+    var close = $('sn-menu-close');
+    var backdrop = $('sn-menu-backdrop');
+    var drawer = $('sn-menu-drawer');
+
+    function openMenu() {
+      if (drawer) drawer.classList.add('is-open');
+      if (backdrop) backdrop.classList.add('is-open');
+    }
+    function closeMenu() {
+      if (drawer) drawer.classList.remove('is-open');
+      if (backdrop) backdrop.classList.remove('is-open');
+    }
+
+    if (toggle) toggle.addEventListener('click', openMenu);
+    if (close) close.addEventListener('click', closeMenu);
+    if (backdrop) backdrop.addEventListener('click', closeMenu);
+  }
+
+  function setupAuthTabs() {
+    var tabL = $('sn-tab-login');
+    var tabS = $('sn-tab-signup');
+    var formL = $('sn-form-login');
+    var formS = $('sn-form-signup');
+
+    if (tabL && tabS) {
+      tabL.addEventListener('click', function() {
+        tabL.classList.add('is-active');
+        tabS.classList.remove('is-active');
+        formL.style.display = 'block';
+        formS.style.display = 'none';
+      });
+      tabS.addEventListener('click', function() {
+        tabS.classList.add('is-active');
+        tabL.classList.remove('is-active');
+        formS.style.display = 'block';
+        formL.style.display = 'none';
+      });
+    }
+  }
+
+  async function checkSession() {
+    try {
+      if (window.supabase && !db) {
+        db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      }
+      if (db) {
+        var res = await db.auth.getSession();
+        if (res.data && res.data.session) {
+          currentUser = res.data.session.user;
+          renderDashboard();
+          return;
+        }
+      }
+    } catch(e) {}
+
+    // Not logged in
+    $('sn-view-auth').style.display = 'block';
+    $('sn-view-dashboard').style.display = 'none';
+  }
+
+  async function renderDashboard() {
+    $('sn-view-auth').style.display = 'none';
+    $('sn-view-dashboard').style.display = 'block';
+
+    var email = currentUser.email || '';
+    $('sn-profile-email').textContent = email;
+    $('sn-set-email').value = email;
+
+    // Load user profile record
+    var name = 'Patron';
+    try {
+      var pRes = await db.from('user_profiles').select('*').eq('id', currentUser.id).single();
+      if (pRes.data && pRes.data.full_name) {
+        name = pRes.data.full_name;
+        $('sn-set-name').value = name;
+        if (pRes.data.phone) $('sn-set-phone').value = pRes.data.phone;
+      }
+    } catch(e) {}
+
+    $('sn-profile-name').textContent = name;
+    $('sn-avatar-initial').textContent = name.charAt(0).toUpperCase();
+
+    loadOrders();
+    loadWishlist();
+    loadAddresses();
+  }
+
+  async function loadOrders() {
+    var listEl = $('sn-orders-list');
+    if (!listEl) return;
+
+    try {
+      var res = await db.from('orders')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+
+      userOrders = res.data || [];
+      $('sn-stat-orders-count').textContent = userOrders.length;
+      var totalSpent = userOrders.reduce(function(sum, o) {
+        return sum + (Number(o.total) || Number(o.total_amount) || 0);
+      }, 0);
+      $('sn-stat-spent-amount').textContent = money(totalSpent);
+
+      if (!userOrders.length) {
+        listEl.innerHTML = '<div style="text-align:center; padding:3rem 1rem; background:#fff; border:1px dashed var(--color-border); border-radius:var(--radius-md);">' +
+          '<i class="fa fa-shopping-bag" style="font-size:2.5rem; color:var(--color-gray-light); margin-bottom:0.75rem;"></i>' +
+          '<h3>No orders yet</h3>' +
+          '<p style="color:#777; margin-bottom:1.5rem;">You haven\'t placed any orders yet. Discover our latest handwoven sarees.</p>' +
+          '<a href="/shop" class="sn-btn sn-btn-wine">Shop Sarees</a>' +
+        '</div>';
+        return;
+      }
+
+      listEl.innerHTML = userOrders.map(function(o) {
+        var items = Array.isArray(o.items) ? o.items : [];
+        var status = String(o.status || 'pending').toLowerCase();
+        var canCancel = status === 'pending' || status === 'processing';
+
+        var itemsHtml = items.map(function(it) {
+          var img = it.image || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=150&q=80';
+          return '<div class="sn-order-item-row">' +
+            '<img src="' + esc(img) + '" alt="' + esc(it.name) + '" class="sn-order-thumb" width="48" height="64">' +
+            '<div style="flex:1; min-width:0;">' +
+              '<div style="font-weight:600; font-size:0.92rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + esc(it.name) + '</div>' +
+              '<div style="font-size:0.8rem; color:#777;">Qty: ' + (it.quantity || 1) + '</div>' +
+            '</div>' +
+            '<div style="font-weight:700; color:var(--color-wine);">' + money(it.total || it.price) + '</div>' +
+          '</div>';
+        }).join('');
+
+        var cancelBtn = canCancel ? '<button type="button" class="sn-btn sn-btn-outline sn-btn-sm" data-action="cancel-order" data-id="' + esc(o.id) + '" style="color:var(--color-danger); border-color:var(--color-danger);">' +
+          'Cancel Order' +
+        '</button>' : '';
+
+        return '<div class="sn-order-card">' +
+          '<div class="sn-order-header">' +
+            '<div>' +
+              '<strong>Order #' + esc(o.order_id || String(o.id).slice(0,8)) + '</strong>' +
+              '<div style="font-size:0.8rem; color:#777; margin-top:2px;">Placed on ' + dateStr(o.created_at) + '</div>' +
+            '</div>' +
+            '<div style="display:flex; align-items:center; gap:12px;">' +
+              '<span class="sn-order-badge sn-badge-' + status + '">' + esc(status) + '</span>' +
+              '<strong>' + money(o.total || o.total_amount) + '</strong>' +
+              cancelBtn +
+            '</div>' +
+          '</div>' +
+          '<div class="sn-order-body">' +
+            itemsHtml +
+          '</div>' +
+        '</div>';
+      }).join('');
+
+    } catch(err) {
+      listEl.innerHTML = '<p style="color:var(--color-danger);">Unable to load your orders.</p>';
+    }
+  }
+
+  async function cancelOrder(orderId) {
+    if (!confirm('Are you sure you want to cancel this order?')) return;
+    try {
+      var res = await db.rpc('cancel_order', {
+        p_order_id: orderId,
+        p_reason: 'Customer initiated cancellation'
+      });
+      if (res.data && res.data.success) {
+        showToast('Order cancelled successfully');
+        loadOrders();
+      } else {
+        showToast((res.data && res.data.error) ? res.data.error : 'Could not cancel order');
+      }
+    } catch(e) {
+      showToast('Error cancelling order.');
+    }
+  }
+
+  function loadWishlist() {
+    var grid = $('sn-wishlist-grid');
+    var wIds = [];
+    try { wIds = JSON.parse(localStorage.getItem('snera_wishlist')) || []; } catch(e) {}
+    $('sn-stat-wishlist-count').textContent = wIds.length;
+
+    if (!wIds.length) {
+      grid.innerHTML = '<p style="grid-column:1/-1; color:#777; text-align:center; padding:2rem 0;">Your wishlist is currently empty.</p>';
+      return;
+    }
+
+    grid.innerHTML = wIds.map(function(id) {
+      return '<div class="sn-addr-card" style="display:flex; justify-content:space-between; align-items:center;">' +
+        '<div><strong>Saree #' + esc(id) + '</strong><br><small style="color:#777;">Saved Handloom Piece</small></div>' +
+        '<div style="display:flex; gap:8px;">' +
+          '<a href="/shop-detail?id=' + encodeURIComponent(id) + '" class="sn-btn sn-btn-wine sn-btn-sm">View</a>' +
+          '<button type="button" class="sn-btn sn-btn-outline sn-btn-sm" data-action="remove-wish" data-id="' + esc(id) + '"><i class="fa fa-trash"></i></button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  async function loadAddresses() {
+    var box = $('sn-addresses-list');
+    if (!box) return;
+    try {
+      var res = await db.from('addresses').select('*').eq('user_id', currentUser.id);
+      var addrs = res.data || [];
+      if (!addrs.length) {
+        box.innerHTML = '<p style="grid-column:1/-1; color:#777;">No saved addresses yet.</p>';
+        return;
+      }
+      box.innerHTML = addrs.map(function(a) {
+        return '<div class="sn-addr-card">' +
+          '<strong>' + esc(a.name) + '</strong> (' + esc(a.phone) + ')<br>' +
+          '<p style="color:#555; font-size:0.88rem; margin:6px 0 12px;">' +
+            esc(a.line1) + (a.line2 ? ', ' + esc(a.line2) : '') + '<br>' +
+            esc(a.city) + ', ' + esc(a.state) + ' - ' + esc(a.pincode) +
+          '</p>' +
+          '<button type="button" class="sn-btn sn-btn-outline sn-btn-sm" data-action="delete-addr" data-id="' + esc(a.id) + '" style="color:var(--color-danger); border-color:var(--color-border);">' +
+            '<i class="fa fa-trash"></i> Delete' +
+          '</button>' +
+        '</div>';
+      }).join('');
+    } catch(e) {}
+  }
+
+  function setupAuthForms() {
+    var fLogin = $('sn-form-login');
+    var fSign = $('sn-form-signup');
+
+    if (fLogin) {
+      fLogin.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var email = $('sn-login-email').value.trim();
+        var pass = $('sn-login-pass').value;
+        var btn = $('sn-btn-login-submit');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Signing in...';
+
+        try {
+          var res = await db.auth.signInWithPassword({ email: email, password: pass });
+          if (res.error) throw res.error;
+          currentUser = res.data.user;
+          showToast('Welcome back to Snera Store!');
+          renderDashboard();
+        } catch(err) {
+          alert(err.message || 'Login failed. Please check your credentials.');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = 'Sign In to My Account';
+        }
+      });
+    }
+
+    if (fSign) {
+      fSign.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var name = $('sn-reg-name').value.trim();
+        var phone = $('sn-reg-phone').value.trim();
+        var email = $('sn-reg-email').value.trim();
+        var pass = $('sn-reg-pass').value;
+        var btn = $('sn-btn-signup-submit');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating Account...';
+
+        try {
+          var res = await db.auth.signUp({
+            email: email,
+            password: pass,
+            options: { data: { full_name: name, phone: phone } }
+          });
+          if (res.error) throw res.error;
+
+          if (res.data && res.data.user) {
+            // Upsert user profile
+            await db.from('user_profiles').upsert([{
+              id: res.data.user.id,
+              full_name: name,
+              phone: phone,
+              email: email
+            }]);
+            currentUser = res.data.user;
+            showToast('Account created successfully!');
+            renderDashboard();
+          }
+        } catch(err) {
+          alert(err.message || 'Registration failed.');
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = 'Create Snera Account';
+        }
+      });
+    }
+  }
+
+  function setupProfileTabs() {
+    var tabsWrap = $('sn-profile-tabs');
+    if (!tabsWrap) return;
+
+    tabsWrap.addEventListener('click', function(e) {
+      var btn = e.target.closest('.sn-pnav-btn[data-tab]');
+      if (!btn) return;
+      var tabId = btn.getAttribute('data-tab');
+
+      tabsWrap.querySelectorAll('.sn-pnav-btn[data-tab]').forEach(function(b) {
+        b.classList.toggle('is-active', b === btn);
+      });
+
+      ['orders', 'wishlist', 'addresses', 'settings'].forEach(function(t) {
+        var el = $('sn-tab-content-' + t);
+        if (el) el.style.display = (t === tabId ? 'block' : 'none');
+      });
+    });
+
+    var logoutBtn = $('sn-btn-logout');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async function() {
+        if (confirm('Are you sure you want to sign out?')) {
+          await db.auth.signOut();
+          currentUser = null;
+          showToast('Signed out of Snera Store');
+          checkSession();
+        }
+      });
+    }
+  }
+
+  function setupDelegation() {
+    document.addEventListener('click', async function(e) {
+      var btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      var action = btn.getAttribute('data-action');
+      var id = btn.getAttribute('data-id');
+
+      if (action === 'cancel-order') {
+        cancelOrder(id);
+      } else if (action === 'remove-wish') {
+        try {
+          var wList = JSON.parse(localStorage.getItem('snera_wishlist')) || [];
+          wList = wList.filter(function(x) { return String(x) !== String(id); });
+          localStorage.setItem('snera_wishlist', JSON.stringify(wList));
+          showToast('Removed from wishlist');
+          loadWishlist();
+        } catch(err) {}
+      } else if (action === 'delete-addr') {
+        if (confirm('Delete this address?')) {
+          await db.from('addresses').delete().eq('id', id);
+          showToast('Address deleted');
+          loadAddresses();
+        }
+      }
+    });
+
+    // Add address toggle
+    var addBtn = $('sn-btn-add-addr');
+    var cancelAddr = $('sn-cancel-addr-btn');
+    var modal = $('sn-add-addr-modal');
+
+    if (addBtn && modal) {
+      addBtn.addEventListener('click', function() { modal.style.display = 'block'; });
+    }
+    if (cancelAddr && modal) {
+      cancelAddr.addEventListener('click', function() { modal.style.display = 'none'; });
+    }
+
+    var addrForm = $('sn-form-new-addr');
+    if (addrForm) {
+      addrForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var payload = {
+          user_id: currentUser.id,
+          name: $('sn-new-addr-name').value.trim(),
+          phone: $('sn-new-addr-phone').value.trim(),
+          line1: $('sn-new-addr-line1').value.trim(),
+          line2: $('sn-new-addr-line2').value.trim(),
+          city: $('sn-new-addr-city').value.trim(),
+          state: $('sn-new-addr-state').value.trim(),
+          pincode: $('sn-new-addr-pin').value.trim()
+        };
+        await db.from('addresses').insert([payload]);
+        showToast('Address saved');
+        addrForm.reset();
+        modal.style.display = 'none';
+        loadAddresses();
+      });
+    }
+
+    var profForm = $('sn-form-profile-update');
+    if (profForm) {
+      profForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var name = $('sn-set-name').value.trim();
+        var phone = $('sn-set-phone').value.trim();
+        await db.from('user_profiles').upsert([{
+          id: currentUser.id,
+          full_name: name,
+          phone: phone,
+          updated_at: new Date().toISOString()
+        }]);
+        showToast('Profile updated');
+        $('sn-profile-name').textContent = name;
+        $('sn-avatar-initial').textContent = name.charAt(0).toUpperCase();
+      });
+    }
+  }
+
+  function init() {
+    initFullBleed();
+    initPortal();
+    setupMobileMenu();
+    updateCartBadge();
+    setupAuthTabs();
+    setupAuthForms();
+    setupProfileTabs();
+    setupDelegation();
+    checkSession();
+  }
+
+  window.SneraProfile = {
+    init: init
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>

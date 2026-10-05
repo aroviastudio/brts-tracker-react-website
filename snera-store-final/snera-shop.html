@@ -1,0 +1,1323 @@
+<!--
+  SNERA STORE — SHOP CATALOG PAGE (ODOO EMBED CODE VERSION)
+  URL Route: /shop
+  Domain: snerafashion.com
+  - 100% Self-Contained Odoo Snippet (Style + Markup + Script)
+  - Scoped strictly under .sn-root / #sn-shop-root
+  - Full-bleed width integration inside Odoo
+  - Supabase integration with 5-minute sessionStorage caching
+  - Live filter by fabric, occasion, price sorting & debounced search
+  - Event delegation (no inline onclick strings)
+  - Mobile responsive (320px to 1920px), tap targets >= 44px
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://yduueujrykugmzvbnndu.supabase.co">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+/* ==========================================================================
+   SNERA STORE DESIGN SYSTEM — SCOPED UNDER .sn-root
+   ========================================================================== */
+.sn-root {
+  --color-wine: #5B1A3A;
+  --color-wine-dark: #3E0F28;
+  --color-wine-light: #7A2E52;
+  --color-gold: #C9A96E;
+  --color-gold-dark: #A8893F;
+  --color-gold-light: #E4D5B0;
+  --color-ivory: #FAF7F2;
+  --color-sand: #F0EBE3;
+  --color-white: #FFFFFF;
+  --color-rose: #E8D5D0;
+  --color-charcoal: #2D2D2D;
+  --color-dark: #1A1A1A;
+  --color-gray: #8A8578;
+  --color-gray-light: #C5C0B8;
+  --color-border: #E5E0D8;
+  --color-success: #3A7D44;
+  --color-danger: #C0392B;
+  --color-info: #2471A3;
+
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+  --shadow-hover: 0 16px 48px rgba(0,0,0,0.12);
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  --sn-odoo-header-h: 0px;
+
+  font-family: var(--font-sans);
+  background-color: var(--color-ivory);
+  color: var(--color-charcoal);
+  line-height: 1.6;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sn-root *, .sn-root *::before, .sn-root *::after {
+  box-sizing: border-box;
+}
+
+.sn-root h1, .sn-root h2, .sn-root h3, .sn-root h4, .sn-root h5, .sn-root h6 {
+  font-family: var(--font-serif);
+  color: var(--color-wine-dark);
+  line-height: 1.25;
+  margin-top: 0;
+  font-weight: 700;
+}
+.sn-root p { margin-top: 0; margin-bottom: 1rem; }
+.sn-root p:last-child { margin-bottom: 0; }
+.sn-root a { color: inherit; text-decoration: none; transition: color var(--transition-fast); }
+.sn-root img { max-width: 100%; height: auto; display: block; }
+.sn-root button, .sn-root input, .sn-root select, .sn-root textarea {
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+.sn-root button { cursor: pointer; border: none; background: none; }
+
+.sn-container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+.sn-section-pad {
+  padding: 3rem 0 5rem;
+}
+
+/* Announcement Top Bar */
+.sn-top-bar {
+  background: var(--color-wine-dark);
+  color: var(--color-gold-light);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0.55rem 1rem;
+}
+
+/* Sticky Main Navigation */
+.sn-navbar {
+  position: -webkit-sticky;
+  position: sticky;
+  top: var(--sn-odoo-header-h, 0px);
+  z-index: 1000;
+  background: rgba(250, 247, 242, 0.96);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+.sn-navbar.is-scrolled {
+  box-shadow: var(--shadow-sm);
+  background: rgba(255, 255, 255, 0.98);
+}
+.sn-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+}
+.sn-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.sn-brand-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+  font-weight: 700;
+  color: var(--color-wine);
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+.sn-brand-sub {
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-gold-dark);
+  font-weight: 600;
+  margin-top: 2px;
+}
+.sn-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.sn-nav-link {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--color-charcoal);
+  position: relative;
+  padding: 0.35rem 0;
+}
+.sn-nav-link:hover, .sn-nav-link.is-active {
+  color: var(--color-wine);
+}
+.sn-nav-link.is-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--color-wine);
+  border-radius: 2px;
+}
+.sn-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.sn-btn-icon {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-charcoal);
+  font-size: 1.05rem;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  position: relative;
+}
+.sn-btn-icon:hover {
+  background: var(--color-sand);
+  color: var(--color-wine);
+}
+.sn-cart-badge-count {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--color-wine);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+.sn-hamburger-btn {
+  display: none;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: var(--color-charcoal);
+}
+
+/* Buttons */
+.sn-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.75rem 1.5rem;
+  min-height: 44px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: transform var(--transition-fast), background var(--transition-fast);
+  cursor: pointer;
+}
+.sn-btn-wine { background: var(--color-wine); color: #fff; }
+.sn-btn-wine:hover { background: var(--color-wine-dark); color: #fff; }
+.sn-btn-outline { border: 1.5px solid var(--color-wine); color: var(--color-wine); background: transparent; }
+.sn-btn-outline:hover { background: var(--color-wine); color: #fff; }
+
+/* Shop Header Banner */
+.sn-shop-hero {
+  background: linear-gradient(180deg, var(--color-sand) 0%, var(--color-ivory) 100%);
+  padding: 3rem 0 2rem;
+  text-align: center;
+  border-bottom: 1px solid var(--color-border);
+}
+.sn-shop-hero h1 {
+  font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+  color: var(--color-wine-dark);
+  margin-bottom: 0.5rem;
+}
+.sn-shop-hero p {
+  color: var(--color-gray);
+  font-size: 1rem;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+/* Filter & Search Bar */
+.sn-filter-bar {
+  background: #ffffff;
+  border-bottom: 1px solid var(--color-border);
+  padding: 1rem 0;
+  position: -webkit-sticky;
+  position: sticky;
+  top: calc(var(--sn-odoo-header-h, 0px) + 70px);
+  z-index: 900;
+  box-shadow: var(--shadow-sm);
+}
+.sn-filter-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.sn-search-box {
+  position: relative;
+  flex: 1 1 240px;
+  max-width: 380px;
+}
+.sn-search-box i {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-gray);
+  pointer-events: none;
+}
+.sn-search-input {
+  width: 100%;
+  padding: 0.65rem 1rem 0.65rem 2.4rem;
+  min-height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-ivory);
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.sn-search-input:focus {
+  border-color: var(--color-gold);
+  background: #ffffff;
+}
+
+/* Filter Controls */
+.sn-filter-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.sn-select {
+  padding: 0.65rem 2.2rem 0.65rem 1rem;
+  min-height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-ivory) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235B1A3A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") no-repeat right 0.75rem center;
+  background-size: 14px;
+  font-size: 0.88rem;
+  color: var(--color-charcoal);
+  font-weight: 500;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.sn-select:focus {
+  border-color: var(--color-gold);
+}
+
+/* Fabric Category Pills */
+.sn-fabric-pills {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.75rem 0 0.25rem;
+  -webkit-overflow-scrolling: touch;
+}
+.sn-pill {
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-charcoal);
+  background: #fff;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+.sn-pill:hover {
+  border-color: var(--color-wine);
+  color: var(--color-wine);
+}
+.sn-pill.is-active {
+  background: var(--color-wine);
+  color: #fff;
+  border-color: var(--color-wine);
+}
+
+/* Results Count & Active Tags */
+.sn-results-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1.5rem 0 1.25rem;
+  font-size: 0.88rem;
+  color: var(--color-gray);
+}
+.sn-reset-btn {
+  color: var(--color-wine);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Product Cards Grid */
+.sn-prod-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 255px), 1fr));
+  gap: 1.75rem;
+}
+.sn-prod-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.sn-prod-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--color-gold-light);
+}
+.sn-prod-thumb-wrap {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  background: var(--color-sand);
+  overflow: hidden;
+}
+.sn-prod-thumb-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.sn-prod-card:hover .sn-prod-thumb-wrap img {
+  transform: scale(1.04);
+}
+.sn-prod-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: var(--color-wine);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  z-index: 2;
+}
+.sn-prod-wish-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--color-charcoal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), color var(--transition-fast);
+  z-index: 2;
+}
+.sn-prod-wish-btn:hover, .sn-prod-wish-btn.is-active {
+  color: var(--color-danger);
+  transform: scale(1.1);
+}
+.sn-prod-content {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.sn-prod-cat {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-gold-dark);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.sn-prod-name {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--color-dark);
+  line-height: 1.35;
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sn-prod-pricing {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+.sn-prod-price {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-wine);
+}
+.sn-prod-orig-price {
+  font-size: 0.88rem;
+  color: #888;
+  text-decoration: line-through;
+}
+.sn-prod-card .sn-btn {
+  margin-top: auto;
+  width: 100%;
+}
+
+/* Empty State */
+.sn-empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 1rem;
+  background: #ffffff;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+}
+.sn-empty-icon {
+  font-size: 2.8rem;
+  color: var(--color-gray-light);
+  margin-bottom: 1rem;
+}
+
+/* Skeletons */
+.sn-skeleton {
+  background: linear-gradient(90deg, #ede8e1 25%, #f7f4ef 50%, #ede8e1 75%);
+  background-size: 200% 100%;
+  animation: snShimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes snShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Footer */
+.sn-footer {
+  background: var(--color-wine-dark);
+  color: #fff;
+  padding: 4.5rem 0 2rem;
+  margin-top: 4rem;
+}
+.sn-footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 2.5rem;
+  margin-bottom: 3.5rem;
+}
+.sn-footer-brand h3 {
+  color: var(--color-gold-light);
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+.sn-footer-brand p {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  max-width: 320px;
+}
+.sn-footer-col h4 {
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  margin-bottom: 1.25rem;
+  position: relative;
+  padding-bottom: 8px;
+}
+.sn-footer-col h4::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 28px;
+  height: 1.5px;
+  background: var(--color-gold);
+}
+.sn-footer-links { list-style: none; padding: 0; margin: 0; }
+.sn-footer-links li { margin-bottom: 0.65rem; }
+.sn-footer-links a { color: rgba(255, 255, 255, 0.75); font-size: 0.88rem; transition: color var(--transition-fast); }
+.sn-footer-links a:hover { color: var(--color-gold-light); text-decoration: underline; }
+.sn-footer-contact-item { display: flex; align-items: flex-start; gap: 10px; color: rgba(255, 255, 255, 0.75); font-size: 0.88rem; margin-bottom: 0.75rem; }
+.sn-footer-contact-item i { color: var(--color-gold); margin-top: 4px; }
+.sn-footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Floating WhatsApp Chat Button */
+.sn-whatsapp-float {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  right: 20px;
+  width: 54px;
+  height: 54px;
+  background-color: #25D366;
+  color: #FFFFFF;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 28px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform 0.25s ease;
+}
+.sn-whatsapp-float:hover { transform: scale(1.1); color: #FFFFFF; }
+
+/* Toast Notifications */
+.sn-toast {
+  position: fixed;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%) translateY(30px);
+  background: var(--color-wine-dark);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.25s ease, opacity 0.25s ease, visibility 0.25s;
+  z-index: 10000;
+  pointer-events: none;
+}
+.sn-toast.is-shown { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+/* Mobile Slide-Over Drawer */
+.sn-drawer-backdrop {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); z-index: 10001;
+  opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s;
+}
+.sn-drawer-backdrop.is-open { opacity: 1; visibility: visible; }
+.sn-drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 300px; max-width: 85vw;
+  background: #ffffff; z-index: 10002; box-shadow: -4px 0 24px rgba(0, 0, 0, 0.2);
+  transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex; flex-direction: column; padding: 1.5rem; box-sizing: border-box;
+}
+.sn-drawer.is-open { transform: translateX(0); }
+.sn-drawer-head { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+.sn-drawer-links { display: flex; flex-direction: column; gap: 1.25rem; }
+.sn-drawer-links a { font-size: 1.1rem; font-weight: 600; color: var(--color-charcoal); }
+
+/* Responsive Media Queries */
+@media (max-width: 992px) {
+  .sn-nav-links { display: none; }
+  .sn-hamburger-btn { display: flex; }
+  .sn-footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+}
+
+@media (max-width: 768px) {
+  .sn-filter-bar { top: var(--sn-odoo-header-h, 0px); }
+  .sn-filter-inner { flex-direction: column; align-items: stretch; }
+  .sn-search-box { max-width: 100%; }
+  .sn-footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .sn-btn { min-height: 48px; }
+}
+
+@media (max-width: 576px) {
+  .sn-container { padding: 0 1rem; }
+  .sn-whatsapp-float {
+    width: 48px; height: 48px; font-size: 24px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)); right: 16px;
+  }
+}
+</style>
+
+<!-- MAIN EMBED CONTENT -->
+<div class="sn-root" id="sn-shop-root">
+
+  <!-- Announcement Bar -->
+  <div class="sn-top-bar">
+    Free Shipping Across India on Orders Over ₹999 &nbsp;|&nbsp; 100% Handloom Authenticity Guarantee
+  </div>
+
+  <!-- Navbar -->
+  <header class="sn-navbar" id="sn-main-navbar">
+    <div class="sn-container sn-nav-inner">
+      <a href="/" class="sn-brand" aria-label="Snera Store Home">
+        <span class="sn-brand-title">Snera</span>
+        <span class="sn-brand-sub">Handloom Boutique</span>
+      </a>
+
+      <nav class="sn-nav-links" aria-label="Main Navigation">
+        <a href="/" class="sn-nav-link">Home</a>
+        <a href="/shop" class="sn-nav-link is-active">Shop Sarees</a>
+        <a href="/#collections" class="sn-nav-link">Collections</a>
+        <a href="/about" class="sn-nav-link">Our Story</a>
+        <a href="/about#contact" class="sn-nav-link">Contact</a>
+      </nav>
+
+      <div class="sn-nav-actions">
+        <a href="/shop" class="sn-btn-icon" aria-label="Search Collection" title="Search"><i class="fa fa-search"></i></a>
+        <a href="/profile" class="sn-btn-icon" aria-label="My Account" title="My Account"><i class="fa fa-user-o"></i></a>
+        <a href="/cart" class="sn-btn-icon" aria-label="View Shopping Cart" title="Cart">
+          <i class="fa fa-shopping-bag"></i>
+          <span class="sn-cart-badge-count" id="sn-cart-badge">0</span>
+        </a>
+        <button type="button" class="sn-hamburger-btn" id="sn-menu-toggle" aria-label="Open Navigation Menu">
+          <i class="fa fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Shop Header -->
+  <div class="sn-shop-hero">
+    <div class="sn-container">
+      <h1>Handwoven Sarees</h1>
+      <p>Artisanal heritage weaves sourced directly from India's most celebrated master weaving clusters.</p>
+    </div>
+  </div>
+
+  <!-- Filter & Search Bar -->
+  <div class="sn-filter-bar">
+    <div class="sn-container">
+      <div class="sn-filter-inner">
+        <!-- Search box -->
+        <div class="sn-search-box">
+          <i class="fa fa-search"></i>
+          <input type="search" id="sn-shop-search" class="sn-search-input" placeholder="Search sarees by name or fabric...">
+        </div>
+
+        <!-- Dropdowns -->
+        <div class="sn-filter-controls">
+          <select id="sn-filter-occasion" class="sn-select" aria-label="Filter by Occasion">
+            <option value="">All Occasions</option>
+            <option value="Wedding">Wedding / Bridal</option>
+            <option value="Festival">Festive Wear</option>
+            <option value="Party">Party &amp; Evening</option>
+            <option value="Daily">Daily &amp; Casual</option>
+          </select>
+
+          <select id="sn-filter-sort" class="sn-select" aria-label="Sort sarees">
+            <option value="featured">Featured First</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="newest">New Arrivals</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Fabric Category Pills -->
+      <div class="sn-fabric-pills" id="sn-fabric-pills">
+        <button type="button" class="sn-pill is-active" data-fabric="">All Fabrics</button>
+        <button type="button" class="sn-pill" data-fabric="Banarasi">Banarasi Silk</button>
+        <button type="button" class="sn-pill" data-fabric="Kanjeevaram">Kanjeevaram</button>
+        <button type="button" class="sn-pill" data-fabric="Chanderi">Chanderi</button>
+        <button type="button" class="sn-pill" data-fabric="Linen">Pure Linen</button>
+        <button type="button" class="sn-pill" data-fabric="Organza">Organza</button>
+        <button type="button" class="sn-pill" data-fabric="Georgette">Georgette</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Catalog Grid -->
+  <main class="sn-section-pad">
+    <div class="sn-container">
+      <div class="sn-results-meta">
+        <span id="sn-results-count">Loading sarees...</span>
+        <button type="button" id="sn-reset-filters" class="sn-reset-btn" style="display:none;">Reset all filters</button>
+      </div>
+
+      <div class="sn-prod-grid" id="sn-shop-grid">
+        <!-- Skeletons while loading -->
+        <div class="sn-prod-card"><div class="sn-prod-thumb-wrap sn-skeleton"></div><div class="sn-prod-content"><div class="sn-skeleton" style="height:20px; width:60%; margin-bottom:8px;"></div><div class="sn-skeleton" style="height:16px; width:40%;"></div></div></div>
+        <div class="sn-prod-card"><div class="sn-prod-thumb-wrap sn-skeleton"></div><div class="sn-prod-content"><div class="sn-skeleton" style="height:20px; width:60%; margin-bottom:8px;"></div><div class="sn-skeleton" style="height:16px; width:40%;"></div></div></div>
+        <div class="sn-prod-card"><div class="sn-prod-thumb-wrap sn-skeleton"></div><div class="sn-prod-content"><div class="sn-skeleton" style="height:20px; width:60%; margin-bottom:8px;"></div><div class="sn-skeleton" style="height:16px; width:40%;"></div></div></div>
+        <div class="sn-prod-card"><div class="sn-prod-thumb-wrap sn-skeleton"></div><div class="sn-prod-content"><div class="sn-skeleton" style="height:20px; width:60%; margin-bottom:8px;"></div><div class="sn-skeleton" style="height:16px; width:40%;"></div></div></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Shared Footer -->
+  <footer class="sn-footer">
+    <div class="sn-container">
+      <div class="sn-footer-grid">
+        <div class="sn-footer-brand">
+          <h3 class="sn-brand-title" style="color:var(--color-gold-light);">Snera</h3>
+          <p>
+            Curating India's most exquisite handwoven sarees. Preserving ancient loom artistry for modern elegance.
+          </p>
+        </div>
+        <div class="sn-footer-col">
+          <h4>Explore</h4>
+          <ul class="sn-footer-links">
+            <li><a href="/shop">All Sarees</a></li>
+            <li><a href="/shop?fabric=Banarasi">Banarasi Silk</a></li>
+            <li><a href="/shop?fabric=Kanjeevaram">Kanjeevaram</a></li>
+            <li><a href="/shop?fabric=Chanderi">Chanderi &amp; Organza</a></li>
+            <li><a href="/shop?occasion=Wedding">Bridal Heritage</a></li>
+          </ul>
+        </div>
+        <div class="sn-footer-col">
+          <h4>Customer Care</h4>
+          <ul class="sn-footer-links">
+            <li><a href="/profile">My Account &amp; Orders</a></li>
+            <li><a href="/cart">Shopping Cart</a></li>
+            <li><a href="/checkout">Checkout</a></li>
+            <li><a href="/shipping-policy">Shipping Policy</a></li>
+            <li><a href="/returns-policy">7-Day Returns Policy</a></li>
+            <li><a href="/terms">Terms &amp; Conditions</a></li>
+            <li><a href="/privacy-policy">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="sn-footer-col">
+          <h4>Boutique &amp; Support</h4>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-envelope-o"></i>
+            <span>support@snerafashion.com</span>
+          </div>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-phone"></i>
+            <span>+91 98765 43210</span>
+          </div>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-map-marker"></i>
+            <span>101 Royal Residency, Ring Road, Surat, Gujarat - 395007, India</span>
+          </div>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-clock-o"></i>
+            <span>Mon – Sat: 10:00 AM – 7:00 PM IST</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sn-footer-bottom">
+        <div>&copy; 2026 Snera Store (snerafashion.com). All rights reserved. Handcrafted with pride in India.</div>
+        <div>
+          <a href="/admin" style="color:rgba(255,255,255,0.45); margin-right:12px;">Admin Portal</a>
+          <span>100% Handcrafted • Cash on Delivery</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating WhatsApp Chat -->
+  <a href="https://wa.me/919876543210?text=Hello%20Snera%20Store%2C%20I%20have%20an%20inquiry%20about%20your%20sarees"
+     class="sn-whatsapp-float"
+     target="_blank"
+     rel="noopener noreferrer"
+     aria-label="Chat with Snera Store on WhatsApp">
+    <i class="fa fa-whatsapp"></i>
+  </a>
+
+</div>
+
+<!-- PORTAL CONTAINER -->
+<div id="sn-portal" class="sn-root">
+  <div class="sn-drawer-backdrop" id="sn-menu-backdrop"></div>
+  <aside class="sn-drawer" id="sn-menu-drawer" aria-label="Mobile Navigation">
+    <div class="sn-drawer-head">
+      <div class="sn-brand-title" style="font-size:1.6rem; color:var(--color-wine);">Snera</div>
+      <button type="button" class="sn-btn-icon" id="sn-menu-close" aria-label="Close menu"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="sn-drawer-links">
+      <a href="/">Home</a>
+      <a href="/shop">Shop Sarees</a>
+      <a href="/#collections">Collections</a>
+      <a href="/about">Our Story</a>
+      <a href="/about#contact">Contact Us</a>
+      <hr style="border:0; border-top:1px solid var(--color-border); margin:0.75rem 0;">
+      <a href="/profile"><i class="fa fa-user-o" style="margin-right:8px;"></i> My Account</a>
+      <a href="/cart"><i class="fa fa-shopping-bag" style="margin-right:8px;"></i> Cart</a>
+    </div>
+  </aside>
+  <div class="sn-toast" id="sn-toast-msg" role="status"></div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var SUPABASE_URL = 'https://yduueujrykugmzvbnndu.supabase.co';
+  var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkdXVldWpyeWt1Z216dmJubmR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MDEyNzYsImV4cCI6MjA5NTE3NzI3Nn0.OeMKhnf5cQv5KfSGqdXHZziP-x4MOmlKnV6EFmnmkJs';
+  var db = null;
+  var allProducts = [];
+  var filteredProducts = [];
+
+  var state = {
+    search: '',
+    fabric: '',
+    occasion: '',
+    sort: 'featured'
+  };
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function money(n) { return '₹' + (Number(n) || 0).toLocaleString('en-IN'); }
+
+  function showToast(msg) {
+    var t = $('sn-toast-msg');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('is-shown');
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(function() { t.classList.remove('is-shown'); }, 2800);
+  }
+
+  function updateCartBadge() {
+    try {
+      var cart = JSON.parse(localStorage.getItem('snera_cart')) || [];
+      var count = cart.reduce(function(sum, item) { return sum + (Number(item.quantity) || Number(item.qty) || 1); }, 0);
+      var badge = $('sn-cart-badge');
+      if (badge) {
+        badge.textContent = count;
+        badge.style.display = count > 0 ? 'inline-flex' : 'none';
+      }
+    } catch(e) {}
+  }
+
+  function initFullBleed() {
+    var root = $('sn-shop-root');
+    function adjust() {
+      if (root) {
+        root.style.marginLeft = '0px';
+        root.style.width = '100%';
+        var rect = root.getBoundingClientRect();
+        var cw = document.documentElement.clientWidth;
+        root.style.width = cw + 'px';
+        root.style.marginLeft = (-rect.left) + 'px';
+      }
+      var oH = document.querySelector('header') || document.querySelector('.o_header_standard') || document.querySelector('#top') || document.querySelector('.navbar:not(.sn-navbar)');
+      var h = (oH && oH.offsetHeight) ? oH.offsetHeight : 0;
+      document.documentElement.style.setProperty('--sn-odoo-header-h', h + 'px');
+    }
+    window.addEventListener('resize', adjust);
+    window.addEventListener('orientationchange', adjust);
+    adjust();
+    setTimeout(adjust, 200);
+  }
+
+  function initPortal() {
+    var p = $('sn-portal');
+    if (p && p.parentElement !== document.body) {
+      document.body.appendChild(p);
+    }
+  }
+
+  function setupMobileMenu() {
+    var toggle = $('sn-menu-toggle');
+    var close = $('sn-menu-close');
+    var backdrop = $('sn-menu-backdrop');
+    var drawer = $('sn-menu-drawer');
+
+    function openMenu() {
+      if (drawer) drawer.classList.add('is-open');
+      if (backdrop) backdrop.classList.add('is-open');
+    }
+    function closeMenu() {
+      if (drawer) drawer.classList.remove('is-open');
+      if (backdrop) backdrop.classList.remove('is-open');
+    }
+
+    if (toggle) toggle.addEventListener('click', openMenu);
+    if (close) close.addEventListener('click', closeMenu);
+    if (backdrop) backdrop.addEventListener('click', closeMenu);
+  }
+
+  function getProductImg(p) {
+    if (p.image_url) return p.image_url;
+    if (Array.isArray(p.images) && p.images.length > 0) return p.images[0];
+    return 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80';
+  }
+
+  function renderGrid() {
+    var grid = $('sn-shop-grid');
+    var countEl = $('sn-results-count');
+    var resetBtn = $('sn-reset-filters');
+    if (!grid) return;
+
+    var isFiltered = state.search || state.fabric || state.occasion;
+    if (resetBtn) resetBtn.style.display = isFiltered ? 'inline-block' : 'none';
+
+    if (!filteredProducts.length) {
+      grid.innerHTML = '<div class="sn-empty-state">' +
+        '<div class="sn-empty-icon"><i class="fa fa-search"></i></div>' +
+        '<h3 style="font-size:1.6rem; color:var(--color-wine); margin-bottom:0.5rem;">No sarees found</h3>' +
+        '<p style="color:#777; max-width:440px; margin:0 auto 1.5rem;">We couldn\'t find any sarees matching your selected criteria. Try resetting filters or exploring our other collections.</p>' +
+        '<button type="button" class="sn-btn sn-btn-wine" id="sn-empty-reset-btn">Reset All Filters</button>' +
+      '</div>';
+      if (countEl) countEl.textContent = 'Showing 0 sarees';
+      var emptyReset = $('sn-empty-reset-btn');
+      if (emptyReset) emptyReset.addEventListener('click', resetFilters);
+      return;
+    }
+
+    if (countEl) {
+      countEl.textContent = 'Showing ' + filteredProducts.length + ' handcrafted saree' + (filteredProducts.length === 1 ? '' : 's');
+    }
+
+    var wishlist = [];
+    try { wishlist = JSON.parse(localStorage.getItem('snera_wishlist')) || []; } catch(e) {}
+
+    grid.innerHTML = filteredProducts.map(function(p) {
+      var isW = wishlist.indexOf(String(p.id)) > -1;
+      var img = getProductImg(p);
+      var origHtml = (p.original_price && Number(p.original_price) > Number(p.price))
+        ? '<span class="sn-prod-orig-price">' + money(p.original_price) + '</span>' : '';
+      var tagHtml = p.fabric ? '<span class="sn-prod-badge">' + esc(p.fabric) + '</span>' : '';
+
+      return '<div class="sn-prod-card" data-card-id="' + esc(p.id) + '">' +
+        '<div class="sn-prod-thumb-wrap">' +
+          tagHtml +
+          '<button type="button" class="sn-prod-wish-btn ' + (isW ? 'is-active' : '') + '" data-action="wishlist" data-id="' + esc(p.id) + '" aria-label="Add to wishlist">' +
+            '<i class="fa fa-heart' + (isW ? '' : '-o') + '"></i>' +
+          '</button>' +
+          '<a href="/shop-detail?id=' + encodeURIComponent(p.id) + '" style="display:block; width:100%; height:100%;">' +
+            '<img src="' + esc(img) + '" alt="' + esc(p.name) + '" width="300" height="400" loading="lazy" decoding="async">' +
+          '</a>' +
+        '</div>' +
+        '<div class="sn-prod-content">' +
+          '<div class="sn-prod-cat">' + esc(p.occasion || p.category_name || 'Handloom') + '</div>' +
+          '<a href="/shop-detail?id=' + encodeURIComponent(p.id) + '" class="sn-prod-name">' + esc(p.name) + '</a>' +
+          '<div class="sn-prod-pricing">' +
+            '<span class="sn-prod-price">' + money(p.price) + '</span>' +
+            origHtml +
+          '</div>' +
+          '<button type="button" class="sn-btn sn-btn-wine" data-action="add-cart" data-id="' + esc(p.id) + '">' +
+            '<i class="fa fa-shopping-bag"></i> Add to Cart' +
+          '</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function applyFilters() {
+    var q = state.search.toLowerCase().trim();
+    var fab = state.fabric.toLowerCase().trim();
+    var occ = state.occasion.toLowerCase().trim();
+
+    filteredProducts = allProducts.filter(function(p) {
+      if (q) {
+        var n = (p.name || '').toLowerCase();
+        var f = (p.fabric || '').toLowerCase();
+        var c = (p.color || '').toLowerCase();
+        if (n.indexOf(q) === -1 && f.indexOf(q) === -1 && c.indexOf(q) === -1) {
+          return false;
+        }
+      }
+      if (fab && (p.fabric || '').toLowerCase().indexOf(fab) === -1) {
+        return false;
+      }
+      if (occ && (p.occasion || '').toLowerCase().indexOf(occ) === -1) {
+        return false;
+      }
+      return true;
+    });
+
+    // Sorting
+    if (state.sort === 'price-asc') {
+      filteredProducts.sort(function(a, b) { return Number(a.price) - Number(b.price); });
+    } else if (state.sort === 'price-desc') {
+      filteredProducts.sort(function(a, b) { return Number(b.price) - Number(a.price); });
+    } else if (state.sort === 'newest') {
+      filteredProducts.sort(function(a, b) { return new Date(b.created_at || 0) - new Date(a.created_at || 0); });
+    } else {
+      // featured
+      filteredProducts.sort(function(a, b) { return (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0); });
+    }
+
+    renderGrid();
+  }
+
+  function resetFilters() {
+    state.search = '';
+    state.fabric = '';
+    state.occasion = '';
+    state.sort = 'featured';
+
+    var searchInput = $('sn-shop-search');
+    if (searchInput) searchInput.value = '';
+    var occSelect = $('sn-filter-occasion');
+    if (occSelect) occSelect.value = '';
+    var sortSelect = $('sn-filter-sort');
+    if (sortSelect) sortSelect.value = 'featured';
+
+    var pills = document.querySelectorAll('.sn-pill');
+    pills.forEach(function(pill) {
+      pill.classList.toggle('is-active', pill.getAttribute('data-fabric') === '');
+    });
+
+    applyFilters();
+  }
+
+  function parseUrlParams() {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('fabric')) {
+      state.fabric = params.get('fabric');
+      var pills = document.querySelectorAll('.sn-pill');
+      pills.forEach(function(pill) {
+        pill.classList.toggle('is-active', (pill.getAttribute('data-fabric') || '').toLowerCase() === state.fabric.toLowerCase());
+      });
+    }
+    if (params.get('occasion')) {
+      state.occasion = params.get('occasion');
+      var occSelect = $('sn-filter-occasion');
+      if (occSelect) occSelect.value = state.occasion;
+    }
+    if (params.get('q')) {
+      state.search = params.get('q');
+      var sIn = $('sn-shop-search');
+      if (sIn) sIn.value = state.search;
+    }
+  }
+
+  async function loadProducts() {
+    var cacheKey = 'snera_all_products_cache';
+    var cacheTsKey = 'snera_all_products_ts';
+    var now = Date.now();
+
+    try {
+      var cached = sessionStorage.getItem(cacheKey);
+      var cachedTs = sessionStorage.getItem(cacheTsKey);
+      if (cached && cachedTs && (now - Number(cachedTs) < 300000)) {
+        allProducts = JSON.parse(cached);
+        applyFilters();
+        return;
+      }
+    } catch(e) {}
+
+    try {
+      if (window.supabase && !db) {
+        db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      }
+      if (db) {
+        var res = await db.from('products')
+          .select('id, name, price, original_price, fabric, color, occasion, stock, image_url, images, is_featured, category_name, created_at')
+          .eq('status', 'active')
+          .order('created_at', { ascending: false });
+
+        if (res.data && res.data.length) {
+          allProducts = res.data;
+          try {
+            sessionStorage.setItem(cacheKey, JSON.stringify(allProducts));
+            sessionStorage.setItem(cacheTsKey, String(now));
+          } catch(e) {}
+          applyFilters();
+          return;
+        }
+      }
+    } catch(err) {
+      console.warn('Failed to fetch shop products from Supabase:', err);
+    }
+
+    // Fallback catalog
+    allProducts = [
+      { id: 'sn-101', name: 'Royal Crimson Banarasi Katan Silk Saree', price: 12500, original_price: 15000, fabric: 'Banarasi', occasion: 'Wedding', stock: 2, image_url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80', is_featured: true },
+      { id: 'sn-102', name: 'Peacock Blue Pure Kanjeevaram Temple Silk', price: 18900, original_price: 22000, fabric: 'Kanjeevaram', occasion: 'Wedding', stock: 1, image_url: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=600&q=80', is_featured: true },
+      { id: 'sn-103', name: 'Dusty Rose Zari Handwoven Chanderi Saree', price: 6800, original_price: 8200, fabric: 'Chanderi', occasion: 'Festival', stock: 3, image_url: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=600&q=80', is_featured: false },
+      { id: 'sn-104', name: 'Hand-Spun Sage Green Pure Linen Saree', price: 4200, original_price: 4999, fabric: 'Linen', occasion: 'Daily', stock: 4, image_url: 'https://images.unsplash.com/photo-1609357605129-26f69add5d6e?auto=format&fit=crop&w=600&q=80', is_featured: false },
+      { id: 'sn-105', name: 'Golden Champagne Sheer Organza Saree', price: 7900, original_price: 9500, fabric: 'Organza', occasion: 'Party', stock: 2, image_url: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80', is_featured: true },
+      { id: 'sn-106', name: 'Jaipuri Bandhani Pure Georgette Saree', price: 5400, original_price: 6500, fabric: 'Georgette', occasion: 'Festival', stock: 3, image_url: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=600&q=80', is_featured: false }
+    ];
+    applyFilters();
+  }
+
+  function setupDelegation() {
+    var grid = $('sn-shop-grid');
+    if (!grid) return;
+
+    grid.addEventListener('click', function(e) {
+      var btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      var action = btn.getAttribute('data-action');
+      var id = btn.getAttribute('data-id');
+      var product = allProducts.find(function(p) { return String(p.id) === String(id); });
+      if (!product) return;
+
+      if (action === 'add-cart') {
+        addToCart(product);
+      } else if (action === 'wishlist') {
+        toggleWishlist(product, btn);
+      }
+    });
+  }
+
+  function addToCart(p) {
+    try {
+      var cart = JSON.parse(localStorage.getItem('snera_cart')) || [];
+      var existing = cart.find(function(item) { return String(item.id) === String(p.id); });
+      var stock = Number(p.stock) || 5;
+
+      if (existing) {
+        var currentQty = Number(existing.quantity || existing.qty || 1);
+        if (currentQty >= stock) {
+          showToast('Only ' + stock + ' piece(s) available in stock.');
+          return;
+        }
+        existing.quantity = currentQty + 1;
+      } else {
+        cart.push({
+          id: p.id,
+          name: p.name,
+          price: Number(p.price) || 0,
+          original_price: Number(p.original_price) || 0,
+          image: getProductImg(p),
+          fabric: p.fabric || 'Handloom',
+          stock: stock,
+          quantity: 1
+        });
+      }
+      localStorage.setItem('snera_cart', JSON.stringify(cart));
+      updateCartBadge();
+      showToast('Added "' + p.name + '" to your cart');
+    } catch(e) {
+      showToast('Could not add to cart.');
+    }
+  }
+
+  function toggleWishlist(p, btn) {
+    try {
+      var wishlist = JSON.parse(localStorage.getItem('snera_wishlist')) || [];
+      var sId = String(p.id);
+      var idx = wishlist.indexOf(sId);
+      if (idx > -1) {
+        wishlist.splice(idx, 1);
+        btn.classList.remove('is-active');
+        btn.innerHTML = '<i class="fa fa-heart-o"></i>';
+        showToast('Removed from wishlist');
+      } else {
+        wishlist.push(sId);
+        btn.classList.add('is-active');
+        btn.innerHTML = '<i class="fa fa-heart"></i>';
+        showToast('Saved to wishlist');
+      }
+      localStorage.setItem('snera_wishlist', JSON.stringify(wishlist));
+    } catch(e) {}
+  }
+
+  function setupFilters() {
+    var searchInput = $('sn-shop-search');
+    var occSelect = $('sn-filter-occasion');
+    var sortSelect = $('sn-filter-sort');
+    var pillsWrap = $('sn-fabric-pills');
+    var resetBtn = $('sn-reset-filters');
+
+    // Debounced search
+    var timer;
+    if (searchInput) {
+      searchInput.addEventListener('input', function(e) {
+        clearTimeout(timer);
+        timer = setTimeout(function() {
+          state.search = e.target.value;
+          applyFilters();
+        }, 220);
+      });
+    }
+
+    if (occSelect) {
+      occSelect.addEventListener('change', function(e) {
+        state.occasion = e.target.value;
+        applyFilters();
+      });
+    }
+
+    if (sortSelect) {
+      sortSelect.addEventListener('change', function(e) {
+        state.sort = e.target.value;
+        applyFilters();
+      });
+    }
+
+    if (pillsWrap) {
+      pillsWrap.addEventListener('click', function(e) {
+        var pill = e.target.closest('.sn-pill');
+        if (!pill) return;
+        var fab = pill.getAttribute('data-fabric') || '';
+        state.fabric = fab;
+
+        pillsWrap.querySelectorAll('.sn-pill').forEach(function(el) {
+          el.classList.toggle('is-active', el === pill);
+        });
+        applyFilters();
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', resetFilters);
+    }
+  }
+
+  function init() {
+    initFullBleed();
+    initPortal();
+    setupMobileMenu();
+    updateCartBadge();
+    setupDelegation();
+    setupFilters();
+    parseUrlParams();
+    loadProducts();
+  }
+
+  window.SneraShop = {
+    init: init,
+    addToCart: addToCart
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>

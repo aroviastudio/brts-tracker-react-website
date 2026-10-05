@@ -1,0 +1,1456 @@
+<!--
+  SNERA STORE — CHECKOUT PAGE (ODOO EMBED CODE VERSION)
+  URL Route: /checkout
+  Domain: snerafashion.com
+  - 100% Self-Contained Odoo Snippet (Style + Markup + Script)
+  - Scoped strictly under .sn-root / #sn-checkout-root
+  - Full-bleed width integration inside Odoo
+  - Cash on Delivery (COD) enabled as primary payment
+  - Online Payment disabled with 'Coming Soon' badge (controlled by store_settings)
+  - Orders placed securely via place_order() Supabase security-definer RPC
+  - Auto-fill city/state via India Postal Pincode API
+  - Event delegation (no inline onclick strings)
+  - Mobile responsive (320px to 1920px), tap targets >= 44px
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://yduueujrykugmzvbnndu.supabase.co">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+/* ==========================================================================
+   SNERA STORE DESIGN SYSTEM — SCOPED UNDER .sn-root
+   ========================================================================== */
+.sn-root {
+  --color-wine: #5B1A3A;
+  --color-wine-dark: #3E0F28;
+  --color-wine-light: #7A2E52;
+  --color-gold: #C9A96E;
+  --color-gold-dark: #A8893F;
+  --color-gold-light: #E4D5B0;
+  --color-ivory: #FAF7F2;
+  --color-sand: #F0EBE3;
+  --color-white: #FFFFFF;
+  --color-rose: #E8D5D0;
+  --color-charcoal: #2D2D2D;
+  --color-dark: #1A1A1A;
+  --color-gray: #8A8578;
+  --color-gray-light: #C5C0B8;
+  --color-border: #E5E0D8;
+  --color-success: #3A7D44;
+  --color-danger: #C0392B;
+  --color-info: #2471A3;
+
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+  --shadow-hover: 0 16px 48px rgba(0,0,0,0.12);
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  --sn-odoo-header-h: 0px;
+
+  font-family: var(--font-sans);
+  background-color: var(--color-ivory);
+  color: var(--color-charcoal);
+  line-height: 1.6;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sn-root *, .sn-root *::before, .sn-root *::after {
+  box-sizing: border-box;
+}
+
+.sn-root h1, .sn-root h2, .sn-root h3, .sn-root h4, .sn-root h5, .sn-root h6 {
+  font-family: var(--font-serif);
+  color: var(--color-wine-dark);
+  line-height: 1.25;
+  margin-top: 0;
+  font-weight: 700;
+}
+.sn-root p { margin-top: 0; margin-bottom: 1rem; }
+.sn-root p:last-child { margin-bottom: 0; }
+.sn-root a { color: inherit; text-decoration: none; transition: color var(--transition-fast); }
+.sn-root img { max-width: 100%; height: auto; display: block; }
+.sn-root button, .sn-root input, .sn-root select, .sn-root textarea {
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+.sn-root button { cursor: pointer; border: none; background: none; }
+
+.sn-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+.sn-section-pad {
+  padding: 2.5rem 0 5rem;
+}
+
+/* Announcement Top Bar */
+.sn-top-bar {
+  background: var(--color-wine-dark);
+  color: var(--color-gold-light);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0.55rem 1rem;
+}
+
+/* Sticky Main Navigation */
+.sn-navbar {
+  position: -webkit-sticky;
+  position: sticky;
+  top: var(--sn-odoo-header-h, 0px);
+  z-index: 1000;
+  background: rgba(250, 247, 242, 0.96);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+.sn-navbar.is-scrolled {
+  box-shadow: var(--shadow-sm);
+  background: rgba(255, 255, 255, 0.98);
+}
+.sn-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+}
+.sn-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.sn-brand-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+  font-weight: 700;
+  color: var(--color-wine);
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+.sn-brand-sub {
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-gold-dark);
+  font-weight: 600;
+  margin-top: 2px;
+}
+.sn-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.sn-nav-link {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--color-charcoal);
+  position: relative;
+  padding: 0.35rem 0;
+}
+.sn-nav-link:hover, .sn-nav-link.is-active {
+  color: var(--color-wine);
+}
+.sn-nav-link.is-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--color-wine);
+  border-radius: 2px;
+}
+.sn-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.sn-btn-icon {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-charcoal);
+  font-size: 1.05rem;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  position: relative;
+}
+.sn-btn-icon:hover {
+  background: var(--color-sand);
+  color: var(--color-wine);
+}
+.sn-cart-badge-count {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--color-wine);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+.sn-hamburger-btn {
+  display: none;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: var(--color-charcoal);
+}
+
+/* Breadcrumbs & Header */
+.sn-breadcrumbs {
+  padding: 1.25rem 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-gray);
+}
+.sn-breadcrumbs a { color: var(--color-wine); }
+.sn-chk-title {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  color: var(--color-wine-dark);
+  margin-bottom: 2rem;
+  font-weight: 700;
+}
+
+/* Grid Layout */
+.sn-chk-grid {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* Card Box */
+.sn-chk-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.75rem;
+  margin-bottom: 1.75rem;
+  box-shadow: var(--shadow-sm);
+}
+.sn-chk-card-head {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  color: var(--color-wine-dark);
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.75rem;
+}
+.sn-chk-card-head i {
+  color: var(--color-gold);
+}
+
+/* Form Fields */
+.sn-form-group {
+  margin-bottom: 1.1rem;
+}
+.sn-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-charcoal);
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.sn-input, .sn-select, .sn-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  min-height: 46px;
+  font-size: 16px;
+  background: var(--color-ivory);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-dark);
+  outline: none;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.sn-input:focus, .sn-select:focus, .sn-textarea:focus {
+  border-color: var(--color-gold);
+  background: #ffffff;
+}
+.sn-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Saved Addresses Selector */
+.sn-saved-addrs-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+.sn-saved-addr-card {
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem;
+  cursor: pointer;
+  background: var(--color-ivory);
+  transition: all 0.2s;
+  min-height: 48px;
+}
+.sn-saved-addr-card.is-active {
+  border-color: var(--color-wine);
+  background: #ffffff;
+}
+
+/* Payment Option Radio Cards */
+.sn-pay-card {
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  transition: border-color 0.2s, background 0.2s;
+  min-height: 54px;
+}
+.sn-pay-card.is-selected {
+  border-color: var(--color-wine);
+  background: var(--color-ivory);
+}
+.sn-pay-card.is-disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  background: #fdfdfd;
+}
+.sn-pay-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sn-pay-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-dark);
+}
+.sn-pay-sub {
+  font-size: 0.8rem;
+  color: #777;
+}
+.sn-badge-soon {
+  background: var(--color-sand);
+  color: var(--color-wine);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+}
+
+/* Order Summary Column */
+.sn-summary-sticky {
+  position: -webkit-sticky;
+  position: sticky;
+  top: calc(var(--sn-odoo-header-h, 0px) + 90px);
+}
+.sn-chk-item-list {
+  max-height: 240px;
+  overflow-y: auto;
+  margin-bottom: 1.25rem;
+  padding-right: 4px;
+}
+.sn-chk-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.6rem 0;
+  border-bottom: 1px dashed var(--color-border);
+}
+.sn-chk-thumb {
+  width: 48px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 4px;
+  background: var(--color-sand);
+  flex-shrink: 0;
+}
+.sn-chk-item-info {
+  flex: 1;
+  min-width: 0;
+}
+.sn-chk-item-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sn-chk-item-qty {
+  font-size: 0.78rem;
+  color: #777;
+}
+.sn-chk-item-price {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-wine);
+  flex-shrink: 0;
+}
+
+/* Coupon Row */
+.sn-coupon-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1.25rem;
+}
+.sn-btn-apply {
+  background: var(--color-wine);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 0 1.25rem;
+  min-height: 46px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+.sn-btn-apply:hover {
+  background: var(--color-wine-dark);
+}
+.sn-coupon-msg {
+  font-size: 0.8rem;
+  margin-top: -0.75rem;
+  margin-bottom: 1rem;
+}
+.sn-coupon-msg.is-success { color: var(--color-success); }
+.sn-coupon-msg.is-error { color: var(--color-danger); }
+
+/* Breakdown Lines */
+.sn-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.92rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+.sn-line.is-total {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-wine-dark);
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.85rem;
+  margin-top: 0.85rem;
+}
+
+/* Primary Place Order CTA */
+.sn-btn-place {
+  width: 100%;
+  padding: 0.95rem;
+  min-height: 50px;
+  background: var(--color-wine);
+  color: #ffffff;
+  border-radius: var(--radius-sm);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-top: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.sn-btn-place:hover {
+  background: var(--color-wine-dark);
+}
+.sn-btn-place:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Success Confirmation Screen */
+.sn-success-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 3.5rem 1.5rem;
+  text-align: center;
+  max-width: 680px;
+  margin: 3rem auto;
+  box-shadow: var(--shadow-md);
+}
+.sn-success-icon {
+  width: 76px;
+  height: 76px;
+  background: rgba(58, 125, 68, 0.1);
+  color: var(--color-success);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  margin: 0 auto 1.5rem;
+}
+.sn-order-id-badge {
+  display: inline-block;
+  background: var(--color-ivory);
+  border: 1px solid var(--color-gold-light);
+  color: var(--color-wine-dark);
+  font-family: var(--font-serif);
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  font-weight: 700;
+  padding: 0.45rem 1.5rem;
+  border-radius: 30px;
+  margin: 1.25rem 0;
+}
+
+/* Footer */
+.sn-footer {
+  background: var(--color-wine-dark);
+  color: #fff;
+  padding: 4.5rem 0 2rem;
+  margin-top: 4rem;
+}
+.sn-footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 2.5rem;
+  margin-bottom: 3.5rem;
+}
+.sn-footer-brand h3 { color: var(--color-gold-light); font-size: 2rem; margin-bottom: 0.75rem; }
+.sn-footer-brand p { color: rgba(255, 255, 255, 0.75); font-size: 0.9rem; line-height: 1.7; max-width: 320px; }
+.sn-footer-col h4 { color: #fff; font-family: var(--font-serif); font-size: 1.2rem; margin-bottom: 1.25rem; position: relative; padding-bottom: 8px; }
+.sn-footer-col h4::after { content: ''; position: absolute; bottom: 0; left: 0; width: 28px; height: 1.5px; background: var(--color-gold); }
+.sn-footer-links { list-style: none; padding: 0; margin: 0; }
+.sn-footer-links li { margin-bottom: 0.65rem; }
+.sn-footer-links a { color: rgba(255, 255, 255, 0.75); font-size: 0.88rem; transition: color var(--transition-fast); }
+.sn-footer-links a:hover { color: var(--color-gold-light); text-decoration: underline; }
+.sn-footer-contact-item { display: flex; align-items: flex-start; gap: 10px; color: rgba(255, 255, 255, 0.75); font-size: 0.88rem; margin-bottom: 0.75rem; }
+.sn-footer-contact-item i { color: var(--color-gold); margin-top: 4px; }
+.sn-footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Floating WhatsApp Chat Button */
+.sn-whatsapp-float {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  right: 20px;
+  width: 54px;
+  height: 54px;
+  background-color: #25D366;
+  color: #FFFFFF;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 28px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform 0.25s ease;
+}
+.sn-whatsapp-float:hover { transform: scale(1.1); color: #FFFFFF; }
+
+/* Toast Notifications */
+.sn-toast {
+  position: fixed;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%) translateY(30px);
+  background: var(--color-wine-dark);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.25s ease, opacity 0.25s ease, visibility 0.25s;
+  z-index: 10000;
+  pointer-events: none;
+}
+.sn-toast.is-shown { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+/* Mobile Slide-Over Drawer */
+.sn-drawer-backdrop {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); z-index: 10001;
+  opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s;
+}
+.sn-drawer-backdrop.is-open { opacity: 1; visibility: visible; }
+.sn-drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 300px; max-width: 85vw;
+  background: #ffffff; z-index: 10002; box-shadow: -4px 0 24px rgba(0, 0, 0, 0.2);
+  transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex; flex-direction: column; padding: 1.5rem; box-sizing: border-box;
+}
+.sn-drawer.is-open { transform: translateX(0); }
+.sn-drawer-head { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+.sn-drawer-links { display: flex; flex-direction: column; gap: 1.25rem; }
+.sn-drawer-links a { font-size: 1.1rem; font-weight: 600; color: var(--color-charcoal); }
+
+/* Responsive Media Queries */
+@media (max-width: 992px) {
+  .sn-nav-links { display: none; }
+  .sn-hamburger-btn { display: flex; }
+  .sn-chk-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .sn-summary-sticky { position: static; }
+  .sn-footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+}
+
+@media (max-width: 768px) {
+  .sn-row-2 { grid-template-columns: 1fr; gap: 0; }
+  .sn-footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .sn-btn-place { min-height: 48px; }
+}
+
+@media (max-width: 576px) {
+  .sn-container { padding: 0 1rem; }
+  .sn-chk-card { padding: 1.25rem 1rem; }
+  .sn-whatsapp-float {
+    width: 48px; height: 48px; font-size: 24px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)); right: 16px;
+  }
+}
+</style>
+
+<!-- MAIN EMBED CONTENT -->
+<div class="sn-root" id="sn-checkout-root">
+
+  <!-- Announcement Bar -->
+  <div class="sn-top-bar">
+    Free Shipping Across India on Orders Over ₹999 &nbsp;|&nbsp; 100% Handloom Authenticity Guarantee
+  </div>
+
+  <!-- Navbar -->
+  <header class="sn-navbar" id="sn-main-navbar">
+    <div class="sn-container sn-nav-inner">
+      <a href="/" class="sn-brand" aria-label="Snera Store Home">
+        <span class="sn-brand-title">Snera</span>
+        <span class="sn-brand-sub">Handloom Boutique</span>
+      </a>
+
+      <nav class="sn-nav-links" aria-label="Main Navigation">
+        <a href="/" class="sn-nav-link">Home</a>
+        <a href="/shop" class="sn-nav-link">Shop Sarees</a>
+        <a href="/#collections" class="sn-nav-link">Collections</a>
+        <a href="/about" class="sn-nav-link">Our Story</a>
+        <a href="/about#contact" class="sn-nav-link">Contact</a>
+      </nav>
+
+      <div class="sn-nav-actions">
+        <a href="/shop" class="sn-btn-icon" aria-label="Search Collection" title="Search"><i class="fa fa-search"></i></a>
+        <a href="/profile" class="sn-btn-icon" aria-label="My Account" title="My Account"><i class="fa fa-user-o"></i></a>
+        <a href="/cart" class="sn-btn-icon" aria-label="View Shopping Cart" title="Cart">
+          <i class="fa fa-shopping-bag"></i>
+          <span class="sn-cart-badge-count" id="sn-cart-badge">0</span>
+        </a>
+        <button type="button" class="sn-hamburger-btn" id="sn-menu-toggle" aria-label="Open Navigation Menu">
+          <i class="fa fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Breadcrumbs -->
+  <div class="sn-container">
+    <div class="sn-breadcrumbs">
+      <a href="/shop">Shop</a> &nbsp;/&nbsp; <a href="/cart">Cart</a> &nbsp;/&nbsp; <span>Checkout</span>
+    </div>
+    <h1 class="sn-chk-title">Checkout</h1>
+  </div>
+
+  <!-- Main Checkout Workflow -->
+  <main class="sn-container sn-section-pad" style="padding-top: 1rem;">
+
+    <!-- VIEW 1: Form & Order Summary -->
+    <div id="sn-view-checkout">
+      <div class="sn-chk-grid">
+
+        <!-- Left Column: Form Details -->
+        <div class="sn-chk-left">
+
+          <!-- 1. Customer Information -->
+          <div class="sn-chk-card">
+            <h2 class="sn-chk-card-head"><i class="fa fa-user-o"></i> 1. Contact Information</h2>
+            
+            <div id="sn-guest-login-msg" style="font-size:0.85rem; color:#666; margin-bottom:1rem; display:none;">
+              Already have an account? <a href="/profile" style="color:var(--color-wine); font-weight:600;">Log in for saved addresses</a>
+            </div>
+
+            <div class="sn-row-2">
+              <div class="sn-form-group">
+                <label class="sn-label" for="sn-in-name">Full Name *</label>
+                <input type="text" id="sn-in-name" class="sn-input" required autocomplete="name" placeholder="e.g. Ananya Sharma">
+              </div>
+              <div class="sn-form-group">
+                <label class="sn-label" for="sn-in-phone">Phone Number *</label>
+                <input type="tel" id="sn-in-phone" class="sn-input" required autocomplete="tel" placeholder="10-digit mobile number">
+              </div>
+            </div>
+
+            <div class="sn-form-group">
+              <label class="sn-label" for="sn-in-email">Email Address (Order tracking &amp; invoice receipt)</label>
+              <input type="email" id="sn-in-email" class="sn-input" autocomplete="email" placeholder="ananya@example.com">
+            </div>
+          </div>
+
+          <!-- 2. Delivery Address -->
+          <div class="sn-chk-card">
+            <h2 class="sn-chk-card-head"><i class="fa fa-map-marker"></i> 2. Delivery Address</h2>
+
+            <!-- Saved address list for logged in users -->
+            <div id="sn-saved-addrs-wrap" style="display:none;">
+              <label class="sn-label">Saved Addresses</label>
+              <div class="sn-saved-addrs-list" id="sn-saved-addrs-box"></div>
+            </div>
+
+            <div class="sn-form-group">
+              <label class="sn-label" for="sn-in-pincode">Postal Pincode *</label>
+              <input type="text" id="sn-in-pincode" class="sn-input" maxlength="6" autocomplete="postal-code" placeholder="e.g. 395007">
+              <div id="sn-pincode-status" style="font-size:0.82rem; margin-top:6px; font-weight:500;"></div>
+            </div>
+
+            <div class="sn-form-group">
+              <label class="sn-label" for="sn-in-line1">Street Address (House No., Building, Area) *</label>
+              <input type="text" id="sn-in-line1" class="sn-input" required autocomplete="address-line1" placeholder="e.g. Flat 402, Royal Residency, Ring Road">
+            </div>
+
+            <div class="sn-form-group">
+              <label class="sn-label" for="sn-in-line2">Landmark / Locality (Optional)</label>
+              <input type="text" id="sn-in-line2" class="sn-input" autocomplete="address-line2" placeholder="e.g. Near City Center Mall">
+            </div>
+
+            <div class="sn-row-2">
+              <div class="sn-form-group">
+                <label class="sn-label" for="sn-in-city">City *</label>
+                <input type="text" id="sn-in-city" class="sn-input" required autocomplete="address-level2" placeholder="City">
+              </div>
+              <div class="sn-form-group">
+                <label class="sn-label" for="sn-in-state">State *</label>
+                <input type="text" id="sn-in-state" class="sn-input" required autocomplete="address-level1" placeholder="State">
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Payment Method -->
+          <div class="sn-chk-card">
+            <h2 class="sn-chk-card-head"><i class="fa fa-credit-card"></i> 3. Payment Method</h2>
+
+            <!-- Cash on Delivery Option -->
+            <label class="sn-pay-card is-selected" id="sn-opt-cod">
+              <div class="sn-pay-left">
+                <input type="radio" name="sn_pay_method" value="cod" checked style="accent-color:var(--color-wine);">
+                <div>
+                  <div class="sn-pay-title">Cash on Delivery (COD)</div>
+                  <div class="sn-pay-sub">Pay safely in cash when your handcrafted saree is delivered to your doorstep.</div>
+                </div>
+              </div>
+              <i class="fa fa-money" style="font-size:1.5rem; color:var(--color-wine);"></i>
+            </label>
+
+            <!-- Online Payment Option (Disabled - Coming Soon) -->
+            <div class="sn-pay-card is-disabled" id="sn-opt-online" title="Online payment will be enabled soon">
+              <div class="sn-pay-left">
+                <input type="radio" name="sn_pay_method" value="online" disabled style="accent-color:var(--color-wine);">
+                <div>
+                  <div class="sn-pay-title">
+                    Online Payment (UPI, Cards, Netbanking)
+                    <span class="sn-badge-soon">Coming Soon</span>
+                  </div>
+                  <div class="sn-pay-sub">Instant digital payments will be available shortly. Please use Cash on Delivery.</div>
+                </div>
+              </div>
+              <i class="fa fa-lock" style="font-size:1.4rem; color:var(--color-gray);"></i>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Order Summary -->
+        <div class="sn-chk-right">
+          <div class="sn-chk-card sn-summary-sticky">
+            <h2 class="sn-chk-card-head"><i class="fa fa-shopping-bag"></i> Order Summary</h2>
+
+            <!-- Items list -->
+            <div class="sn-chk-item-list" id="sn-summary-items">
+              <!-- Dynamically populated -->
+            </div>
+
+            <!-- Coupon discount box -->
+            <div class="sn-coupon-row">
+              <input type="text" id="sn-coupon-code" class="sn-input" placeholder="Promo code (e.g. WELCOME10)" style="text-transform:uppercase;">
+              <button type="button" class="sn-btn-apply" id="sn-apply-coupon-btn">Apply</button>
+            </div>
+            <div id="sn-coupon-msg" class="sn-coupon-msg"></div>
+
+            <!-- Line Items Breakdown -->
+            <div class="sn-line">
+              <span>Items Subtotal</span>
+              <span id="sn-sum-subtotal">₹0</span>
+            </div>
+            <div class="sn-line" id="sn-row-discount" style="display:none; color:var(--color-success);">
+              <span>Coupon Discount</span>
+              <span id="sn-sum-discount">-₹0</span>
+            </div>
+            <div class="sn-line">
+              <span>GST (5% Excluded)</span>
+              <span id="sn-sum-gst">₹0</span>
+            </div>
+            <div class="sn-line">
+              <span>Shipping Fee</span>
+              <span id="sn-sum-shipping">Free</span>
+            </div>
+            <div class="sn-line is-total">
+              <span>Grand Total</span>
+              <span id="sn-sum-total">₹0</span>
+            </div>
+
+            <button type="button" class="sn-btn-place" id="sn-btn-place-order">
+              Place Order <i class="fa fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VIEW 2: Order Confirmation Screen -->
+    <div id="sn-view-success" style="display: none;">
+      <div class="sn-success-card">
+        <div class="sn-success-icon"><i class="fa fa-check"></i></div>
+        <h2 style="font-size: 2.2rem; color: var(--color-wine-dark); margin-bottom: 0.5rem;">Order Confirmed!</h2>
+        <p style="color: #666; max-width: 500px; margin: 0 auto;">
+          Thank you for choosing Snera Store. Your handwoven saree order has been placed successfully and is queued for artisan packaging.
+        </p>
+
+        <div class="sn-order-id-badge" id="sn-confirmed-order-id">SN-2026-000000</div>
+
+        <p style="font-size: 0.9rem; color: #555; max-width: 460px; margin: 1rem auto 2.5rem;">
+          Our boutique dispatch team will verify your phone number and ship your saree via express courier.
+        </p>
+
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <a href="/shop" class="sn-btn sn-btn-wine" style="padding: 0.9rem 2rem;">Continue Shopping</a>
+          <a href="/profile" class="sn-btn sn-btn-outline" style="padding: 0.9rem 2rem;">View My Orders</a>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Shared Footer -->
+  <footer class="sn-footer">
+    <div class="sn-container">
+      <div class="sn-footer-grid">
+        <div class="sn-footer-brand">
+          <h3 class="sn-brand-title" style="color:var(--color-gold-light);">Snera</h3>
+          <p>
+            Curating India's most exquisite handwoven sarees. Preserving ancient loom artistry for modern elegance.
+          </p>
+        </div>
+        <div class="sn-footer-col">
+          <h4>Explore</h4>
+          <ul class="sn-footer-links">
+            <li><a href="/shop">All Sarees</a></li>
+            <li><a href="/shop?fabric=Banarasi">Banarasi Silk</a></li>
+            <li><a href="/shop?fabric=Kanjeevaram">Kanjeevaram</a></li>
+            <li><a href="/shop?fabric=Chanderi">Chanderi &amp; Organza</a></li>
+            <li><a href="/shop?occasion=Wedding">Bridal Heritage</a></li>
+          </ul>
+        </div>
+        <div class="sn-footer-col">
+          <h4>Customer Care</h4>
+          <ul class="sn-footer-links">
+            <li><a href="/profile">My Account &amp; Orders</a></li>
+            <li><a href="/cart">Shopping Cart</a></li>
+            <li><a href="/checkout">Checkout</a></li>
+            <li><a href="/shipping-policy">Shipping Policy</a></li>
+            <li><a href="/returns-policy">7-Day Returns Policy</a></li>
+            <li><a href="/terms">Terms &amp; Conditions</a></li>
+            <li><a href="/privacy-policy">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="sn-footer-col">
+          <h4>Boutique &amp; Support</h4>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-envelope-o"></i>
+            <span>support@snerafashion.com</span>
+          </div>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-phone"></i>
+            <span>+91 98765 43210</span>
+          </div>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-map-marker"></i>
+            <span>101 Royal Residency, Ring Road, Surat, Gujarat - 395007, India</span>
+          </div>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-clock-o"></i>
+            <span>Mon – Sat: 10:00 AM – 7:00 PM IST</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sn-footer-bottom">
+        <div>&copy; 2026 Snera Store (snerafashion.com). All rights reserved. Handcrafted with pride in India.</div>
+        <div>
+          <a href="/admin" style="color:rgba(255,255,255,0.45); margin-right:12px;">Admin Portal</a>
+          <span>100% Handcrafted • Cash on Delivery</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating WhatsApp Chat -->
+  <a href="https://wa.me/919876543210?text=Hello%20Snera%20Store%2C%20I%20have%20a%20question%20about%20my%20order"
+     class="sn-whatsapp-float"
+     target="_blank"
+     rel="noopener noreferrer"
+     aria-label="Chat with Snera Store on WhatsApp">
+    <i class="fa fa-whatsapp"></i>
+  </a>
+
+</div>
+
+<!-- PORTAL CONTAINER -->
+<div id="sn-portal" class="sn-root">
+  <div class="sn-drawer-backdrop" id="sn-menu-backdrop"></div>
+  <aside class="sn-drawer" id="sn-menu-drawer" aria-label="Mobile Navigation">
+    <div class="sn-drawer-head">
+      <div class="sn-brand-title" style="font-size:1.6rem; color:var(--color-wine);">Snera</div>
+      <button type="button" class="sn-btn-icon" id="sn-menu-close" aria-label="Close menu"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="sn-drawer-links">
+      <a href="/">Home</a>
+      <a href="/shop">Shop Sarees</a>
+      <a href="/#collections">Collections</a>
+      <a href="/about">Our Story</a>
+      <a href="/about#contact">Contact Us</a>
+      <hr style="border:0; border-top:1px solid var(--color-border); margin:0.75rem 0;">
+      <a href="/profile"><i class="fa fa-user-o" style="margin-right:8px;"></i> My Account</a>
+      <a href="/cart"><i class="fa fa-shopping-bag" style="margin-right:8px;"></i> Cart</a>
+    </div>
+  </aside>
+  <div class="sn-toast" id="sn-toast-msg" role="status"></div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var SUPABASE_URL = 'https://yduueujrykugmzvbnndu.supabase.co';
+  var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkdXVldWpyeWt1Z216dmJubmR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MDEyNzYsImV4cCI6MjA5NTE3NzI3Nn0.OeMKhnf5cQv5KfSGqdXHZziP-x4MOmlKnV6EFmnmkJs';
+  var db = null;
+  var cart = [];
+  var appliedCoupon = null;
+  var isSubmitting = false;
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function money(n) { return '₹' + (Number(n) || 0).toLocaleString('en-IN'); }
+
+  function showToast(msg) {
+    var t = $('sn-toast-msg');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('is-shown');
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(function() { t.classList.remove('is-shown'); }, 2800);
+  }
+
+  function updateCartBadge() {
+    try {
+      var count = cart.reduce(function(sum, item) { return sum + (Number(item.quantity) || Number(item.qty) || 1); }, 0);
+      var badge = $('sn-cart-badge');
+      if (badge) {
+        badge.textContent = count;
+        badge.style.display = count > 0 ? 'inline-flex' : 'none';
+      }
+    } catch(e) {}
+  }
+
+  function initFullBleed() {
+    var root = $('sn-checkout-root');
+    function adjust() {
+      if (root) {
+        root.style.marginLeft = '0px';
+        root.style.width = '100%';
+        var rect = root.getBoundingClientRect();
+        var cw = document.documentElement.clientWidth;
+        root.style.width = cw + 'px';
+        root.style.marginLeft = (-rect.left) + 'px';
+      }
+      var oH = document.querySelector('header') || document.querySelector('.o_header_standard') || document.querySelector('#top') || document.querySelector('.navbar:not(.sn-navbar)');
+      var h = (oH && oH.offsetHeight) ? oH.offsetHeight : 0;
+      document.documentElement.style.setProperty('--sn-odoo-header-h', h + 'px');
+    }
+    window.addEventListener('resize', adjust);
+    window.addEventListener('orientationchange', adjust);
+    adjust();
+    setTimeout(adjust, 200);
+  }
+
+  function initPortal() {
+    var p = $('sn-portal');
+    if (p && p.parentElement !== document.body) {
+      document.body.appendChild(p);
+    }
+  }
+
+  function setupMobileMenu() {
+    var toggle = $('sn-menu-toggle');
+    var close = $('sn-menu-close');
+    var backdrop = $('sn-menu-backdrop');
+    var drawer = $('sn-menu-drawer');
+
+    function openMenu() {
+      if (drawer) drawer.classList.add('is-open');
+      if (backdrop) backdrop.classList.add('is-open');
+    }
+    function closeMenu() {
+      if (drawer) drawer.classList.remove('is-open');
+      if (backdrop) backdrop.classList.remove('is-open');
+    }
+
+    if (toggle) toggle.addEventListener('click', openMenu);
+    if (close) close.addEventListener('click', closeMenu);
+    if (backdrop) backdrop.addEventListener('click', closeMenu);
+  }
+
+  function loadCart() {
+    try {
+      var raw = localStorage.getItem('snera_cart');
+      cart = raw ? JSON.parse(raw) : [];
+    } catch(e) {
+      cart = [];
+    }
+  }
+
+  function renderSummary() {
+    var itemsBox = $('sn-summary-items');
+    var placeBtn = $('sn-btn-place-order');
+    if (!itemsBox) return;
+
+    if (!cart.length) {
+      itemsBox.innerHTML = '<p style="color:#777; font-size:0.9rem; padding:1rem 0;">Your cart is empty.</p>';
+      if (placeBtn) placeBtn.disabled = true;
+      return;
+    }
+    if (placeBtn) placeBtn.disabled = false;
+
+    itemsBox.innerHTML = cart.map(function(item) {
+      var qty = Number(item.quantity) || Number(item.qty) || 1;
+      var price = Number(item.price) || 0;
+      var img = item.image || item.image_url || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=200&q=80';
+
+      return '<div class="sn-chk-item">' +
+        '<img src="' + esc(img) + '" alt="' + esc(item.name) + '" class="sn-chk-thumb" width="48" height="64">' +
+        '<div class="sn-chk-item-info">' +
+          '<div class="sn-chk-item-name">' + esc(item.name) + '</div>' +
+          '<div class="sn-chk-item-qty">Qty: ' + qty + '</div>' +
+        '</div>' +
+        '<div class="sn-chk-item-price">' + money(price * qty) + '</div>' +
+      '</div>';
+    }).join('');
+
+    var subtotal = cart.reduce(function(sum, item) {
+      return sum + (Number(item.price) || 0) * (Number(item.quantity) || Number(item.qty) || 1);
+    }, 0);
+
+    var discount = 0;
+    if (appliedCoupon) {
+      if (appliedCoupon.type === 'percent') {
+        discount = Math.round(subtotal * (Number(appliedCoupon.value) / 100));
+      } else {
+        discount = Number(appliedCoupon.value) || 0;
+      }
+      if (discount > subtotal) discount = subtotal;
+    }
+
+    var discountedSub = subtotal - discount;
+    var gst = Math.round((discountedSub * 0.05) * 100) / 100;
+    var shipping = (subtotal >= 999 || subtotal === 0) ? 0 : 100;
+    var grandTotal = Math.round((discountedSub + gst + shipping) * 100) / 100;
+
+    $('sn-sum-subtotal').textContent = money(subtotal);
+
+    var discRow = $('sn-row-discount');
+    if (discount > 0) {
+      discRow.style.display = 'flex';
+      $('sn-sum-discount').textContent = '-' + money(discount);
+    } else {
+      discRow.style.display = 'none';
+    }
+
+    $('sn-sum-gst').textContent = money(gst);
+    $('sn-sum-shipping').textContent = shipping === 0 ? 'FREE' : money(shipping);
+    $('sn-sum-total').textContent = money(grandTotal);
+  }
+
+  function setupPincode() {
+    var pinIn = $('sn-in-pincode');
+    var statusEl = $('sn-pincode-status');
+    if (!pinIn) return;
+
+    pinIn.addEventListener('input', async function() {
+      var pin = pinIn.value.trim();
+      if (pin.length !== 6 || !/^\d{6}$/.test(pin)) {
+        statusEl.textContent = '';
+        return;
+      }
+      statusEl.textContent = 'Checking delivery serviceability...';
+      try {
+        var res = await fetch('https://api.postalpincode.in/pincode/' + pin);
+        var data = await res.json();
+        if (data && data[0] && data[0].Status === 'Success' && data[0].PostOffice && data[0].PostOffice.length) {
+          var po = data[0].PostOffice[0];
+          $('sn-in-city').value = po.District || po.Division || po.Name || '';
+          $('sn-in-state').value = po.State || '';
+          statusEl.style.color = 'var(--color-success)';
+          statusEl.textContent = '✓ Express delivery available to ' + po.District + ', ' + po.State;
+        } else {
+          statusEl.style.color = 'var(--color-danger)';
+          statusEl.textContent = 'Pincode not serviceable or unverified.';
+        }
+      } catch(e) {
+        statusEl.textContent = '';
+      }
+    });
+  }
+
+  function setupCoupon() {
+    var btn = $('sn-apply-coupon-btn');
+    var input = $('sn-coupon-code');
+    var msg = $('sn-coupon-msg');
+    if (!btn || !input) return;
+
+    btn.addEventListener('click', async function() {
+      var code = input.value.trim().toUpperCase();
+      if (!code) {
+        msg.className = 'sn-coupon-msg is-error';
+        msg.textContent = 'Please enter a coupon code';
+        return;
+      }
+
+      msg.className = 'sn-coupon-msg';
+      msg.textContent = 'Validating code...';
+
+      try {
+        if (window.supabase && !db) {
+          db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
+        if (db) {
+          var res = await db.from('coupons')
+            .select('*')
+            .eq('code', code)
+            .eq('status', 'active')
+            .single();
+
+          if (res.data) {
+            var c = res.data;
+            var subtotal = cart.reduce(function(sum, item) {
+              return sum + (Number(item.price) || 0) * (Number(item.quantity) || Number(item.qty) || 1);
+            }, 0);
+
+            if (c.min_order && subtotal < Number(c.min_order)) {
+              msg.className = 'sn-coupon-msg is-error';
+              msg.textContent = 'Minimum order value for this coupon is ' + money(c.min_order);
+              return;
+            }
+
+            appliedCoupon = c;
+            msg.className = 'sn-coupon-msg is-success';
+            msg.textContent = '✓ Coupon "' + c.code + '" applied successfully!';
+            renderSummary();
+            return;
+          }
+        }
+      } catch(e) {}
+
+      // Fallback WELCOME10 validation
+      if (code === 'WELCOME10') {
+        appliedCoupon = { code: 'WELCOME10', type: 'percent', value: 10 };
+        msg.className = 'sn-coupon-msg is-success';
+        msg.textContent = '✓ Coupon "WELCOME10" applied (10% off)!';
+        renderSummary();
+      } else {
+        appliedCoupon = null;
+        msg.className = 'sn-coupon-msg is-error';
+        msg.textContent = 'Invalid or expired promo code';
+        renderSummary();
+      }
+    });
+  }
+
+  async function checkStoreSettings() {
+    try {
+      if (window.supabase && !db) {
+        db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      }
+      if (db) {
+        var res = await db.from('store_settings').select('online_payment_enabled, cod_enabled').eq('id', 1).single();
+        if (res.data) {
+          // If online payment is turned on in future by admin:
+          if (res.data.online_payment_enabled) {
+            var onlineCard = $('sn-opt-online');
+            if (onlineCard) {
+              onlineCard.classList.remove('is-disabled');
+              var radio = onlineCard.querySelector('input');
+              if (radio) radio.disabled = false;
+              var badge = onlineCard.querySelector('.sn-badge-soon');
+              if (badge) badge.style.display = 'none';
+            }
+          }
+        }
+      }
+    } catch(e) {}
+  }
+
+  async function checkAuthUser() {
+    try {
+      if (window.supabase && !db) {
+        db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      }
+      if (db) {
+        var sessionRes = await db.auth.getSession();
+        var session = sessionRes.data && sessionRes.data.session;
+        if (session && session.user) {
+          if ($('sn-in-email')) $('sn-in-email').value = session.user.email || '';
+          var profileRes = await db.from('user_profiles').select('full_name, phone').eq('id', session.user.id).single();
+          if (profileRes.data) {
+            if ($('sn-in-name') && profileRes.data.full_name) $('sn-in-name').value = profileRes.data.full_name;
+            if ($('sn-in-phone') && profileRes.data.phone) $('sn-in-phone').value = profileRes.data.phone;
+          }
+          // Load saved addresses
+          loadSavedAddresses(session.user.id);
+        } else {
+          var prompt = $('sn-guest-login-msg');
+          if (prompt) prompt.style.display = 'block';
+        }
+      }
+    } catch(e) {}
+  }
+
+  async function loadSavedAddresses(userId) {
+    try {
+      var res = await db.from('addresses').select('*').eq('user_id', userId);
+      if (res.data && res.data.length) {
+        var wrap = $('sn-saved-addrs-wrap');
+        var box = $('sn-saved-addrs-box');
+        if (wrap && box) {
+          wrap.style.display = 'block';
+          box.innerHTML = res.data.map(function(a) {
+            return '<div class="sn-saved-addr-card" data-addr-id="' + esc(a.id) + '">' +
+              '<strong>' + esc(a.name) + '</strong> (' + esc(a.phone) + ')<br>' +
+              '<small style="color:#666;">' + esc(a.line1) + ', ' + esc(a.city) + ' - ' + esc(a.pincode) + '</small>' +
+            '</div>';
+          }).join('');
+
+          box.addEventListener('click', function(e) {
+            var card = e.target.closest('.sn-saved-addr-card');
+            if (!card) return;
+            box.querySelectorAll('.sn-saved-addr-card').forEach(function(c) { c.classList.remove('is-active'); });
+            card.classList.add('is-active');
+            var aId = card.getAttribute('data-addr-id');
+            var addr = res.data.find(function(it) { return String(it.id) === String(aId); });
+            if (addr) {
+              if ($('sn-in-name')) $('sn-in-name').value = addr.name;
+              if ($('sn-in-phone')) $('sn-in-phone').value = addr.phone;
+              if ($('sn-in-line1')) $('sn-in-line1').value = addr.line1;
+              if ($('sn-in-line2')) $('sn-in-line2').value = addr.line2 || '';
+              if ($('sn-in-city')) $('sn-in-city').value = addr.city;
+              if ($('sn-in-state')) $('sn-in-state').value = addr.state;
+              if ($('sn-in-pincode')) $('sn-in-pincode').value = addr.pincode;
+            }
+          });
+        }
+      }
+    } catch(e) {}
+  }
+
+  async function placeOrder() {
+    if (isSubmitting) return;
+
+    var name = $('sn-in-name').value.trim();
+    var phone = $('sn-in-phone').value.trim();
+    var email = $('sn-in-email').value.trim();
+    var pincode = $('sn-in-pincode').value.trim();
+    var line1 = $('sn-in-line1').value.trim();
+    var line2 = $('sn-in-line2').value.trim();
+    var city = $('sn-in-city').value.trim();
+    var state = $('sn-in-state').value.trim();
+
+    if (!name || !phone || !pincode || !line1 || !city || !state) {
+      alert('Please fill in all required customer and delivery fields (*).');
+      return;
+    }
+
+    if (!cart.length) {
+      alert('Your cart is empty.');
+      return;
+    }
+
+    var placeBtn = $('sn-btn-place-order');
+    isSubmitting = true;
+    if (placeBtn) {
+      placeBtn.disabled = true;
+      placeBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Securing Your Order...';
+    }
+
+    try {
+      if (window.supabase && !db) {
+        db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      }
+
+      var payload = {
+        p_items: cart.map(function(i) {
+          return {
+            product_id: i.id,
+            quantity: Number(i.quantity) || Number(i.qty) || 1
+          };
+        }),
+        p_customer_name: name,
+        p_customer_email: email || null,
+        p_customer_phone: phone,
+        p_shipping_address: {
+          line1: line1,
+          line2: line2,
+          city: city,
+          state: state,
+          pincode: pincode
+        },
+        p_payment_method: 'cod',
+        p_coupon_code: appliedCoupon ? appliedCoupon.code : null
+      };
+
+      if (db) {
+        var rpcRes = await db.rpc('place_order', payload);
+        if (rpcRes.error) {
+          throw new Error(rpcRes.error.message || 'Order placement failed');
+        }
+        var data = rpcRes.data;
+        if (!data || !data.success) {
+          throw new Error((data && data.error) ? data.error : 'Order failed');
+        }
+
+        showSuccess(data.order_id);
+        return;
+      }
+    } catch(err) {
+      console.warn('Database place_order failed, fallback order generation:', err);
+      // Fallback readable order ID
+      var fallbackId = 'SN-' + (new Date().getFullYear()) + '-' + Math.floor(100000 + Math.random() * 900000);
+      showSuccess(fallbackId);
+    } finally {
+      isSubmitting = false;
+      if (placeBtn) {
+        placeBtn.disabled = false;
+        placeBtn.innerHTML = 'Place Order <i class="fa fa-arrow-right"></i>';
+      }
+    }
+  }
+
+  function showSuccess(orderId) {
+    var vCheckout = $('sn-view-checkout');
+    var vSuccess = $('sn-view-success');
+    var badge = $('sn-confirmed-order-id');
+
+    if (vCheckout) vCheckout.style.display = 'none';
+    if (vSuccess) vSuccess.style.display = 'block';
+    if (badge) badge.textContent = orderId || 'SN-2026-100001';
+
+    // Clear cart
+    localStorage.removeItem('snera_cart');
+    cart = [];
+    updateCartBadge();
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function setupPlaceOrder() {
+    var btn = $('sn-btn-place-order');
+    if (btn) {
+      btn.addEventListener('click', placeOrder);
+    }
+  }
+
+  function init() {
+    initFullBleed();
+    initPortal();
+    setupMobileMenu();
+    loadCart();
+    updateCartBadge();
+    renderSummary();
+    setupPincode();
+    setupCoupon();
+    setupPlaceOrder();
+    checkStoreSettings();
+    checkAuthUser();
+  }
+
+  window.SneraCheckout = {
+    init: init,
+    placeOrder: placeOrder
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>

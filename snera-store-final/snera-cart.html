@@ -1,0 +1,1078 @@
+<!--
+  SNERA STORE — SHOPPING CART PAGE (ODOO EMBED CODE VERSION)
+  URL Route: /cart
+  Domain: snerafashion.com
+  - 100% Self-Contained Odoo Snippet (Style + Markup + Script)
+  - Scoped strictly under .sn-root / #sn-cart-root
+  - Full-bleed width integration inside Odoo
+  - Live cart calculations, free shipping threshold meter (₹999)
+  - Event delegation (no inline onclick strings)
+  - Mobile responsive (320px to 1920px), tap targets >= 44px
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://yduueujrykugmzvbnndu.supabase.co">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+/* ==========================================================================
+   SNERA STORE DESIGN SYSTEM — SCOPED UNDER .sn-root
+   ========================================================================== */
+.sn-root {
+  --color-wine: #5B1A3A;
+  --color-wine-dark: #3E0F28;
+  --color-wine-light: #7A2E52;
+  --color-gold: #C9A96E;
+  --color-gold-dark: #A8893F;
+  --color-gold-light: #E4D5B0;
+  --color-ivory: #FAF7F2;
+  --color-sand: #F0EBE3;
+  --color-white: #FFFFFF;
+  --color-rose: #E8D5D0;
+  --color-charcoal: #2D2D2D;
+  --color-dark: #1A1A1A;
+  --color-gray: #8A8578;
+  --color-gray-light: #C5C0B8;
+  --color-border: #E5E0D8;
+  --color-success: #3A7D44;
+  --color-danger: #C0392B;
+  --color-info: #2471A3;
+
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.1);
+  --shadow-hover: 0 16px 48px rgba(0,0,0,0.12);
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  --sn-odoo-header-h: 0px;
+
+  font-family: var(--font-sans);
+  background-color: var(--color-ivory);
+  color: var(--color-charcoal);
+  line-height: 1.6;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.sn-root *, .sn-root *::before, .sn-root *::after {
+  box-sizing: border-box;
+}
+
+.sn-root h1, .sn-root h2, .sn-root h3, .sn-root h4, .sn-root h5, .sn-root h6 {
+  font-family: var(--font-serif);
+  color: var(--color-wine-dark);
+  line-height: 1.25;
+  margin-top: 0;
+  font-weight: 700;
+}
+.sn-root p { margin-top: 0; margin-bottom: 1rem; }
+.sn-root p:last-child { margin-bottom: 0; }
+.sn-root a { color: inherit; text-decoration: none; transition: color var(--transition-fast); }
+.sn-root img { max-width: 100%; height: auto; display: block; }
+.sn-root button, .sn-root input, .sn-root select, .sn-root textarea {
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+.sn-root button { cursor: pointer; border: none; background: none; }
+
+.sn-container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+.sn-section-pad {
+  padding: 3rem 0 5rem;
+}
+
+/* Announcement Top Bar */
+.sn-top-bar {
+  background: var(--color-wine-dark);
+  color: var(--color-gold-light);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0.55rem 1rem;
+}
+
+/* Sticky Main Navigation */
+.sn-navbar {
+  position: -webkit-sticky;
+  position: sticky;
+  top: var(--sn-odoo-header-h, 0px);
+  z-index: 1000;
+  background: rgba(250, 247, 242, 0.96);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+.sn-navbar.is-scrolled {
+  box-shadow: var(--shadow-sm);
+  background: rgba(255, 255, 255, 0.98);
+}
+.sn-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+}
+.sn-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.sn-brand-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+  font-weight: 700;
+  color: var(--color-wine);
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+.sn-brand-sub {
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-gold-dark);
+  font-weight: 600;
+  margin-top: 2px;
+}
+.sn-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.sn-nav-link {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--color-charcoal);
+  position: relative;
+  padding: 0.35rem 0;
+}
+.sn-nav-link:hover, .sn-nav-link.is-active {
+  color: var(--color-wine);
+}
+.sn-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.sn-btn-icon {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-charcoal);
+  font-size: 1.05rem;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  position: relative;
+}
+.sn-btn-icon:hover {
+  background: var(--color-sand);
+  color: var(--color-wine);
+}
+.sn-cart-badge-count {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--color-wine);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+.sn-hamburger-btn {
+  display: none;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: var(--color-charcoal);
+}
+
+/* Breadcrumbs */
+.sn-breadcrumbs {
+  padding: 1.25rem 0;
+  font-size: 0.85rem;
+  color: var(--color-gray);
+}
+.sn-breadcrumbs a {
+  color: var(--color-wine);
+}
+.sn-breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+/* Page Header */
+.sn-cart-title {
+  font-size: clamp(2.2rem, 4vw, 3rem);
+  color: var(--color-wine-dark);
+  margin-bottom: 2rem;
+  font-weight: 700;
+}
+
+/* Free Shipping Meter */
+.sn-free-ship-bar {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+.sn-ship-text {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-wine-dark);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sn-progress-track {
+  height: 8px;
+  background: var(--color-sand);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.sn-progress-fill {
+  height: 100%;
+  background: var(--color-success);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+/* Cart Grid Layout */
+.sn-cart-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* Cart Table Card */
+.sn-cart-items-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-sm);
+}
+.sn-cart-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.sn-cart-table th {
+  text-align: left;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-gray);
+  font-weight: 600;
+}
+.sn-cart-table td {
+  padding: 1.25rem 0;
+  border-bottom: 1px dashed var(--color-border);
+  vertical-align: middle;
+}
+.sn-cart-table tr:last-child td {
+  border-bottom: 0;
+}
+.sn-cart-item-flex {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.sn-cart-thumb {
+  width: 64px;
+  height: 84px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  background: var(--color-sand);
+  flex-shrink: 0;
+}
+.sn-cart-meta h4 {
+  font-size: 1rem;
+  font-family: var(--font-serif);
+  margin-bottom: 3px;
+  color: var(--color-dark);
+}
+.sn-cart-meta p {
+  font-size: 0.78rem;
+  color: #777;
+  margin: 0;
+}
+
+/* Quantity Control in Cart */
+.sn-cart-qty {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-ivory);
+  height: 38px;
+}
+.sn-cart-qty-btn {
+  width: 32px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: var(--color-charcoal);
+  cursor: pointer;
+}
+.sn-cart-qty-val {
+  width: 34px;
+  text-align: center;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+/* Remove Button */
+.sn-remove-btn {
+  color: #999;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  padding: 8px;
+}
+.sn-remove-btn:hover {
+  color: var(--color-danger);
+}
+
+/* Summary Card */
+.sn-summary-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-sm);
+  position: -webkit-sticky;
+  position: sticky;
+  top: calc(var(--sn-odoo-header-h, 0px) + 90px);
+}
+.sn-summary-title {
+  font-size: 1.4rem;
+  color: var(--color-wine-dark);
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.75rem;
+}
+.sn-summary-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+.sn-summary-line.is-total {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-wine-dark);
+  border-top: 1px solid var(--color-border);
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+/* Checkout CTA */
+.sn-btn-checkout {
+  width: 100%;
+  min-height: 48px;
+  background: var(--color-wine);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-top: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.sn-btn-checkout:hover {
+  background: var(--color-wine-dark);
+}
+.sn-btn-continue {
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.88rem;
+  color: var(--color-wine);
+  font-weight: 600;
+}
+.sn-btn-continue:hover {
+  text-decoration: underline;
+}
+
+/* Trust Badges */
+.sn-cart-trust {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+  border-top: 1px solid var(--color-border);
+  padding-top: 1.25rem;
+  font-size: 0.82rem;
+  color: #666;
+}
+.sn-cart-trust-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sn-cart-trust-item i {
+  color: var(--color-gold);
+}
+
+/* Empty State */
+.sn-cart-empty {
+  text-align: center;
+  padding: 5rem 1rem;
+  background: #ffffff;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  max-width: 640px;
+  margin: 0 auto;
+}
+.sn-empty-cart-icon {
+  font-size: 3.5rem;
+  color: var(--color-gray-light);
+  margin-bottom: 1rem;
+}
+
+/* Footer */
+.sn-footer {
+  background: var(--color-wine-dark);
+  color: #fff;
+  padding: 4.5rem 0 2rem;
+  margin-top: 4rem;
+}
+.sn-footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 2.5rem;
+  margin-bottom: 3.5rem;
+}
+.sn-footer-brand h3 { color: var(--color-gold-light); font-size: 2rem; margin-bottom: 0.75rem; }
+.sn-footer-brand p { color: rgba(255, 255, 255, 0.75); font-size: 0.9rem; line-height: 1.7; max-width: 320px; }
+.sn-footer-col h4 { color: #fff; font-family: var(--font-serif); font-size: 1.2rem; margin-bottom: 1.25rem; position: relative; padding-bottom: 8px; }
+.sn-footer-col h4::after { content: ''; position: absolute; bottom: 0; left: 0; width: 28px; height: 1.5px; background: var(--color-gold); }
+.sn-footer-links { list-style: none; padding: 0; margin: 0; }
+.sn-footer-links li { margin-bottom: 0.65rem; }
+.sn-footer-links a { color: rgba(255, 255, 255, 0.75); font-size: 0.88rem; transition: color var(--transition-fast); }
+.sn-footer-links a:hover { color: var(--color-gold-light); text-decoration: underline; }
+.sn-footer-contact-item { display: flex; align-items: flex-start; gap: 10px; color: rgba(255, 255, 255, 0.75); font-size: 0.88rem; margin-bottom: 0.75rem; }
+.sn-footer-contact-item i { color: var(--color-gold); margin-top: 4px; }
+.sn-footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Floating WhatsApp Chat Button */
+.sn-whatsapp-float {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  right: 20px;
+  width: 54px;
+  height: 54px;
+  background-color: #25D366;
+  color: #FFFFFF;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 28px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: transform 0.25s ease;
+}
+.sn-whatsapp-float:hover { transform: scale(1.1); color: #FFFFFF; }
+
+/* Toast Notifications */
+.sn-toast {
+  position: fixed;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%) translateY(30px);
+  background: var(--color-wine-dark);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 0.25s ease, opacity 0.25s ease, visibility 0.25s;
+  z-index: 10000;
+  pointer-events: none;
+}
+.sn-toast.is-shown { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+/* Mobile Slide-Over Drawer */
+.sn-drawer-backdrop {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); z-index: 10001;
+  opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s;
+}
+.sn-drawer-backdrop.is-open { opacity: 1; visibility: visible; }
+.sn-drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 300px; max-width: 85vw;
+  background: #ffffff; z-index: 10002; box-shadow: -4px 0 24px rgba(0, 0, 0, 0.2);
+  transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex; flex-direction: column; padding: 1.5rem; box-sizing: border-box;
+}
+.sn-drawer.is-open { transform: translateX(0); }
+.sn-drawer-head { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+.sn-drawer-links { display: flex; flex-direction: column; gap: 1.25rem; }
+.sn-drawer-links a { font-size: 1.1rem; font-weight: 600; color: var(--color-charcoal); }
+
+/* Responsive Media Queries */
+@media (max-width: 992px) {
+  .sn-nav-links { display: none; }
+  .sn-hamburger-btn { display: flex; }
+  .sn-cart-grid { grid-template-columns: 1fr; }
+  .sn-summary-card { position: static; }
+  .sn-footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+}
+
+@media (max-width: 768px) {
+  .sn-cart-table thead { display: none; }
+  .sn-cart-table, .sn-cart-table tbody, .sn-cart-table tr, .sn-cart-table td { display: block; width: 100%; }
+  .sn-cart-table tr {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-border);
+    position: relative;
+  }
+  .sn-cart-table td { padding: 0.4rem 0; border: 0; }
+  .sn-cart-item-flex { margin-bottom: 0.5rem; }
+  .sn-cart-table td[data-col="qty"] { display: flex; align-items: center; justify-content: space-between; }
+  .sn-cart-table td[data-col="qty"]::before { content: 'Quantity:'; font-size: 0.85rem; color: #777; font-weight: 600; }
+  .sn-cart-table td[data-col="total"] { display: flex; align-items: center; justify-content: space-between; font-weight: 700; color: var(--color-wine); }
+  .sn-cart-table td[data-col="total"]::before { content: 'Total:'; font-size: 0.85rem; color: #777; font-weight: 600; }
+  .sn-cart-table td[data-col="remove"] { position: absolute; top: 1rem; right: 0; }
+  .sn-footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+}
+
+@media (max-width: 576px) {
+  .sn-container { padding: 0 1rem; }
+  .sn-cart-items-card { padding: 1.25rem 1rem; }
+  .sn-summary-card { padding: 1.25rem 1rem; }
+  .sn-whatsapp-float {
+    width: 48px; height: 48px; font-size: 24px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)); right: 16px;
+  }
+}
+</style>
+
+<!-- MAIN EMBED CONTENT -->
+<div class="sn-root" id="sn-cart-root">
+
+  <!-- Announcement Bar -->
+  <div class="sn-top-bar">
+    Free Shipping Across India on Orders Over ₹999 &nbsp;|&nbsp; 100% Handloom Authenticity Guarantee
+  </div>
+
+  <!-- Navbar -->
+  <header class="sn-navbar" id="sn-main-navbar">
+    <div class="sn-container sn-nav-inner">
+      <a href="/" class="sn-brand" aria-label="Snera Store Home">
+        <span class="sn-brand-title">Snera</span>
+        <span class="sn-brand-sub">Handloom Boutique</span>
+      </a>
+
+      <nav class="sn-nav-links" aria-label="Main Navigation">
+        <a href="/" class="sn-nav-link">Home</a>
+        <a href="/shop" class="sn-nav-link">Shop Sarees</a>
+        <a href="/#collections" class="sn-nav-link">Collections</a>
+        <a href="/about" class="sn-nav-link">Our Story</a>
+        <a href="/about#contact" class="sn-nav-link">Contact</a>
+      </nav>
+
+      <div class="sn-nav-actions">
+        <a href="/shop" class="sn-btn-icon" aria-label="Search Collection" title="Search"><i class="fa fa-search"></i></a>
+        <a href="/profile" class="sn-btn-icon" aria-label="My Account" title="My Account"><i class="fa fa-user-o"></i></a>
+        <a href="/cart" class="sn-btn-icon" aria-label="View Shopping Cart" title="Cart">
+          <i class="fa fa-shopping-bag"></i>
+          <span class="sn-cart-badge-count" id="sn-cart-badge">0</span>
+        </a>
+        <button type="button" class="sn-hamburger-btn" id="sn-menu-toggle" aria-label="Open Navigation Menu">
+          <i class="fa fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Breadcrumbs -->
+  <div class="sn-container">
+    <div class="sn-breadcrumbs">
+      <a href="/">Home</a> &nbsp;/&nbsp; <a href="/shop">Shop</a> &nbsp;/&nbsp; <span>Shopping Cart</span>
+    </div>
+    <h1 class="sn-cart-title">Your Shopping Cart</h1>
+  </div>
+
+  <!-- Main Cart Content -->
+  <main class="sn-container">
+    <!-- Free Shipping Progress Tracker -->
+    <div class="sn-free-ship-bar" id="sn-ship-meter-box">
+      <div class="sn-ship-text" id="sn-ship-meter-text">
+        <i class="fa fa-truck"></i> Calculating shipping threshold...
+      </div>
+      <div class="sn-progress-track">
+        <div class="sn-progress-fill" id="sn-ship-progress-fill" style="width: 0%;"></div>
+      </div>
+    </div>
+
+    <!-- Active Cart View -->
+    <div class="sn-cart-grid" id="sn-cart-view-items">
+      <!-- Left: Items Table Card -->
+      <div class="sn-cart-items-card">
+        <table class="sn-cart-table">
+          <thead>
+            <tr>
+              <th>Handcrafted Saree</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="sn-cart-tbody">
+            <!-- Dynamically populated from localStorage -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Right: Summary Card -->
+      <div class="sn-summary-card">
+        <h2 class="sn-summary-title">Order Summary</h2>
+
+        <div class="sn-summary-line">
+          <span>Items Subtotal</span>
+          <span id="sn-cart-subtotal" style="font-weight:600;">₹0</span>
+        </div>
+
+        <div class="sn-summary-line">
+          <span>Estimated Shipping</span>
+          <span id="sn-cart-shipping">Free</span>
+        </div>
+
+        <div class="sn-summary-line" style="font-size:0.8rem; color:#888;">
+          <span>GST (5% Excluded)</span>
+          <span>Calculated at checkout</span>
+        </div>
+
+        <div class="sn-summary-line is-total">
+          <span>Estimated Total</span>
+          <span id="sn-cart-total">₹0</span>
+        </div>
+
+        <a href="/checkout" class="sn-btn-checkout" id="sn-btn-checkout">
+          Proceed to Checkout <i class="fa fa-arrow-right"></i>
+        </a>
+
+        <a href="/shop" class="sn-btn-continue">
+          <i class="fa fa-arrow-left"></i> Continue Shopping
+        </a>
+
+        <div class="sn-cart-trust">
+          <div class="sn-cart-trust-item"><i class="fa fa-certificate"></i> Certified 100% Genuine Handloom</div>
+          <div class="sn-cart-trust-item"><i class="fa fa-refresh"></i> 7-Day Hassle-Free Returns &amp; Exchanges</div>
+          <div class="sn-cart-trust-item"><i class="fa fa-shield"></i> Cash on Delivery (COD) Doorstep Payment</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty Cart View -->
+    <div class="sn-cart-empty" id="sn-cart-view-empty" style="display: none;">
+      <div class="sn-empty-cart-icon"><i class="fa fa-shopping-bag"></i></div>
+      <h2 style="font-size: 2rem; color: var(--color-wine-dark); margin-bottom: 0.75rem;">Your Cart is Empty</h2>
+      <p style="color: #666; max-width: 440px; margin: 0 auto 2rem;">
+        You haven't selected any handloom sarees yet. Explore our curated Banarasi, Kanjeevaram, and Chanderi collections.
+      </p>
+      <a href="/shop" class="sn-btn sn-btn-wine" style="padding: 0.9rem 2.5rem;">Explore Sarees Catalog</a>
+    </div>
+  </main>
+
+  <!-- Shared Footer -->
+  <footer class="sn-footer">
+    <div class="sn-container">
+      <div class="sn-footer-grid">
+        <div class="sn-footer-brand">
+          <h3 class="sn-brand-title" style="color:var(--color-gold-light);">Snera</h3>
+          <p>
+            Curating India's most exquisite handwoven sarees. Preserving ancient loom artistry for modern elegance.
+          </p>
+        </div>
+        <div class="sn-footer-col">
+          <h4>Explore</h4>
+          <ul class="sn-footer-links">
+            <li><a href="/shop">All Sarees</a></li>
+            <li><a href="/shop?fabric=Banarasi">Banarasi Silk</a></li>
+            <li><a href="/shop?fabric=Kanjeevaram">Kanjeevaram</a></li>
+            <li><a href="/shop?fabric=Chanderi">Chanderi &amp; Organza</a></li>
+            <li><a href="/shop?occasion=Wedding">Bridal Heritage</a></li>
+          </ul>
+        </div>
+        <div class="sn-footer-col">
+          <h4>Customer Care</h4>
+          <ul class="sn-footer-links">
+            <li><a href="/profile">My Account &amp; Orders</a></li>
+            <li><a href="/cart">Shopping Cart</a></li>
+            <li><a href="/checkout">Checkout</a></li>
+            <li><a href="/shipping-policy">Shipping Policy</a></li>
+            <li><a href="/returns-policy">7-Day Returns Policy</a></li>
+            <li><a href="/terms">Terms &amp; Conditions</a></li>
+            <li><a href="/privacy-policy">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="sn-footer-col">
+          <h4>Boutique &amp; Support</h4>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-envelope-o"></i>
+            <span>support@snerafashion.com</span>
+          </div>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-phone"></i>
+            <span>+91 98765 43210</span>
+          </div>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-map-marker"></i>
+            <span>101 Royal Residency, Ring Road, Surat, Gujarat - 395007, India</span>
+          </div>
+          <div class="sn-footer-contact-item">
+            <i class="fa fa-clock-o"></i>
+            <span>Mon – Sat: 10:00 AM – 7:00 PM IST</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sn-footer-bottom">
+        <div>&copy; 2026 Snera Store (snerafashion.com). All rights reserved. Handcrafted with pride in India.</div>
+        <div>
+          <a href="/admin" style="color:rgba(255,255,255,0.45); margin-right:12px;">Admin Portal</a>
+          <span>100% Handcrafted • Cash on Delivery</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating WhatsApp Chat -->
+  <a href="https://wa.me/919876543210?text=Hello%20Snera%20Store%2C%20I%20have%20an%20inquiry%20about%20my%20cart"
+     class="sn-whatsapp-float"
+     target="_blank"
+     rel="noopener noreferrer"
+     aria-label="Chat with Snera Store on WhatsApp">
+    <i class="fa fa-whatsapp"></i>
+  </a>
+
+</div>
+
+<!-- PORTAL CONTAINER -->
+<div id="sn-portal" class="sn-root">
+  <div class="sn-drawer-backdrop" id="sn-menu-backdrop"></div>
+  <aside class="sn-drawer" id="sn-menu-drawer" aria-label="Mobile Navigation">
+    <div class="sn-drawer-head">
+      <div class="sn-brand-title" style="font-size:1.6rem; color:var(--color-wine);">Snera</div>
+      <button type="button" class="sn-btn-icon" id="sn-menu-close" aria-label="Close menu"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="sn-drawer-links">
+      <a href="/">Home</a>
+      <a href="/shop">Shop Sarees</a>
+      <a href="/#collections">Collections</a>
+      <a href="/about">Our Story</a>
+      <a href="/about#contact">Contact Us</a>
+      <hr style="border:0; border-top:1px solid var(--color-border); margin:0.75rem 0;">
+      <a href="/profile"><i class="fa fa-user-o" style="margin-right:8px;"></i> My Account</a>
+      <a href="/cart"><i class="fa fa-shopping-bag" style="margin-right:8px;"></i> Cart</a>
+    </div>
+  </aside>
+  <div class="sn-toast" id="sn-toast-msg" role="status"></div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var cart = [];
+  var FREE_SHIPPING_THRESHOLD = 999;
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function money(n) { return '₹' + (Number(n) || 0).toLocaleString('en-IN'); }
+
+  function showToast(msg) {
+    var t = $('sn-toast-msg');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('is-shown');
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(function() { t.classList.remove('is-shown'); }, 2800);
+  }
+
+  function updateCartBadge() {
+    try {
+      var count = cart.reduce(function(sum, item) { return sum + (Number(item.quantity) || Number(item.qty) || 1); }, 0);
+      var badge = $('sn-cart-badge');
+      if (badge) {
+        badge.textContent = count;
+        badge.style.display = count > 0 ? 'inline-flex' : 'none';
+      }
+    } catch(e) {}
+  }
+
+  function initFullBleed() {
+    var root = $('sn-cart-root');
+    function adjust() {
+      if (root) {
+        root.style.marginLeft = '0px';
+        root.style.width = '100%';
+        var rect = root.getBoundingClientRect();
+        var cw = document.documentElement.clientWidth;
+        root.style.width = cw + 'px';
+        root.style.marginLeft = (-rect.left) + 'px';
+      }
+      var oH = document.querySelector('header') || document.querySelector('.o_header_standard') || document.querySelector('#top') || document.querySelector('.navbar:not(.sn-navbar)');
+      var h = (oH && oH.offsetHeight) ? oH.offsetHeight : 0;
+      document.documentElement.style.setProperty('--sn-odoo-header-h', h + 'px');
+    }
+    window.addEventListener('resize', adjust);
+    window.addEventListener('orientationchange', adjust);
+    adjust();
+    setTimeout(adjust, 200);
+  }
+
+  function initPortal() {
+    var p = $('sn-portal');
+    if (p && p.parentElement !== document.body) {
+      document.body.appendChild(p);
+    }
+  }
+
+  function setupMobileMenu() {
+    var toggle = $('sn-menu-toggle');
+    var close = $('sn-menu-close');
+    var backdrop = $('sn-menu-backdrop');
+    var drawer = $('sn-menu-drawer');
+
+    function openMenu() {
+      if (drawer) drawer.classList.add('is-open');
+      if (backdrop) backdrop.classList.add('is-open');
+    }
+    function closeMenu() {
+      if (drawer) drawer.classList.remove('is-open');
+      if (backdrop) backdrop.classList.remove('is-open');
+    }
+
+    if (toggle) toggle.addEventListener('click', openMenu);
+    if (close) close.addEventListener('click', closeMenu);
+    if (backdrop) backdrop.addEventListener('click', closeMenu);
+  }
+
+  function loadCart() {
+    try {
+      var raw = localStorage.getItem('snera_cart');
+      cart = raw ? JSON.parse(raw) : [];
+    } catch(e) {
+      cart = [];
+    }
+  }
+
+  function saveCart() {
+    localStorage.setItem('snera_cart', JSON.stringify(cart));
+    updateCartBadge();
+    renderCart();
+  }
+
+  function renderCart() {
+    var viewItems = $('sn-cart-view-items');
+    var viewEmpty = $('sn-cart-view-empty');
+    var shipMeterBox = $('sn-ship-meter-box');
+    var tbody = $('sn-cart-tbody');
+
+    if (!cart.length) {
+      if (viewItems) viewItems.style.display = 'none';
+      if (shipMeterBox) shipMeterBox.style.display = 'none';
+      if (viewEmpty) viewEmpty.style.display = 'block';
+      return;
+    }
+
+    if (viewItems) viewItems.style.display = 'grid';
+    if (shipMeterBox) shipMeterBox.style.display = 'block';
+    if (viewEmpty) viewEmpty.style.display = 'none';
+
+    var subtotal = 0;
+
+    tbody.innerHTML = cart.map(function(item) {
+      var qty = Number(item.quantity) || Number(item.qty) || 1;
+      var price = Number(item.price) || 0;
+      var lineTotal = price * qty;
+      subtotal += lineTotal;
+      var img = item.image || item.image_url || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=300&q=80';
+
+      return '<tr data-item-id="' + esc(item.id) + '">' +
+        '<td>' +
+          '<div class="sn-cart-item-flex">' +
+            '<img src="' + esc(img) + '" alt="' + esc(item.name) + '" class="sn-cart-thumb" width="64" height="84">' +
+            '<div class="sn-cart-meta">' +
+              '<h4>' + esc(item.name) + '</h4>' +
+              '<p>' + esc(item.fabric || 'Authentic Handloom') + '</p>' +
+            '</div>' +
+          '</div>' +
+        '</td>' +
+        '<td data-col="price" style="font-weight:600; color:var(--color-charcoal);">' + money(price) + '</td>' +
+        '<td data-col="qty">' +
+          '<div class="sn-cart-qty">' +
+            '<button type="button" class="sn-cart-qty-btn" data-action="decrease" data-id="' + esc(item.id) + '">−</button>' +
+            '<span class="sn-cart-qty-val">' + qty + '</span>' +
+            '<button type="button" class="sn-cart-qty-btn" data-action="increase" data-id="' + esc(item.id) + '">+</button>' +
+          '</div>' +
+        '</td>' +
+        '<td data-col="total" style="font-weight:700; color:var(--color-wine);">' + money(lineTotal) + '</td>' +
+        '<td data-col="remove">' +
+          '<button type="button" class="sn-remove-btn" data-action="remove" data-id="' + esc(item.id) + '" aria-label="Remove item">' +
+            '<i class="fa fa-trash-o"></i>' +
+          '</button>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+
+    // Update Shipping Meter
+    var meterText = $('sn-ship-meter-text');
+    var meterFill = $('sn-ship-progress-fill');
+    var isFree = subtotal >= FREE_SHIPPING_THRESHOLD;
+    var estShipping = isFree ? 0 : 100;
+    var grandEst = subtotal + estShipping;
+
+    if (isFree) {
+      if (meterText) meterText.innerHTML = '<i class="fa fa-check-circle" style="color:var(--color-success);"></i> <strong>Congratulations!</strong> You have qualified for <strong>FREE Delivery</strong> across India.';
+      if (meterFill) meterFill.style.width = '100%';
+    } else {
+      var diff = FREE_SHIPPING_THRESHOLD - subtotal;
+      var pct = Math.min(100, Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100));
+      if (meterText) meterText.innerHTML = '<i class="fa fa-truck"></i> Add <strong>' + money(diff) + '</strong> more to your cart to qualify for <strong>FREE Shipping</strong>!';
+      if (meterFill) meterFill.style.width = pct + '%';
+    }
+
+    // Update Summary Lines
+    var subEl = $('sn-cart-subtotal');
+    var shipEl = $('sn-cart-shipping');
+    var totEl = $('sn-cart-total');
+
+    if (subEl) subEl.textContent = money(subtotal);
+    if (shipEl) shipEl.textContent = isFree ? 'FREE' : money(estShipping);
+    if (totEl) totEl.textContent = money(grandEst);
+  }
+
+  function setupDelegation() {
+    var tbody = $('sn-cart-tbody');
+    if (!tbody) return;
+
+    tbody.addEventListener('click', function(e) {
+      var btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      var action = btn.getAttribute('data-action');
+      var id = btn.getAttribute('data-id');
+      var item = cart.find(function(it) { return String(it.id) === String(id); });
+      if (!item) return;
+
+      var currentQty = Number(item.quantity) || Number(item.qty) || 1;
+      var maxStock = Number(item.stock) || 10;
+
+      if (action === 'increase') {
+        if (currentQty < maxStock) {
+          item.quantity = currentQty + 1;
+          saveCart();
+        } else {
+          showToast('Maximum available stock reached for this piece.');
+        }
+      } else if (action === 'decrease') {
+        if (currentQty > 1) {
+          item.quantity = currentQty - 1;
+          saveCart();
+        } else {
+          removeItem(id);
+        }
+      } else if (action === 'remove') {
+        removeItem(id);
+      }
+    });
+  }
+
+  function removeItem(id) {
+    cart = cart.filter(function(it) { return String(it.id) !== String(id); });
+    saveCart();
+    showToast('Saree removed from cart');
+  }
+
+  function init() {
+    initFullBleed();
+    initPortal();
+    setupMobileMenu();
+    loadCart();
+    updateCartBadge();
+    setupDelegation();
+    renderCart();
+  }
+
+  window.SneraCart = {
+    init: init,
+    removeItem: removeItem
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>

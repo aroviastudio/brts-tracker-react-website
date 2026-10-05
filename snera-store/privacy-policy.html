@@ -21,6 +21,40 @@
   padding: 2.5rem 1rem 4rem;
   width: 100%;
   box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.sn-policy-root,
+.sn-policy-root h1,
+.sn-policy-root h2,
+.sn-policy-root h3,
+.sn-policy-root p,
+.sn-policy-root a,
+.sn-policy-root ul,
+.sn-policy-root li,
+.sn-policy-root span,
+.sn-policy-root label,
+.sn-policy-root div {
+  font-family: var(--font-sans) !important;
+  line-height: 1.6;
+}
+.sn-policy-root h1,
+.sn-policy-root h2,
+.sn-policy-root h3 {
+  font-family: var(--font-serif) !important;
+  line-height: 1.25;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.sn-policy-root p {
+  margin-top: 0;
+}
+.sn-policy-root a {
+  color: var(--wine);
+  text-decoration: none;
+}
+.sn-policy-root a:hover {
+  text-decoration: underline;
 }
 
 .sn-policy-root *, .sn-policy-root *::before, .sn-policy-root *::after {
@@ -101,12 +135,28 @@
   color: #FFFFFF;
 }
 
+@media (max-width: 768px) {
+  .sn-policy-root {
+    padding: 2rem 0.75rem 3.5rem;
+  }
+  .sn-policy-section h2 {
+    font-size: 1.3rem;
+  }
+}
+
 @media (max-width: 576px) {
   .sn-policy-root {
     padding: 1.5rem 0.75rem 3.5rem;
   }
   .sn-policy-section {
     padding: 1.25rem 1rem;
+  }
+  .sn-whatsapp-float {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    right: 16px;
   }
 }
 </style>
@@ -140,7 +190,7 @@
 
     <div class="sn-policy-section">
       <h2>5. Contact Us Regarding Your Data</h2>
-      <p>If you have any questions or wish to request data correction or removal, please contact our support team at <strong>support@snerastore.com</strong>.</p>
+      <p>If you have any questions or wish to request data correction or removal, please contact our support team at <strong>support@snerafashion.com</strong>.</p>
     </div>
   </div>
 </div>
