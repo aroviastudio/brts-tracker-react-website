@@ -1,0 +1,3586 @@
+<!--
+================================================================================
+  BHUVI MEHANDI — HAUTE COUTURE BRIDAL HENNA STUDIO
+  Architected with High-End Agency Visual Design & Cast Motion Principles
+  100% Odoo Isolated Embed • Zero Localhost Dependencies • Direct Supabase Engine
+  File: bhuviweb.html
+================================================================================
+-->
+
+<!-- Google Fonts Import for Royal Editorial Luxury Aesthetic -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+/* Root Scoped CSS: Zero Bleed into Odoo, Immune to Odoo Bootstrap Overrides */
+#bhuvi-root {
+    /* 1. HAUTE COUTURE LUXURY COLOR TOKENS */
+    --bhuvi-velvet: #360813;
+    --bhuvi-velvet-dark: #22050b;
+    --bhuvi-velvet-light: #520e1f;
+    --bhuvi-gold: #c59b4e;
+    --bhuvi-gold-bright: #e7bf72;
+    --bhuvi-gold-dark: #916c27;
+    --bhuvi-gold-subtle: rgba(197, 155, 78, 0.12);
+    --bhuvi-gold-border: rgba(197, 155, 78, 0.28);
+    --bhuvi-gold-glow: rgba(197, 155, 78, 0.25);
+    
+    --bhuvi-cream: #faf6f0;
+    --bhuvi-cream-soft: #f4ecdf;
+    --bhuvi-cream-card: #ffffff;
+    --bhuvi-charcoal: #161314;
+    --bhuvi-muted: #726760;
+    --bhuvi-muted-light: #a3968e;
+
+    /* 2. TYPOGRAPHY SCALES */
+    --font-display: 'Cinzel', serif;
+    --font-editorial: 'Cormorant Garamond', Georgia, serif;
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+    /* 3. FLUID DYNAMICS & SPRING EASING */
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* 4. BASE RESET & ISOLATION */
+    all: initial;
+    display: block;
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--bhuvi-charcoal);
+    background-color: var(--bhuvi-cream);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#bhuvi-root *,
+#bhuvi-root *::before,
+#bhuvi-root *::after {
+    box-sizing: border-box;
+}
+
+#bhuvi-root a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.3s var(--ease-out);
+}
+
+#bhuvi-root button,
+#bhuvi-root input,
+#bhuvi-root select,
+#bhuvi-root textarea {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+}
+
+#bhuvi-root img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* SUBTLE FILM GRAIN TEXTURE (Haptic Physical Paper Feel) */
+#bhuvi-root .bhuvi-grain-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9998;
+    opacity: 0.022;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* LAYOUT CONTAINER */
+#bhuvi-root .bhuvi-container {
+    width: 100%;
+    max-width: 1320px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 28px;
+    padding-right: 28px;
+}
+
+@media (max-width: 767px) {
+    #bhuvi-root .bhuvi-container {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+}
+
+/* SECTION SPACING WITH MACRO-WHITESPACE */
+#bhuvi-root .bhuvi-section {
+    padding-top: 108px;
+    padding-bottom: 108px;
+    position: relative;
+}
+
+@media (max-width: 767px) {
+    #bhuvi-root .bhuvi-section {
+        padding-top: 64px;
+        padding-bottom: 64px;
+    }
+}
+
+/* DOUBLE-BEZEL (DOPPELRAND) ARCHITECTURE */
+#bhuvi-root .bezel-outer {
+    position: relative;
+    border-radius: 28px;
+    padding: 6px;
+    background: linear-gradient(135deg, rgba(197, 155, 78, 0.28) 0%, rgba(197, 155, 78, 0.06) 50%, rgba(54, 8, 19, 0.12) 100%);
+    box-shadow: 0 16px 40px -16px rgba(54, 8, 19, 0.08), 0 2px 6px rgba(0, 0, 0, 0.02);
+    transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
+}
+
+#bhuvi-root .bezel-outer:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 50px -12px rgba(54, 8, 19, 0.14), 0 0 25px rgba(197, 155, 78, 0.22);
+}
+
+#bhuvi-root .bezel-inner {
+    border-radius: calc(28px - 6px);
+    background: #ffffff;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9), inset 0 -1px 2px rgba(0, 0, 0, 0.02);
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+}
+
+/* DARK VELVET DOUBLE BEZEL */
+#bhuvi-root .bezel-outer-dark {
+    position: relative;
+    border-radius: 28px;
+    padding: 6px;
+    background: linear-gradient(135deg, rgba(197, 155, 78, 0.45) 0%, rgba(197, 155, 78, 0.1) 50%, rgba(255, 255, 255, 0.05) 100%);
+    box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.35);
+    transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
+}
+
+#bhuvi-root .bezel-outer-dark:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 28px 60px -10px rgba(0, 0, 0, 0.45), 0 0 30px rgba(197, 155, 78, 0.3);
+}
+
+#bhuvi-root .bezel-inner-dark {
+    border-radius: calc(28px - 6px);
+    background: linear-gradient(145deg, #360813 0%, #20040a 100%);
+    color: var(--bhuvi-cream);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+}
+
+/* TYPOGRAPHY COMPONENTS */
+#bhuvi-root .bhuvi-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 9999px;
+    background: var(--bhuvi-gold-subtle);
+    border: 1px solid var(--bhuvi-gold-border);
+    color: var(--bhuvi-gold-dark);
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    margin-bottom: 20px;
+}
+
+#bhuvi-root .bhuvi-eyebrow-dark {
+    background: rgba(197, 155, 78, 0.16);
+    border: 1px solid rgba(197, 155, 78, 0.35);
+    color: var(--bhuvi-gold-bright);
+}
+
+#bhuvi-root .section-header {
+    text-align: center;
+    max-width: 780px;
+    margin: 0 auto 64px auto;
+}
+
+#bhuvi-root .section-header h2 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--bhuvi-velvet);
+    margin: 0 0 16px 0;
+    letter-spacing: 0.02em;
+}
+
+#bhuvi-root .section-header h2.text-light {
+    color: var(--bhuvi-cream);
+}
+
+#bhuvi-root .section-header p {
+    font-family: var(--font-editorial);
+    font-size: clamp(1.15rem, 2vw, 1.45rem);
+    font-style: italic;
+    color: var(--bhuvi-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+#bhuvi-root .section-header p.text-light {
+    color: #e1d3c5;
+}
+
+/* NESTED CTA BUTTON ARCHITECTURE (BUTTON-IN-BUTTON) */
+#bhuvi-root .btn-royal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 8px 8px 8px 26px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #c59b4e 0%, #a47c34 100%);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 14.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 10px 24px -6px rgba(164, 124, 52, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+    cursor: pointer;
+    transition: transform 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out), background 0.3s ease;
+    user-select: none;
+}
+
+#bhuvi-root .btn-royal:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 32px -6px rgba(164, 124, 52, 0.55), 0 0 20px rgba(197, 155, 78, 0.4);
+    background: linear-gradient(135deg, #d3ab5d 0%, #b3893c 100%);
+}
+
+#bhuvi-root .btn-royal:active {
+    transform: scale(0.97);
+}
+
+#bhuvi-root .btn-royal .btn-icon-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 9999px;
+    background: #ffffff;
+    color: var(--bhuvi-velvet);
+    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    transition: transform 0.4s var(--ease-spring);
+}
+
+#bhuvi-root .btn-royal:hover .btn-icon-pill {
+    transform: translateX(3px) rotate(15deg) scale(1.08);
+}
+
+#bhuvi-root .btn-velvet {
+    background: linear-gradient(135deg, var(--bhuvi-velvet) 0%, var(--bhuvi-velvet-dark) 100%);
+    box-shadow: 0 10px 24px -6px rgba(54, 8, 19, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.18);
+    border: 1px solid var(--bhuvi-gold-border);
+}
+
+#bhuvi-root .btn-velvet:hover {
+    background: linear-gradient(135deg, #440c1a 0%, #28060e 100%);
+    box-shadow: 0 16px 32px -6px rgba(54, 8, 19, 0.6), 0 0 20px rgba(197, 155, 78, 0.3);
+}
+
+#bhuvi-root .btn-velvet .btn-icon-pill {
+    background: var(--bhuvi-gold);
+    color: #ffffff;
+}
+
+#bhuvi-root .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 28px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--bhuvi-gold-border);
+    color: var(--bhuvi-cream);
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.35s var(--ease-out);
+}
+
+#bhuvi-root .btn-outline:hover {
+    background: rgba(197, 155, 78, 0.18);
+    border-color: var(--bhuvi-gold);
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   1. FLOATING FLUID ISLAND HEADER
+   ========================================================================== */
+#bhuvi-root .bhuvi-nav-wrapper {
+    position: fixed;
+    top: 20px;
+    left: 0;
+    right: 0;
+    z-index: 9990;
+    pointer-events: none;
+    padding: 0 20px;
+}
+
+#bhuvi-root .bhuvi-nav-island {
+    pointer-events: auto;
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 10px 18px 10px 24px;
+    border-radius: 9999px;
+    background: rgba(34, 5, 11, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(197, 155, 78, 0.32);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4), 0 0 20px rgba(197, 155, 78, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.4s var(--ease-out);
+}
+
+#bhuvi-root .bhuvi-nav-island.scrolled {
+    background: rgba(22, 3, 7, 0.95);
+    box-shadow: 0 24px 48px -10px rgba(0, 0, 0, 0.55), 0 0 25px rgba(197, 155, 78, 0.22);
+    padding: 8px 16px 8px 22px;
+}
+
+#bhuvi-root .bhuvi-nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#bhuvi-root .bhuvi-logo-mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c59b4e 0%, #7d5b1d 100%);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 4px 12px rgba(197, 155, 78, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: 0.05em;
+}
+
+#bhuvi-root .bhuvi-brand-title {
+    display: flex;
+    flex-direction: column;
+}
+
+#bhuvi-root .bhuvi-brand-title span:first-child {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: #ffffff;
+    text-transform: uppercase;
+    line-height: 1.1;
+}
+
+#bhuvi-root .bhuvi-brand-title span:last-child {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    color: var(--bhuvi-gold-bright);
+    text-transform: uppercase;
+}
+
+#bhuvi-root .bhuvi-nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+@media (max-width: 991px) {
+    #bhuvi-root .bhuvi-nav-menu {
+        display: none;
+    }
+}
+
+#bhuvi-root .bhuvi-nav-link {
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #e5ded7;
+    position: relative;
+    padding: 6px 0;
+}
+
+#bhuvi-root .bhuvi-nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    width: 100%;
+    height: 2px;
+    background: var(--bhuvi-gold);
+    transition: transform 0.3s var(--ease-out);
+}
+
+#bhuvi-root .bhuvi-nav-link:hover {
+    color: #ffffff;
+}
+
+#bhuvi-root .bhuvi-nav-link:hover::after {
+    transform: translateX(-50%) scaleX(1);
+}
+
+#bhuvi-root .bhuvi-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#bhuvi-root .bhuvi-btn-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-radius: 9999px;
+    background: rgba(197, 155, 78, 0.15);
+    border: 1px solid rgba(197, 155, 78, 0.35);
+    color: var(--bhuvi-gold-bright);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    transition: all 0.3s var(--ease-out);
+}
+
+#bhuvi-root .bhuvi-btn-phone:hover {
+    background: var(--bhuvi-gold);
+    color: #ffffff;
+    border-color: var(--bhuvi-gold);
+}
+
+#bhuvi-root .bhuvi-mobile-toggle {
+    display: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(197, 155, 78, 0.3);
+    color: #ffffff;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 991px) {
+    #bhuvi-root .bhuvi-mobile-toggle {
+        display: flex;
+    }
+}
+
+/* MOBILE FULL-SCREEN GLASS DRAWER */
+#bhuvi-root .bhuvi-mobile-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(22, 3, 7, 0.96);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    z-index: 9995;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s var(--ease-out);
+}
+
+#bhuvi-root .bhuvi-mobile-drawer.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#bhuvi-root .bhuvi-drawer-close {
+    position: absolute;
+    top: 28px;
+    right: 28px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(197, 155, 78, 0.3);
+    color: #ffffff;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+#bhuvi-root .bhuvi-drawer-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    text-align: center;
+}
+
+#bhuvi-root .bhuvi-drawer-link {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--bhuvi-cream);
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+}
+
+#bhuvi-root .bhuvi-drawer-link:hover {
+    color: var(--bhuvi-gold);
+}
+
+/* ==========================================================================
+   2. CINEMATIC HERO CAROUSEL
+   ========================================================================== */
+#bhuvi-root .hero-viewport {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--bhuvi-velvet-dark);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+#bhuvi-root .hero-carousel-track {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.9s var(--ease-out);
+}
+
+#bhuvi-root .hero-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+#bhuvi-root .hero-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transform: scale(1.05);
+    transition: transform 7s ease-out;
+}
+
+#bhuvi-root .hero-slide.active img {
+    transform: scale(1);
+}
+
+#bhuvi-root .hero-slide-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(34, 5, 11, 0.45) 0%, rgba(34, 5, 11, 0.7) 50%, rgba(22, 3, 7, 0.95) 100%),
+                radial-gradient(circle at center, rgba(197, 155, 78, 0.15) 0%, transparent 70%);
+}
+
+#bhuvi-root .hero-content-layer {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    padding-top: 130px;
+    padding-bottom: 90px;
+}
+
+#bhuvi-root .hero-card-bezel {
+    max-width: 880px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#bhuvi-root .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 5.8vw, 4.6rem);
+    font-weight: 700;
+    line-height: 1.15;
+    color: #ffffff;
+    margin: 0 0 20px 0;
+    letter-spacing: 0.03em;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+#bhuvi-root .hero-subtitle {
+    font-family: var(--font-editorial);
+    font-size: clamp(1.25rem, 2.5vw, 1.8rem);
+    font-style: italic;
+    color: #f1e5d8;
+    max-width: 720px;
+    margin: 0 auto 36px auto;
+    line-height: 1.5;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+#bhuvi-root .hero-cta-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 48px;
+}
+
+/* HERO CAROUSEL CONTROLS & HUD */
+#bhuvi-root .hero-hud {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 12px 24px;
+    border-radius: 9999px;
+    background: rgba(22, 3, 7, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(197, 155, 78, 0.25);
+}
+
+#bhuvi-root .hero-nav-arrow {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(197, 155, 78, 0.3);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+#bhuvi-root .hero-nav-arrow:hover {
+    background: var(--bhuvi-gold);
+    color: #ffffff;
+    transform: scale(1.08);
+}
+
+#bhuvi-root .hero-dots-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#bhuvi-root .hero-dot-indicator {
+    width: 32px;
+    height: 4px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.25);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.4s var(--ease-out);
+}
+
+#bhuvi-root .hero-dot-indicator.active {
+    background: var(--bhuvi-gold);
+    width: 54px;
+    box-shadow: 0 0 10px rgba(197, 155, 78, 0.6);
+}
+
+#bhuvi-root .hero-counter {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--bhuvi-gold-bright);
+}
+
+/* ==========================================================================
+   3. ROYAL TRUST BAR (Double-Bezel Asymmetric Bento Grid)
+   ========================================================================== */
+#bhuvi-root .trust-bar-section {
+    position: relative;
+    margin-top: -60px;
+    z-index: 20;
+    padding-bottom: 60px;
+}
+
+#bhuvi-root .trust-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 991px) {
+    #bhuvi-root .trust-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 575px) {
+    #bhuvi-root .trust-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+#bhuvi-root .trust-card-inner {
+    padding: 28px 24px;
+    text-align: center;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#bhuvi-root .trust-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(197, 155, 78, 0.15) 0%, rgba(54, 8, 19, 0.05) 100%);
+    border: 1px solid var(--bhuvi-gold-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 16px;
+    color: var(--bhuvi-velvet);
+}
+
+#bhuvi-root .trust-number {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--bhuvi-velvet);
+    line-height: 1.1;
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+}
+
+#bhuvi-root .trust-label {
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--bhuvi-muted);
+    line-height: 1.35;
+}
+
+/* ==========================================================================
+   4. SIGNATURE SERVICES (9 Master Services in Bento Grid)
+   ========================================================================== */
+#bhuvi-root .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+}
+
+@media (max-width: 991px) {
+    #bhuvi-root .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    #bhuvi-root .services-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+#bhuvi-root .service-card-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#bhuvi-root .service-img-wrapper {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
+}
+
+#bhuvi-root .service-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s var(--ease-out);
+}
+
+#bhuvi-root .bezel-outer:hover .service-img-wrapper img {
+    transform: scale(1.08);
+}
+
+#bhuvi-root .service-badge-pill {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    padding: 5px 14px;
+    border-radius: 9999px;
+    background: rgba(34, 5, 11, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--bhuvi-gold-border);
+    color: var(--bhuvi-gold-bright);
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+#bhuvi-root .service-content {
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+#bhuvi-root .service-content h3 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--bhuvi-velvet);
+    margin: 0 0 12px 0;
+    line-height: 1.3;
+}
+
+#bhuvi-root .service-content p {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--bhuvi-muted);
+    line-height: 1.6;
+    margin: 0 0 20px 0;
+    flex-grow: 1;
+}
+
+#bhuvi-root .service-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px solid rgba(197, 155, 78, 0.15);
+    margin-bottom: 18px;
+}
+
+#bhuvi-root .service-meta-item {
+    display: flex;
+    flex-direction: column;
+}
+
+#bhuvi-root .service-meta-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--bhuvi-muted-light);
+}
+
+#bhuvi-root .service-meta-value {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--bhuvi-velvet);
+}
+
+#bhuvi-root .service-btn-wrap {
+    margin-top: auto;
+}
+
+#bhuvi-root .service-btn-wrap .btn-royal {
+    width: 100%;
+}
+
+/* ==========================================================================
+   5. DESIGN PORTFOLIO & FILTERABLE GALLERY
+   ========================================================================== */
+#bhuvi-root .gallery-filters-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 48px;
+}
+
+#bhuvi-root .filter-pill {
+    padding: 10px 22px;
+    border-radius: 9999px;
+    background: #ffffff;
+    border: 1px solid rgba(197, 155, 78, 0.25);
+    color: var(--bhuvi-muted);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    transition: all 0.35s var(--ease-out);
+}
+
+#bhuvi-root .filter-pill:hover {
+    color: var(--bhuvi-velvet);
+    border-color: var(--bhuvi-gold);
+    transform: translateY(-2px);
+}
+
+#bhuvi-root .filter-pill.active {
+    background: var(--bhuvi-velvet);
+    color: #ffffff;
+    border-color: var(--bhuvi-velvet);
+    box-shadow: 0 8px 20px -4px rgba(54, 8, 19, 0.35);
+}
+
+#bhuvi-root .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+}
+
+@media (max-width: 1100px) {
+    #bhuvi-root .gallery-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    #bhuvi-root .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    #bhuvi-root .gallery-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+#bhuvi-root .gallery-card-inner {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+#bhuvi-root .gallery-card-inner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s var(--ease-out);
+}
+
+#bhuvi-root .bezel-outer:hover .gallery-card-inner img {
+    transform: scale(1.1);
+}
+
+#bhuvi-root .gallery-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(34, 5, 11, 0.9) 100%);
+    opacity: 0;
+    transition: opacity 0.4s var(--ease-out);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 24px;
+    color: #ffffff;
+}
+
+#bhuvi-root .gallery-card-inner:hover .gallery-overlay {
+    opacity: 1;
+}
+
+#bhuvi-root .gallery-cat-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--bhuvi-gold-bright);
+    margin-bottom: 4px;
+}
+
+#bhuvi-root .gallery-item-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.25;
+}
+
+#bhuvi-root .gallery-zoom-pill {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 14px;
+    transition: transform 0.3s ease;
+}
+
+#bhuvi-root .gallery-card-inner:hover .gallery-zoom-pill {
+    transform: scale(1.15);
+}
+
+/* ==========================================================================
+   6. ABOUT THE MASTER ARTIST (Editorial Split with Double-Bezel)
+   ========================================================================== */
+#bhuvi-root .about-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+    align-items: center;
+}
+
+@media (max-width: 991px) {
+    #bhuvi-root .about-split {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+}
+
+#bhuvi-root .about-visual-col {
+    position: relative;
+}
+
+#bhuvi-root .about-portrait-inner {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+}
+
+#bhuvi-root .about-portrait-inner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#bhuvi-root .about-experience-badge {
+    position: absolute;
+    bottom: -24px;
+    right: -24px;
+    z-index: 10;
+    padding: 20px 28px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #c59b4e 0%, #916c27 100%);
+    color: #ffffff;
+    box-shadow: 0 16px 36px -10px rgba(145, 108, 39, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    text-align: center;
+}
+
+@media (max-width: 575px) {
+    #bhuvi-root .about-experience-badge {
+        bottom: 12px;
+        right: 12px;
+        padding: 14px 20px;
+    }
+}
+
+#bhuvi-root .about-experience-badge strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+#bhuvi-root .about-experience-badge span {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+}
+
+#bhuvi-root .about-content-col h2 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 3.8vw, 2.8rem);
+    font-weight: 700;
+    color: var(--bhuvi-velvet);
+    line-height: 1.2;
+    margin: 0 0 20px 0;
+}
+
+#bhuvi-root .about-lead-quote {
+    font-family: var(--font-editorial);
+    font-size: 21px;
+    font-style: italic;
+    color: var(--bhuvi-gold-dark);
+    line-height: 1.5;
+    margin: 0 0 24px 0;
+    padding-left: 20px;
+    border-left: 3px solid var(--bhuvi-gold);
+}
+
+#bhuvi-root .about-content-col p {
+    font-size: 15px;
+    color: var(--bhuvi-muted);
+    line-height: 1.7;
+    margin-bottom: 24px;
+}
+
+#bhuvi-root .about-pills-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 36px;
+}
+
+@media (max-width: 575px) {
+    #bhuvi-root .about-pills-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+#bhuvi-root .about-pill-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--bhuvi-velvet);
+}
+
+#bhuvi-root .about-pill-item span:first-child {
+    color: var(--bhuvi-gold);
+    font-size: 16px;
+}
+
+/* ==========================================================================
+   7. VERIFIED BRIDE REVIEWS (Real Supabase Backend Integration)
+   ========================================================================== */
+#bhuvi-root .reviews-section {
+    background: linear-gradient(180deg, #faf6f0 0%, #f4ecdf 100%);
+}
+
+#bhuvi-root .reviews-header-wrap {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 54px;
+}
+
+#bhuvi-root .reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+}
+
+@media (max-width: 991px) {
+    #bhuvi-root .reviews-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    #bhuvi-root .reviews-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+#bhuvi-root .review-card-inner {
+    padding: 32px 28px;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#bhuvi-root .review-stars {
+    color: var(--bhuvi-gold);
+    font-size: 18px;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+}
+
+#bhuvi-root .review-quote {
+    font-family: var(--font-editorial);
+    font-size: 19px;
+    font-style: italic;
+    color: var(--bhuvi-charcoal);
+    line-height: 1.55;
+    margin: 0 0 24px 0;
+    flex-grow: 1;
+}
+
+#bhuvi-root .review-author-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(197, 155, 78, 0.15);
+}
+
+#bhuvi-root .review-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--bhuvi-velvet) 0%, #520e1f 100%);
+    color: var(--bhuvi-gold-bright);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(54, 8, 19, 0.2);
+}
+
+#bhuvi-root .review-author-info {
+    display: flex;
+    flex-direction: column;
+}
+
+#bhuvi-root .review-author-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--bhuvi-velvet);
+}
+
+#bhuvi-root .review-author-role {
+    font-size: 12.5px;
+    color: var(--bhuvi-muted);
+}
+
+/* ==========================================================================
+   8. ROYAL BOOKING CONCIERGE FORM
+   ========================================================================== */
+#bhuvi-root .booking-section {
+    background: linear-gradient(180deg, #22050b 0%, #160307 100%);
+    color: var(--bhuvi-cream);
+}
+
+#bhuvi-root .booking-inner-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 56px;
+    align-items: center;
+}
+
+@media (max-width: 991px) {
+    #bhuvi-root .booking-inner-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+}
+
+#bhuvi-root .booking-info-box h2 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 3.8vw, 3rem);
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+    margin: 0 0 20px 0;
+}
+
+#bhuvi-root .booking-info-box p {
+    font-family: var(--font-editorial);
+    font-size: 19px;
+    font-style: italic;
+    color: #e5d8cc;
+    line-height: 1.6;
+    margin-bottom: 32px;
+}
+
+#bhuvi-root .concierge-perks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 40px;
+}
+
+#bhuvi-root .concierge-perk-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+#bhuvi-root .perk-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(197, 155, 78, 0.15);
+    border: 1px solid var(--bhuvi-gold-border);
+    color: var(--bhuvi-gold-bright);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+#bhuvi-root .perk-text strong {
+    display: block;
+    font-size: 15px;
+    color: #ffffff;
+    margin-bottom: 2px;
+}
+
+#bhuvi-root .perk-text span {
+    font-size: 13px;
+    color: #b5a498;
+}
+
+#bhuvi-root .booking-card-inner {
+    padding: 38px 34px;
+    background: linear-gradient(145deg, rgba(34, 5, 11, 0.8) 0%, rgba(22, 3, 7, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(197, 155, 78, 0.25);
+}
+
+@media (max-width: 575px) {
+    #bhuvi-root .booking-card-inner {
+        padding: 24px 18px;
+    }
+}
+
+#bhuvi-root .form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+@media (max-width: 575px) {
+    #bhuvi-root .form-grid-2 {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+}
+
+#bhuvi-root .bhuvi-field-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+
+#bhuvi-root .bhuvi-field-group label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--bhuvi-gold-bright);
+    margin-bottom: 8px;
+}
+
+#bhuvi-root .bhuvi-field-group input,
+#bhuvi-root .bhuvi-field-group select,
+#bhuvi-root .bhuvi-field-group textarea {
+    width: 100%;
+    padding: 13px 18px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(197, 155, 78, 0.25);
+    color: #ffffff;
+    font-size: 14.5px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+#bhuvi-root .bhuvi-field-group input:focus,
+#bhuvi-root .bhuvi-field-group select:focus,
+#bhuvi-root .bhuvi-field-group textarea:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--bhuvi-gold);
+    box-shadow: 0 0 15px rgba(197, 155, 78, 0.3);
+}
+
+#bhuvi-root .bhuvi-field-group select option {
+    background: var(--bhuvi-velvet-dark);
+    color: #ffffff;
+}
+
+#bhuvi-root .phone-hint-text {
+    font-size: 11px;
+    margin-top: 5px;
+    color: var(--bhuvi-muted-light);
+}
+
+#bhuvi-root .booking-submit-row {
+    margin-top: 10px;
+}
+
+#bhuvi-root .booking-submit-row .btn-royal {
+    width: 100%;
+}
+
+#bhuvi-root .booking-status-box {
+    margin-top: 16px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    background: rgba(197, 155, 78, 0.15);
+    border: 1px solid var(--bhuvi-gold);
+    color: var(--bhuvi-gold-bright);
+    font-size: 13.5px;
+    text-align: center;
+    display: none;
+}
+
+/* ==========================================================================
+   9. FREQUENTLY ASKED QUESTIONS (Royal Accordion)
+   ========================================================================== */
+#bhuvi-root .faq-stack {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+#bhuvi-root .faq-item-inner {
+    background: #ffffff;
+    border-radius: calc(28px - 6px);
+    overflow: hidden;
+}
+
+#bhuvi-root .faq-question-btn {
+    width: 100%;
+    padding: 24px 28px;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    text-align: left;
+    cursor: pointer;
+}
+
+#bhuvi-root .faq-question-btn span {
+    font-family: var(--font-display);
+    font-size: 17.5px;
+    font-weight: 600;
+    color: var(--bhuvi-velvet);
+    line-height: 1.35;
+}
+
+#bhuvi-root .faq-icon-indicator {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bhuvi-gold-subtle);
+    border: 1px solid var(--bhuvi-gold-border);
+    color: var(--bhuvi-gold-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    transition: transform 0.4s var(--ease-spring);
+}
+
+#bhuvi-root .faq-item.active .faq-icon-indicator {
+    transform: rotate(45deg);
+    background: var(--bhuvi-velvet);
+    color: #ffffff;
+    border-color: var(--bhuvi-velvet);
+}
+
+#bhuvi-root .faq-answer-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.45s var(--ease-out);
+    padding: 0 28px;
+}
+
+#bhuvi-root .faq-item.active .faq-answer-panel {
+    padding-bottom: 24px;
+}
+
+#bhuvi-root .faq-answer-panel p {
+    font-size: 14.5px;
+    color: var(--bhuvi-muted);
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* ==========================================================================
+   10. FOOTER & CONCIERGE INFORMATION
+   ========================================================================== */
+#bhuvi-root .bhuvi-footer {
+    background: #140306;
+    color: var(--bhuvi-cream);
+    padding-top: 80px;
+    padding-bottom: 40px;
+    border-top: 1px solid rgba(197, 155, 78, 0.2);
+}
+
+#bhuvi-root .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.2fr;
+    gap: 40px;
+    margin-bottom: 60px;
+}
+
+@media (max-width: 991px) {
+    #bhuvi-root .footer-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 575px) {
+    #bhuvi-root .footer-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+#bhuvi-root .footer-brand-col p {
+    font-family: var(--font-editorial);
+    font-size: 17px;
+    font-style: italic;
+    color: #bfaea3;
+    line-height: 1.6;
+    margin-top: 16px;
+    max-width: 340px;
+}
+
+#bhuvi-root .footer-col-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--bhuvi-gold-bright);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 20px;
+}
+
+#bhuvi-root .footer-links-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#bhuvi-root .footer-links-list a {
+    font-size: 14px;
+    color: #bfaea3;
+    transition: color 0.3s ease;
+}
+
+#bhuvi-root .footer-links-list a:hover {
+    color: var(--bhuvi-gold-bright);
+}
+
+#bhuvi-root .footer-bottom-row {
+    padding-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 13px;
+    color: #8c7c72;
+}
+
+/* ==========================================================================
+   11. FLOATING QUICK ACTIONS & MOBILE BOTTOM BAR
+   ========================================================================== */
+#bhuvi-root .floating-whatsapp-btn {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 9980;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 22px;
+    border-radius: 9999px;
+    background: #1b6330;
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    box-shadow: 0 10px 24px rgba(27, 99, 48, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: transform 0.4s var(--ease-spring), box-shadow 0.4s ease;
+}
+
+#bhuvi-root .floating-whatsapp-btn:hover {
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 16px 32px rgba(27, 99, 48, 0.6);
+}
+
+#bhuvi-root .mobile-sticky-bar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9970;
+    background: rgba(22, 3, 7, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(197, 155, 78, 0.3);
+    padding: 12px 16px;
+}
+
+@media (max-width: 767px) {
+    #bhuvi-root .mobile-sticky-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    #bhuvi-root .floating-whatsapp-btn {
+        bottom: 78px;
+        right: 18px;
+        padding: 10px 16px;
+    }
+}
+
+#bhuvi-root .mobile-bar-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 0;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ==========================================================================
+   12. INTERACTIVE MODALS (LIGHTBOX & CLIENT REVIEW)
+   ========================================================================== */
+#bhuvi-root .bhuvi-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(16, 2, 5, 0.92);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s var(--ease-out);
+}
+
+#bhuvi-root .bhuvi-modal-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#bhuvi-root .modal-close-trigger {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(197, 155, 78, 0.3);
+    color: #ffffff;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#bhuvi-root .modal-close-trigger:hover {
+    background: var(--bhuvi-gold);
+    transform: rotate(90deg);
+}
+
+/* LIGHTBOX CONTAINER */
+#bhuvi-root .lightbox-dialog {
+    max-width: 900px;
+    width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#bhuvi-root .lightbox-img-wrap {
+    max-height: 68vh;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(197, 155, 78, 0.3);
+}
+
+#bhuvi-root .lightbox-img-wrap img {
+    max-height: 68vh;
+    width: auto;
+    object-fit: contain;
+}
+
+#bhuvi-root .lightbox-caption-bar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 18px;
+    padding: 12px 20px;
+    border-radius: 9999px;
+    background: rgba(34, 5, 11, 0.8);
+    border: 1px solid rgba(197, 155, 78, 0.3);
+}
+
+#bhuvi-root .lightbox-caption-text {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+#bhuvi-root .lightbox-arrow-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(34, 5, 11, 0.7);
+    border: 1px solid rgba(197, 155, 78, 0.35);
+    color: #ffffff;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#bhuvi-root .lightbox-arrow-btn:hover {
+    background: var(--bhuvi-gold);
+    transform: translateY(-50%) scale(1.1);
+}
+
+#bhuvi-root .lightbox-arrow-btn.prev { left: 24px; }
+#bhuvi-root .lightbox-arrow-btn.next { right: 24px; }
+
+/* REVIEW MODAL CARD */
+#bhuvi-root .review-modal-box {
+    width: 100%;
+    max-width: 580px;
+    padding: 40px 34px;
+    background: linear-gradient(145deg, #24050d 0%, #170308 100%);
+    border-radius: 28px;
+    border: 1px solid rgba(197, 155, 78, 0.35);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6);
+    color: var(--bhuvi-cream);
+}
+
+#bhuvi-root .review-modal-box h3 {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 8px 0;
+}
+
+#bhuvi-root .review-modal-box p {
+    font-family: var(--font-editorial);
+    font-size: 16px;
+    font-style: italic;
+    color: #c7b8ad;
+    margin: 0 0 24px 0;
+}
+
+/* SCROLL REVEAL UTILITY */
+#bhuvi-root .reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.85s var(--ease-out), transform 0.85s var(--ease-out);
+}
+
+#bhuvi-root .reveal-on-scroll.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+</style>
+
+<!-- MAIN STANDALONE WRAPPER -->
+<div id="bhuvi-root">
+
+    <!-- SUBTLE HAPTIC PAPER GRAIN -->
+    <div class="bhuvi-grain-overlay"></div>
+
+    <!-- ======================================================================
+         1. FLOATING FLUID ISLAND HEADER
+         ====================================================================== -->
+    <div class="bhuvi-nav-wrapper">
+        <header class="bhuvi-nav-island" id="bhuviNavIsland">
+            <div class="bhuvi-nav-brand">
+                <div class="bhuvi-logo-mark">B</div>
+                <div class="bhuvi-brand-title">
+                    <span>Bhuvi Mehandi</span>
+                    <span>Haute Couture Henna</span>
+                </div>
+            </div>
+
+            <nav class="bhuvi-nav-menu">
+                <a href="#portfolio" class="bhuvi-nav-link">Portfolio</a>
+                <a href="#services" class="bhuvi-nav-link">Artistry</a>
+                <a href="#about" class="bhuvi-nav-link">Heritage</a>
+                <a href="#reviews" class="bhuvi-nav-link">Brides</a>
+                <a href="#booking" class="bhuvi-nav-link">Concierge</a>
+                <a href="#faq" class="bhuvi-nav-link">FAQ</a>
+            </nav>
+
+            <div class="bhuvi-nav-actions">
+                <a href="tel:+918094935632" class="bhuvi-btn-phone">
+                    <span>📞</span> +91 80949 35632
+                </a>
+                <a href="#booking" class="btn-royal" style="padding: 6px 6px 6px 18px; font-size: 13px;">
+                    <span>Book Bridal</span>
+                    <span class="btn-icon-pill" style="width: 30px; height: 30px; font-size: 13px;">✦</span>
+                </a>
+                <button class="bhuvi-mobile-toggle" id="bhuviMobileToggle" aria-label="Toggle Navigation Menu">☰</button>
+            </div>
+        </header>
+    </div>
+
+    <!-- MOBILE FULL-SCREEN GLASS DRAWER -->
+    <div class="bhuvi-mobile-drawer" id="bhuviMobileDrawer">
+        <button class="bhuvi-drawer-close" id="bhuviDrawerClose" aria-label="Close Navigation Menu">✕</button>
+        <div class="bhuvi-drawer-links">
+            <a href="#portfolio" class="bhuvi-drawer-link">✦ Portfolio</a>
+            <a href="#services" class="bhuvi-drawer-link">✦ Signature Services</a>
+            <a href="#about" class="bhuvi-drawer-link">✦ The Master Artist</a>
+            <a href="#reviews" class="bhuvi-drawer-link">✦ Bride Reviews</a>
+            <a href="#booking" class="bhuvi-drawer-link">✦ Royal Booking</a>
+            <a href="#faq" class="bhuvi-drawer-link">✦ Questions & Care</a>
+            <a href="tel:+918094935632" class="btn-royal" style="margin-top: 20px;">
+                <span>Call Studio Concierge</span>
+                <span class="btn-icon-pill">📞</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- ======================================================================
+         2. CINEMATIC HERO CAROUSEL
+         ====================================================================== -->
+    <section class="hero-viewport" id="hero">
+        <div class="hero-carousel-track" id="bhuviHeroTrack">
+            <!-- Slide 1: Royal Bridal -->
+            <div class="hero-slide active" data-index="0">
+                <img src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?auto=format&fit=crop&w=2000&q=85" alt="Royal Rajasthani Bridal Henna" loading="eager">
+                <div class="hero-slide-overlay"></div>
+            </div>
+            <!-- Slide 2: Destination Henna -->
+            <div class="hero-slide" data-index="1">
+                <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=2000&q=85" alt="Destination Palace Mehndi" loading="lazy">
+                <div class="hero-slide-overlay"></div>
+            </div>
+            <!-- Slide 3: Arabic Indo-Western Fusion -->
+            <div class="hero-slide" data-index="2">
+                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=2000&q=85" alt="Contemporary Arabic Mehndi" loading="lazy">
+                <div class="hero-slide-overlay"></div>
+            </div>
+            <!-- Slide 4: Organic Dark Stain Legacy -->
+            <div class="hero-slide" data-index="3">
+                <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=2000&q=85" alt="Deep Mahogany Henna Stain" loading="lazy">
+                <div class="hero-slide-overlay"></div>
+            </div>
+        </div>
+
+        <div class="hero-content-layer">
+            <div class="bhuvi-container">
+                <div class="hero-card-bezel reveal-on-scroll">
+                    <div class="bhuvi-eyebrow bhuvi-eyebrow-dark">
+                        <span>✦</span> ROYAL HERITAGE ARTISTRY • UDAIPUR & WORLDWIDE
+                    </div>
+                    <h1 class="hero-title">Haute Couture Bridal Henna For Your Grand Celebration</h1>
+                    <p class="hero-subtitle">
+                        Transcending tradition with triple-sifted organic Sojat henna, bespoke matrimonial portraiture, and fifteen years of imperial wedding craftsmanship.
+                    </p>
+                    <div class="hero-cta-group">
+                        <a href="#booking" class="btn-royal">
+                            <span>Reserve Your Wedding Date</span>
+                            <span class="btn-icon-pill">💍</span>
+                        </a>
+                        <a href="#portfolio" class="btn-outline">
+                            <span>Explore 2026 Collection</span>
+                            <span>→</span>
+                        </a>
+                    </div>
+
+                    <!-- HERO CAROUSEL HUD -->
+                    <div class="hero-hud">
+                        <button class="hero-nav-arrow" id="heroPrevBtn" aria-label="Previous Hero Slide">‹</button>
+                        <div class="hero-dots-container" id="heroDotsWrap">
+                            <button class="hero-dot-indicator active" data-slide="0" aria-label="Slide 1"></button>
+                            <button class="hero-dot-indicator" data-slide="1" aria-label="Slide 2"></button>
+                            <button class="hero-dot-indicator" data-slide="2" aria-label="Slide 3"></button>
+                            <button class="hero-dot-indicator" data-slide="3" aria-label="Slide 4"></button>
+                        </div>
+                        <div class="hero-counter" id="heroSlideCounter">01 / 04</div>
+                        <button class="hero-nav-arrow" id="heroNextBtn" aria-label="Next Hero Slide">›</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         3. ROYAL TRUST BAR (Double-Bezel Bento Grid)
+         ====================================================================== -->
+    <section class="trust-bar-section">
+        <div class="bhuvi-container">
+            <div class="trust-grid">
+                <!-- Badge 1 -->
+                <div class="bezel-outer reveal-on-scroll">
+                    <div class="bezel-inner trust-card-inner">
+                        <div class="trust-icon">🌿</div>
+                        <div class="trust-number">100%</div>
+                        <div class="trust-label">Organic Chemical-Free Tri-Blend Sojat Henna</div>
+                    </div>
+                </div>
+                <!-- Badge 2 -->
+                <div class="bezel-outer reveal-on-scroll">
+                    <div class="bezel-inner trust-card-inner">
+                        <div class="trust-icon">👑</div>
+                        <div class="trust-number">15+</div>
+                        <div class="trust-label">Years of Royal Palace Wedding Mastery</div>
+                    </div>
+                </div>
+                <!-- Badge 3 -->
+                <div class="bezel-outer reveal-on-scroll">
+                    <div class="bezel-inner trust-card-inner">
+                        <div class="trust-icon">💍</div>
+                        <div class="trust-number">4,800+</div>
+                        <div class="trust-label">Cherished Brides Adorned Worldwide</div>
+                    </div>
+                </div>
+                <!-- Badge 4 -->
+                <div class="bezel-outer reveal-on-scroll">
+                    <div class="bezel-inner trust-card-inner">
+                        <div class="trust-icon">⭐</div>
+                        <div class="trust-number">4.98</div>
+                        <div class="trust-label">Flawless Average Verified Bride Rating</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         4. SIGNATURE ARTISTRY SERVICES (9 Master Services)
+         ========================================================================== -->
+    <section class="bhuvi-section" id="services">
+        <div class="bhuvi-container">
+            <div class="section-header reveal-on-scroll">
+                <div class="bhuvi-eyebrow">
+                    <span>✦</span> BESPOKE WEDDING COLLECTIONS
+                </div>
+                <h2>Signature Bridal & Celebration Artistry</h2>
+                <p>Each design is an original handwritten manuscript etched with pure intention, patience, and symmetry.</p>
+            </div>
+
+            <div class="services-grid">
+                <!-- Service 1: Royal Rajasthani -->
+                <div class="bezel-outer reveal-on-scroll">
+                    <div class="bezel-inner service-card-inner">
+                        <div class="service-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?auto=format&fit=crop&w=700&q=80" alt="Royal Rajasthani Bharwa Mehndi" loading="lazy">
+                            <span class="service-badge-pill">Imperial Signature</span>
+                        </div>
+                        <div class="service-content">
+                            <h3>Royal Rajasthani Bharwa</h3>
+                            <p>Dense, breathtaking traditional motifs featuring peacock arches, lotus ponds, jharokha balconies, and micro-grid symmetry running up to the elbows.</p>
+                            <div class="service-meta">
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Duration</span>
+                                    <span class="service-meta-value">4 – 6 Hours</span>
+                                </div>
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Coverage</span>
+                                    <span class="service-meta-value">Full Arm & Feet</span>
+                                </div>
+                            </div>
+                            <div class="service-btn-wrap">
+                                <a href="#booking" class="btn-royal btn-velvet" data-book-service="Royal Rajasthani Bharwa">
+                                    <span>Select Design</span>
+                                    <span class="btn-icon-pill">✦</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 2: Dulha-Dulhan Story -->
+                <div class="bezel-outer reveal-on-scroll">
+                    <div class="bezel-inner service-card-inner">
+                        <div class="service-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=700&q=80" alt="Marwari Dulha Dulhan Story Henna" loading="lazy">
+                            <span class="service-badge-pill">Custom Portraiture</span>
+                        </div>
+                        <div class="service-content">
+                            <h3>Matrimonial Storytelling</h3>
+                            <p>Hand-drawn miniature portraits of the bride and groom, varmala procession, sindoor ceremony, skyline silhouettes, and encoded personal vows.</p>
+                            <div class="service-meta">
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Duration</span>
+                                    <span class="service-meta-value">5 – 7 Hours</span>
+                                </div>
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Coverage</span>
+                                    <span class="service-meta-value">Bespoke Story</span>
+                                </div>
+                            </div>
+                            <div class="service-btn-wrap">
+                                <a href="#booking" class="btn-royal btn-velvet" data-book-service="Matrimonial Storytelling Portraiture">
+                                    <span>Select Design</span>
+                                    <span class="btn-icon-pill">✦</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 3: Luxury Arabic -->
+                <div class="bezel-outer reveal-on-scroll">
+                    <div class="bezel-inner service-card-inner">
+                        <div class="service-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=700&q=80" alt="Luxury Arabic Indo-Western Mehndi" loading="lazy">
+                            <span class="service-badge-pill">Modern Elegance</span>
+                        </div>
+                        <div class="service-content">
+                            <h3>Luxury Arabic & Indo-Western</h3>
+                            <p>Flowing diagonal bel vines, bold shaded roses, architectural negative space, and gossamer net grids that accent couture jewelry and lehengas.</p>
+                            <div class="service-meta">
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Duration</span>
+                                    <span class="service-meta-value">3 – 4 Hours</span>
+                                </div>
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Coverage</span>
+                                    <span class="service-meta-value">Forearms & Palms</span>
+                                </div>
+                            </div>
+                            <div class="service-btn-wrap">
+                                <a href="#booking" class="btn-royal btn-velvet" data-book-service="Luxury Arabic & Indo-Western Fusion">
+                                    <span>Select Design</span>
+                                    <span class="btn-icon-pill">✦</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 4: Contemporary Minimalist -->
+                <div class="bezel-outer reveal-on-scroll">
+                    <div class="bezel-inner service-card-inner">
+                        <div class="service-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=700&q=80" alt="Contemporary Minimalist Bridal Mehndi" loading="lazy">
+                            <span class="service-badge-pill">Vogue Minimal</span>
+                        </div>
+                        <div class="service-content">
+                            <h3>Contemporary Minimalist</h3>
+                            <p>Refined cuff bracelets, delicate finger chandeliers, botanical sprigs, and geometric bands engineered for modern editorial brides.</p>
+                            <div class="service-meta">
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Duration</span>
+                                    <span class="service-meta-value">2 – 3 Hours</span>
+                                </div>
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Coverage</span>
+                                    <span class="service-meta-value">Palms & Wrists</span>
+                                </div>
+                            </div>
+                            <div class="service-btn-wrap">
+                                <a href="#booking" class="btn-royal btn-velvet" data-book-service="Contemporary Minimalist Bridal">
+                                    <span>Select Design</span>
+                                    <span class="btn-icon-pill">✦</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 5: Destination Wedding -->
+                <div class="bezel-outer reveal-on-scroll">
+                    <div class="bezel-inner service-card-inner">
+                        <div class="service-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=700&q=80" alt="Destination Palace Wedding Henna" loading="lazy">
+                            <span class="service-badge-pill">Global Travel</span>
+                        </div>
+                        <div class="service-content">
+                            <h3>Destination Wedding Concierge</h3>
+                            <p>Comprehensive on-location bridal team travel across Udaipur, Jaipur, Goa, Dubai, Bali, and European heritage venues with fresh organic cone kits.</p>
+                            <div class="service-meta">
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Duration</span>
+                                    <span class="service-meta-value">Multi-Day</span>
+                                </div>
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Coverage</span>
+                                    <span class="service-meta-value">Bride + VIP Family</span>
+                                </div>
+                            </div>
+                            <div class="service-btn-wrap">
+                                <a href="#booking" class="btn-royal btn-velvet" data-book-service="Destination Wedding Concierge">
+                                    <span>Select Design</span>
+                                    <span class="btn-icon-pill">✦</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 6: Groom's Regal Mehndi -->
+                <div class="bezel-outer reveal-on-scroll">
+                    <div class="bezel-inner service-card-inner">
+                        <div class="service-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=700&q=80" alt="Groom Regal Symbolic Mehndi" loading="lazy">
+                            <span class="service-badge-pill">Groom Edition</span>
+                        </div>
+                        <div class="service-content">
+                            <h3>Groom's Regal Symbolic Mehndi</h3>
+                            <p>Subtle royal motifs including family crests, auspicious Sanskrit shlokas, sword crests, bride initials, and minimal palm mandalas.</p>
+                            <div class="service-meta">
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Duration</span>
+                                    <span class="service-meta-value">45 – 90 Mins</span>
+                                </div>
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Coverage</span>
+                                    <span class="service-meta-value">Palms or Wrists</span>
+                                </div>
+                            </div>
+                            <div class="service-btn-wrap">
+                                <a href="#booking" class="btn-royal btn-velvet" data-book-service="Groom Regal Symbolic Mehndi">
+                                    <span>Select Design</span>
+                                    <span class="btn-icon-pill">✦</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 7: Bridal Party & Sangeet -->
+                <div class="bezel-outer reveal-on-scroll">
+                    <div class="bezel-inner service-card-inner">
+                        <div class="service-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=700&q=80" alt="Sangeet & Bridal Party Mehndi Package" loading="lazy">
+                            <span class="service-badge-pill">Group Package</span>
+                        </div>
+                        <div class="service-content">
+                            <h3>Sangeet & Bridal Party Packages</h3>
+                            <p>Speedy, exquisite guest henna artists dedicated to family and friends, allowing the bride to enjoy her celebration unhurried.</p>
+                            <div class="service-meta">
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Capacity</span>
+                                    <span class="service-meta-value">15 – 100+ Guests</span>
+                                </div>
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Team</span>
+                                    <span class="service-meta-value">2 – 8 Senior Artists</span>
+                                </div>
+                            </div>
+                            <div class="service-btn-wrap">
+                                <a href="#booking" class="btn-royal btn-velvet" data-book-service="Sangeet Bridal Party Package">
+                                    <span>Select Design</span>
+                                    <span class="btn-icon-pill">✦</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 8: Organic Fresh Cones -->
+                <div class="bezel-outer reveal-on-scroll">
+                    <div class="bezel-inner service-card-inner">
+                        <div class="service-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=700&q=80" alt="Handcrafted Organic Henna Cones" loading="lazy">
+                            <span class="service-badge-pill">Pure Botanicals</span>
+                        </div>
+                        <div class="service-content">
+                            <h3>Handcrafted Organic Henna Cones</h3>
+                            <p>Fresh batches blended exclusively with Rajasthani Lawsonia inermis, pure eucalyptus, cajeput, and Bulgarian lavender essential oils.</p>
+                            <div class="service-meta">
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Purity</span>
+                                    <span class="service-meta-value">100% Chemical-Free</span>
+                                </div>
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Stain Guarantee</span>
+                                    <span class="service-meta-value">Deep Mahogany Stain</span>
+                                </div>
+                            </div>
+                            <div class="service-btn-wrap">
+                                <a href="#booking" class="btn-royal btn-velvet" data-book-service="Handcrafted Organic Henna Cones">
+                                    <span>Inquire Supplies</span>
+                                    <span class="btn-icon-pill">✦</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service 9: Masterclass Academy -->
+                <div class="bezel-outer reveal-on-scroll">
+                    <div class="bezel-inner service-card-inner">
+                        <div class="service-img-wrapper">
+                            <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=700&q=80" alt="Bridal Mehndi Masterclass Academy" loading="lazy">
+                            <span class="service-badge-pill">Certification</span>
+                        </div>
+                        <div class="service-content">
+                            <h3>Masterclass & Bridal Academy</h3>
+                            <p>Private intensive workshops covering cone rolling ergonomics, figure sketching, spatial symmetry, chemical safety, and bridal client management.</p>
+                            <div class="service-meta">
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Format</span>
+                                    <span class="service-meta-value">1-on-1 & Virtual</span>
+                                </div>
+                                <div class="service-meta-item">
+                                    <span class="service-meta-label">Level</span>
+                                    <span class="service-meta-value">Beginner to Pro</span>
+                                </div>
+                            </div>
+                            <div class="service-btn-wrap">
+                                <a href="#booking" class="btn-royal btn-velvet" data-book-service="Masterclass Bridal Academy">
+                                    <span>Join Cohort</span>
+                                    <span class="btn-icon-pill">✦</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         5. DESIGN PORTFOLIO GALLERY (Filterable & Interactive Lightbox)
+         ====================================================================== -->
+    <section class="bhuvi-section" id="portfolio" style="background: #ffffff;">
+        <div class="bhuvi-container">
+            <div class="section-header reveal-on-scroll">
+                <div class="bhuvi-eyebrow">
+                    <span>✦</span> CURATED PORTFOLIO
+                </div>
+                <h2>The 2026 Bridal Design Gallery</h2>
+                <p>Click any artwork to inspect the micro-linework, stain progression, and direct booking options.</p>
+            </div>
+
+            <div class="gallery-filters-row reveal-on-scroll" id="galleryFilters">
+                <button class="filter-pill active" data-filter="all">All Masterpieces</button>
+                <button class="filter-pill" data-filter="bridal">Royal Bridal</button>
+                <button class="filter-pill" data-filter="rajasthani">Rajasthani Bharwa</button>
+                <button class="filter-pill" data-filter="arabic">Arabic Fusion</button>
+                <button class="filter-pill" data-filter="designer">Contemporary</button>
+                <button class="filter-pill" data-filter="engagement">Engagement & Roka</button>
+            </div>
+
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- Gallery 1 -->
+                <div class="bezel-outer gallery-item reveal-on-scroll" data-category="bridal" data-title="The Jharokha Palace Bridal" data-img="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?auto=format&fit=crop&w=1200&q=85">
+                    <div class="bezel-inner gallery-card-inner">
+                        <img src="https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?auto=format&fit=crop&w=600&q=80" alt="The Jharokha Palace Bridal" loading="lazy">
+                        <div class="gallery-overlay">
+                            <span class="gallery-cat-label">Royal Bridal</span>
+                            <div class="gallery-item-title">The Jharokha Palace Bridal</div>
+                        </div>
+                        <div class="gallery-zoom-pill">🔍</div>
+                    </div>
+                </div>
+
+                <!-- Gallery 2 -->
+                <div class="bezel-outer gallery-item reveal-on-scroll" data-category="rajasthani" data-title="Imperial Marwari Heritage Sleeves" data-img="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1200&q=85">
+                    <div class="bezel-inner gallery-card-inner">
+                        <img src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=600&q=80" alt="Imperial Marwari Heritage Sleeves" loading="lazy">
+                        <div class="gallery-overlay">
+                            <span class="gallery-cat-label">Rajasthani Bharwa</span>
+                            <div class="gallery-item-title">Imperial Marwari Heritage Sleeves</div>
+                        </div>
+                        <div class="gallery-zoom-pill">🔍</div>
+                    </div>
+                </div>
+
+                <!-- Gallery 3 -->
+                <div class="bezel-outer gallery-item reveal-on-scroll" data-category="arabic" data-title="Couture Florentine Arabic Trails" data-img="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=1200&q=85">
+                    <div class="bezel-inner gallery-card-inner">
+                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80" alt="Couture Florentine Arabic Trails" loading="lazy">
+                        <div class="gallery-overlay">
+                            <span class="gallery-cat-label">Arabic Fusion</span>
+                            <div class="gallery-item-title">Couture Florentine Arabic Trails</div>
+                        </div>
+                        <div class="gallery-zoom-pill">🔍</div>
+                    </div>
+                </div>
+
+                <!-- Gallery 4 -->
+                <div class="bezel-outer gallery-item reveal-on-scroll" data-category="designer" data-title="Minimalist Lotus Cuff Geometry" data-img="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85">
+                    <div class="bezel-inner gallery-card-inner">
+                        <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80" alt="Minimalist Lotus Cuff Geometry" loading="lazy">
+                        <div class="gallery-overlay">
+                            <span class="gallery-cat-label">Contemporary</span>
+                            <div class="gallery-item-title">Minimalist Lotus Cuff Geometry</div>
+                        </div>
+                        <div class="gallery-zoom-pill">🔍</div>
+                    </div>
+                </div>
+
+                <!-- Gallery 5 -->
+                <div class="bezel-outer gallery-item reveal-on-scroll" data-category="bridal" data-title="The Udaipur Pichwai Bridal Symphony" data-img="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1200&q=85">
+                    <div class="bezel-inner gallery-card-inner">
+                        <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80" alt="The Udaipur Pichwai Bridal Symphony" loading="lazy">
+                        <div class="gallery-overlay">
+                            <span class="gallery-cat-label">Royal Bridal</span>
+                            <div class="gallery-item-title">The Udaipur Pichwai Bridal Symphony</div>
+                        </div>
+                        <div class="gallery-zoom-pill">🔍</div>
+                    </div>
+                </div>
+
+                <!-- Gallery 6 -->
+                <div class="bezel-outer gallery-item reveal-on-scroll" data-category="engagement" data-title="Regal Roka Mandala & Finger Bells" data-img="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85">
+                    <div class="bezel-inner gallery-card-inner">
+                        <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80" alt="Regal Roka Mandala & Finger Bells" loading="lazy">
+                        <div class="gallery-overlay">
+                            <span class="gallery-cat-label">Engagement & Roka</span>
+                            <div class="gallery-item-title">Regal Roka Mandala & Finger Bells</div>
+                        </div>
+                        <div class="gallery-zoom-pill">🔍</div>
+                    </div>
+                </div>
+
+                <!-- Gallery 7 -->
+                <div class="bezel-outer gallery-item reveal-on-scroll" data-category="rajasthani" data-title="Elephant Ambabari Procession" data-img="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1200&q=85">
+                    <div class="bezel-inner gallery-card-inner">
+                        <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=600&q=80" alt="Elephant Ambabari Procession" loading="lazy">
+                        <div class="gallery-overlay">
+                            <span class="gallery-cat-label">Rajasthani Bharwa</span>
+                            <div class="gallery-item-title">Elephant Ambabari Procession</div>
+                        </div>
+                        <div class="gallery-zoom-pill">🔍</div>
+                    </div>
+                </div>
+
+                <!-- Gallery 8 -->
+                <div class="bezel-outer gallery-item reveal-on-scroll" data-category="designer" data-title="Bohemian Rose & Net Glove Henna" data-img="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=85">
+                    <div class="bezel-inner gallery-card-inner">
+                        <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80" alt="Bohemian Rose & Net Glove Henna" loading="lazy">
+                        <div class="gallery-overlay">
+                            <span class="gallery-cat-label">Contemporary</span>
+                            <div class="gallery-item-title">Bohemian Rose & Net Glove Henna</div>
+                        </div>
+                        <div class="gallery-zoom-pill">🔍</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         6. THE MASTER ARTIST & HERITAGE (Editorial Split)
+         ====================================================================== -->
+    <section class="bhuvi-section" id="about">
+        <div class="bhuvi-container">
+            <div class="about-split">
+                <div class="about-visual-col reveal-on-scroll">
+                    <div class="bezel-outer-dark">
+                        <div class="bezel-inner-dark about-portrait-inner">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1000&q=85" alt="Master Henna Artist at Work" loading="lazy">
+                        </div>
+                    </div>
+                    <div class="about-experience-badge">
+                        <strong>15+</strong>
+                        <span>Years Royal Legacy</span>
+                    </div>
+                </div>
+
+                <div class="about-content-col reveal-on-scroll">
+                    <div class="bhuvi-eyebrow">
+                        <span>✦</span> THE MAESTRO'S PHILOSOPHY
+                    </div>
+                    <h2>Where Heritage Architecture Meets Living Skin</h2>
+                    <div class="about-lead-quote">
+                        "A bride's mehndi is not mere decoration; it is her first matrimonial heirloom, carrying the pulse of her vows and the fragrance of blessing."
+                    </div>
+                    <p>
+                        Born amidst the palaces and havelis of Rajasthan, Bhuvi Mehandi has spent over fifteen years perfecting the delicate chemistry of pure organic henna and high-precision micro-linework. We reject synthetic dyes, PPD chemicals, and factory-made pasty cones.
+                    </p>
+                    <p>
+                        Every cone is mixed fresh 24 hours before your ceremony, blending triple-sifted Sojat henna leaves with botanical essential oils. The result is a luminous crimson that develops into an intensely rich, dark mahogany stain that honors your wedding photography.
+                    </p>
+
+                    <div class="about-pills-list">
+                        <div class="about-pill-item">
+                            <span>✦</span>
+                            <span>100% Skin-Safe Organic Certification</span>
+                        </div>
+                        <div class="about-pill-item">
+                            <span>✦</span>
+                            <span>Private Bridal Studio Consultation</span>
+                        </div>
+                        <div class="about-pill-item">
+                            <span>✦</span>
+                            <span>Worldwide Travel Concierge</span>
+                        </div>
+                        <div class="about-pill-item">
+                            <span>✦</span>
+                            <span>Guaranteed Deep Mahogany Stain</span>
+                        </div>
+                    </div>
+
+                    <a href="#booking" class="btn-royal">
+                        <span>Book an Artist Consultation</span>
+                        <span class="btn-icon-pill">💍</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         7. REAL BRIDE REVIEWS (Dynamic Supabase Backend Grid)
+         ====================================================================== -->
+    <section class="bhuvi-section reviews-section" id="reviews">
+        <div class="bhuvi-container">
+            <div class="reviews-header-wrap reveal-on-scroll">
+                <div>
+                    <div class="bhuvi-eyebrow">
+                        <span>✦</span> VERIFIED TESTIMONIALS
+                    </div>
+                    <h2 style="font-family: var(--font-display); font-size: clamp(2rem, 3.8vw, 3rem); color: var(--bhuvi-velvet); margin: 0 0 10px 0;">
+                        Words From Our Royal Brides
+                    </h2>
+                    <p style="font-family: var(--font-editorial); font-size: 1.35rem; font-style: italic; color: var(--bhuvi-muted); margin: 0;">
+                        Stories of devotion, stain depth, and unforgettable wedding memories.
+                    </p>
+                </div>
+                <div>
+                    <button class="btn-royal" id="openReviewModalTrigger">
+                        <span>Share Your Bride Story</span>
+                        <span class="btn-icon-pill">✍</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="reviews-grid" id="bhuviReviewsGrid">
+                <!-- Review Card 1 -->
+                <div class="bezel-outer reveal-on-scroll">
+                    <div class="bezel-inner review-card-inner">
+                        <div class="review-stars">★★★★★</div>
+                        <div class="review-quote">
+                            "The portrait of my husband and our golden retriever hidden in the jharokha was pure magic. The stain was pitch dark mahogany by day two of our palace wedding."
+                        </div>
+                        <div class="review-author-wrap">
+                            <div class="review-avatar">A</div>
+                            <div class="review-author-info">
+                                <span class="review-author-name">Ananya Singhania</span>
+                                <span class="review-author-role">Royal Bridal • Taj Lake Palace, Udaipur</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Card 2 -->
+                <div class="bezel-outer reveal-on-scroll">
+                    <div class="bezel-inner review-card-inner">
+                        <div class="review-stars">★★★★★</div>
+                        <div class="review-quote">
+                            "Completely natural, smelled heavenly of lavender and eucalyptus, with zero burning. Bhuvi's patience and gentle demeanor kept me so calm amidst wedding chaos."
+                        </div>
+                        <div class="review-author-wrap">
+                            <div class="review-avatar">R</div>
+                            <div class="review-author-info">
+                                <span class="review-author-name">Radhika Khandelwal</span>
+                                <span class="review-author-role">Marwari Bharwa • The Oberoi Udaivilas</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Card 3 -->
+                <div class="bezel-outer reveal-on-scroll">
+                    <div class="bezel-inner review-card-inner">
+                        <div class="review-stars">★★★★★</div>
+                        <div class="review-quote">
+                            "Flown down to Dubai for my three-day nuptials. Every single guest was awestruck by the sheer speed and breathtaking symmetry of the artistry."
+                        </div>
+                        <div class="review-author-wrap">
+                            <div class="review-avatar">S</div>
+                            <div class="review-author-info">
+                                <span class="review-author-name">Dr. Sara Al-Maktoum</span>
+                                <span class="review-author-role">Destination Fusion • Burj Al Arab, Dubai</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         8. ROYAL BOOKING CONCIERGE FORM (Supabase + WhatsApp Engine)
+         ====================================================================== -->
+    <section class="bhuvi-section booking-section" id="booking">
+        <div class="bhuvi-container">
+            <div class="booking-inner-grid">
+                <div class="booking-info-box reveal-on-scroll">
+                    <div class="bhuvi-eyebrow bhuvi-eyebrow-dark">
+                        <span>✦</span> SECURE YOUR DATES
+                    </div>
+                    <h2>Begin Your Royal Matrimonial Journey</h2>
+                    <p>
+                        Due to the intensive hours devoted to each couture bride, we accept a strictly limited number of wedding dates each season.
+                    </p>
+
+                    <div class="concierge-perks-list">
+                        <div class="concierge-perk-item">
+                            <div class="perk-icon-wrap">✦</div>
+                            <div class="perk-text">
+                                <strong>Complimentary Design Consultation</strong>
+                                <span>Personalized pattern curation aligned with your lehenga fabric and heirloom jewelry.</span>
+                            </div>
+                        </div>
+                        <div class="concierge-perk-item">
+                            <div class="perk-icon-wrap">🌿</div>
+                            <div class="perk-text">
+                                <strong>Freshly Harvested Organic Cones</strong>
+                                <span>Zero preservatives or harsh chemical boosters; pure botanical richness.</span>
+                            </div>
+                        </div>
+                        <div class="concierge-perk-item">
+                            <div class="perk-icon-wrap">📦</div>
+                            <div class="perk-text">
+                                <strong>VIP Bridal Aftercare Kit</strong>
+                                <span>Handmade botanical balm, essential sealant oil, and cotton wrapping gloves included.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                        <a href="https://wa.me/918094935632?text=Hello%20Bhuvi%20Mehandi,%20I%20would%20like%20to%20inquire%20about%20bridal%20mehndi%20booking" target="_blank" class="btn-royal btn-velvet" style="background: #1b6330; border-color: rgba(255,255,255,0.3);">
+                            <span>Direct WhatsApp Concierge</span>
+                            <span class="btn-icon-pill">💬</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="booking-form-box reveal-on-scroll">
+                    <div class="bezel-outer-dark">
+                        <div class="bezel-inner-dark booking-card-inner">
+                            <form id="bhuviBookingForm">
+                                <div class="form-grid-2">
+                                    <div class="bhuvi-field-group">
+                                        <label for="bhuviCustName">Bride / Client Name *</label>
+                                        <input type="text" id="bhuviCustName" required placeholder="e.g. Priyanka Mehra">
+                                    </div>
+                                    <div class="bhuvi-field-group">
+                                        <label for="bhuviCustPhone">WhatsApp Number (10 Digits) *</label>
+                                        <input type="tel" id="bhuviCustPhone" required placeholder="e.g. 9876543210" maxlength="10">
+                                        <div class="phone-hint-text" id="phoneHint">Enter 10 digit Indian mobile</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-grid-2">
+                                    <div class="bhuvi-field-group">
+                                        <label for="bhuviCustEmail">Email Address</label>
+                                        <input type="email" id="bhuviCustEmail" placeholder="e.g. priyanka@gmail.com">
+                                    </div>
+                                    <div class="bhuvi-field-group">
+                                        <label for="bhuviEventOccasion">Event Occasion *</label>
+                                        <select id="bhuviEventOccasion" required>
+                                            <option value="Royal Bridal Ceremony">Royal Bridal Ceremony</option>
+                                            <option value="Destination Wedding Package">Destination Wedding Package</option>
+                                            <option value="Engagement & Roka">Engagement & Roka</option>
+                                            <option value="Sangeet & Bridal Party">Sangeet & Bridal Party</option>
+                                            <option value="Groom Regalia Mehndi">Groom Regalia Mehndi</option>
+                                            <option value="Festival & Private Celebration">Festival & Private Celebration</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-grid-2">
+                                    <div class="bhuvi-field-group">
+                                        <label for="bhuviEventDate">Ceremony Date *</label>
+                                        <input type="date" id="bhuviEventDate" required>
+                                    </div>
+                                    <div class="bhuvi-field-group">
+                                        <label for="bhuviEventTime">Preferred Time Slot</label>
+                                        <select id="bhuviEventTime">
+                                            <option value="Morning (08:00 AM – 01:00 PM)">Morning (08:00 AM – 01:00 PM)</option>
+                                            <option value="Afternoon (01:00 PM – 05:00 PM)">Afternoon (01:00 PM – 05:00 PM)</option>
+                                            <option value="Evening (05:00 PM – 10:00 PM)">Evening (05:00 PM – 10:00 PM)</option>
+                                            <option value="Late Night Royal Vigil">Late Night Royal Vigil</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-grid-2">
+                                    <div class="bhuvi-field-group">
+                                        <label for="bhuviEventVenue">City & Venue Details *</label>
+                                        <input type="text" id="bhuviEventVenue" required placeholder="e.g. Udaipur • Jagmandir Island Palace">
+                                    </div>
+                                    <div class="bhuvi-field-group">
+                                        <label for="bhuviGuestCount">Guest Count (Mehndi)</label>
+                                        <select id="bhuviGuestCount">
+                                            <option value="1 (Bride Only)">1 (Bride Only)</option>
+                                            <option value="5 - 15 Guests">5 - 15 Guests</option>
+                                            <option value="15 - 30 Guests">15 - 30 Guests</option>
+                                            <option value="30 - 60 Guests">30 - 60 Guests</option>
+                                            <option value="60+ Grand Sangeet">60+ Grand Sangeet</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="bhuvi-field-group">
+                                    <label for="bhuviDesignPick">Preferred Artistry Collection</label>
+                                    <select id="bhuviDesignPick">
+                                        <option value="Royal Rajasthani Bharwa">Royal Rajasthani Bharwa</option>
+                                        <option value="Matrimonial Storytelling Portraiture">Matrimonial Storytelling Portraiture</option>
+                                        <option value="Luxury Arabic & Indo-Western Fusion">Luxury Arabic & Indo-Western Fusion</option>
+                                        <option value="Contemporary Minimalist Bridal">Contemporary Minimalist Bridal</option>
+                                        <option value="Custom Bespoke Consultation">Custom Bespoke Consultation</option>
+                                    </select>
+                                </div>
+
+                                <div class="bhuvi-field-group">
+                                    <label for="bhuviNotes">Special Requests or Personalized Story Details</label>
+                                    <textarea id="bhuviNotes" rows="3" placeholder="Tell us about special motifs, portraits, date coordinates, or lehenga inspirations..."></textarea>
+                                </div>
+
+                                <div class="booking-submit-row">
+                                    <button type="submit" class="btn-royal" id="bhuviSubmitBtn">
+                                        <span>Confirm Booking & Launch WhatsApp Concierge</span>
+                                        <span class="btn-icon-pill">✦</span>
+                                    </button>
+                                </div>
+
+                                <div class="booking-status-box" id="bhuviStatusBox">
+                                    ✦ Saving booking to Supabase & opening WhatsApp with your royal itinerary...
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         9. FREQUENTLY ASKED QUESTIONS (Royal Accordion)
+         ====================================================================== -->
+    <section class="bhuvi-section" id="faq">
+        <div class="bhuvi-container">
+            <div class="section-header reveal-on-scroll">
+                <div class="bhuvi-eyebrow">
+                    <span>✦</span> COMMON INQUIRIES
+                </div>
+                <h2>Artistry, Care & Matrimonial Logistics</h2>
+                <p>Everything you need to know about bridal preparation, chemical safety, and stain longevity.</p>
+            </div>
+
+            <div class="faq-stack">
+                <!-- FAQ 1 -->
+                <div class="bezel-outer faq-item active reveal-on-scroll">
+                    <div class="bezel-inner faq-item-inner">
+                        <button class="faq-question-btn" type="button">
+                            <span>How far in advance should I reserve my wedding date?</span>
+                            <div class="faq-icon-indicator">+</div>
+                        </button>
+                        <div class="faq-answer-panel" style="max-height: 200px;">
+                            <p>For prime wedding dates (October through March), we strongly advise booking 3 to 6 months in advance. Because we only accommodate one primary bride per calendar day to ensure perfection, dates fill rapidly.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 2 -->
+                <div class="bezel-outer faq-item reveal-on-scroll">
+                    <div class="bezel-inner faq-item-inner">
+                        <button class="faq-question-btn" type="button">
+                            <span>How do I achieve the darkest mahogany stain for wedding photography?</span>
+                            <div class="faq-icon-indicator">+</div>
+                        </button>
+                        <div class="faq-answer-panel">
+                            <p>Schedule your bridal henna application 48 hours prior to your wedding day. Allow the dried paste to stay intact for 6 to 8 hours, apply lemon-sugar sealant, scrape off without water, and keep hands warm. Our organic essential oils guarantee maximum color oxidation.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="bezel-outer faq-item reveal-on-scroll">
+                    <div class="bezel-inner faq-item-inner">
+                        <button class="faq-question-btn" type="button">
+                            <span>Do you travel for destination weddings outside Rajasthan?</span>
+                            <div class="faq-icon-indicator">+</div>
+                        </button>
+                        <div class="faq-answer-panel">
+                            <p>Yes. Our senior bridal team frequently travels across India (Goa, Mumbai, Delhi, Kerala) as well as international destination venues in UAE, Europe, and Southeast Asia. Flight travel and local lodging arrangements are coordinated seamlessly with your wedding planner.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="bezel-outer faq-item reveal-on-scroll">
+                    <div class="bezel-inner faq-item-inner">
+                        <button class="faq-question-btn" type="button">
+                            <span>Can we include custom portraits, vows, and dates in the artwork?</span>
+                            <div class="faq-icon-indicator">+</div>
+                        </button>
+                        <div class="faq-answer-panel">
+                            <p>Absolutely. Custom storytelling is our signature forte. You may share photographs of you and your groom, wedding skylines, pets, family monograms, or secret messages, which are hand-drawn into the composition with photographic precision.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================================
+         10. FOOTER & CONCIERGE INFORMATION
+         ====================================================================== -->
+    <footer class="bhuvi-footer">
+        <div class="bhuvi-container">
+            <div class="footer-grid">
+                <div class="footer-brand-col">
+                    <div class="bhuvi-nav-brand">
+                        <div class="bhuvi-logo-mark">B</div>
+                        <div class="bhuvi-brand-title">
+                            <span>Bhuvi Mehandi</span>
+                            <span>Haute Couture Henna</span>
+                        </div>
+                    </div>
+                    <p>
+                        Imperial bridal henna studio devoted to preserving authentic Rajasthani heritage, organic botanicals, and bespoke matrimonial storytelling.
+                    </p>
+                </div>
+
+                <div>
+                    <div class="footer-col-title">Collections</div>
+                    <div class="footer-links-list">
+                        <a href="#services">Royal Rajasthani</a>
+                        <a href="#services">Matrimonial Stories</a>
+                        <a href="#services">Luxury Arabic</a>
+                        <a href="#services">Minimalist Bridal</a>
+                        <a href="#services">Destination Henna</a>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="footer-col-title">Studio & Help</div>
+                    <div class="footer-links-list">
+                        <a href="#about">The Master Artist</a>
+                        <a href="#reviews">Verified Reviews</a>
+                        <a href="#faq">Care Guide</a>
+                        <a href="#booking">Book Concierge</a>
+                        <a href="tel:+918094935632">Direct Call</a>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="footer-col-title">Studio Location</div>
+                    <div class="footer-links-list">
+                        <span style="font-size: 14px; color: #bfaea3;">📍 Heritage Lane, Near City Palace, Udaipur, Rajasthan 313001</span>
+                        <span style="font-size: 14px; color: #bfaea3;">📞 +91 80949 35632</span>
+                        <span style="font-size: 14px; color: #bfaea3;">🕒 Mon – Sun: 09:00 AM – 09:00 PM</span>
+                        <span style="font-size: 14px; color: var(--bhuvi-gold-bright);">✦ By Prior Appointment Only</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom-row">
+                <div>© <span id="bhuviCurrentYear">2026</span> Bhuvi Mehandi Studio. All rights reserved.</div>
+                <div>Handcrafted with Royal Precision • Udaipur, Rajasthan</div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ======================================================================
+         11. FLOATING ACTIONS & MOBILE DOCK
+         ====================================================================== -->
+    <a href="https://wa.me/918094935632?text=Hello%20Bhuvi%20Mehandi,%20I%20would%20like%20to%20inquire%20about%20bridal%20mehndi%20booking" target="_blank" class="floating-whatsapp-btn" aria-label="Chat on WhatsApp">
+        <span style="font-size: 18px;">💬</span>
+        <span>WhatsApp Concierge</span>
+    </a>
+
+    <div class="mobile-sticky-bar">
+        <a href="tel:+918094935632" class="mobile-bar-btn" style="background: rgba(255,255,255,0.1); color: #ffffff;">
+            <span>📞 Call</span>
+        </a>
+        <a href="#booking" class="mobile-bar-btn" style="background: var(--bhuvi-gold); color: #ffffff;">
+            <span>✦ Book Bridal</span>
+        </a>
+    </div>
+
+    <!-- ======================================================================
+         12. INTERACTIVE MODALS (LIGHTBOX & CLIENT REVIEW)
+         ====================================================================== -->
+    <!-- LIGHTBOX MODAL -->
+    <div class="bhuvi-modal-backdrop" id="bhuviLightboxModal" role="dialog" aria-modal="true">
+        <button class="modal-close-trigger" id="bhuviCloseLightbox" aria-label="Close Lightbox">✕</button>
+        <button class="lightbox-arrow-btn prev" id="lightboxPrevBtn" aria-label="Previous Design">‹</button>
+        <button class="lightbox-arrow-btn next" id="lightboxNextBtn" aria-label="Next Design">›</button>
+
+        <div class="lightbox-dialog">
+            <div class="lightbox-img-wrap">
+                <img id="lightboxLargeImg" src="" alt="Mehndi Artwork Preview">
+            </div>
+            <div class="lightbox-caption-bar">
+                <div class="lightbox-caption-text" id="lightboxCaptionText">Royal Bridal Artwork</div>
+                <a href="#booking" class="btn-royal" id="lightboxBookThisBtn" style="padding: 6px 16px; font-size: 13px;">
+                    <span>Book This Exact Design</span>
+                    <span class="btn-icon-pill" style="width: 28px; height: 28px; font-size: 12px;">✦</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLIENT REVIEW MODAL -->
+    <div class="bhuvi-modal-backdrop" id="bhuviReviewModal" role="dialog" aria-modal="true">
+        <div class="review-modal-box">
+            <button class="modal-close-trigger" id="bhuviCloseReviewModal" style="top: 20px; right: 20px;" aria-label="Close Review Modal">✕</button>
+            <h3>✦ Share Your Bride Experience</h3>
+            <p>Tell future brides how Bhuvi Mehandi elevated your royal wedding celebration.</p>
+
+            <form id="bhuviReviewForm">
+                <div class="bhuvi-field-group">
+                    <label for="bhuviRevName">Your Name *</label>
+                    <input type="text" id="bhuviRevName" required placeholder="e.g. Radhika Sharma">
+                </div>
+                <div class="bhuvi-field-group">
+                    <label for="bhuviRevRole">Event & Venue / City *</label>
+                    <input type="text" id="bhuviRevRole" required placeholder="e.g. Royal Bridal • The Leela Palace, Udaipur">
+                </div>
+                <div class="bhuvi-field-group">
+                    <label for="bhuviRevStars">Star Rating</label>
+                    <select id="bhuviRevStars">
+                        <option value="5">★★★★★ (5 Stars - Flawless Royal Excellence)</option>
+                        <option value="4">★★★★☆ (4 Stars - Highly Recommended)</option>
+                        <option value="3">★★★☆☆ (3 Stars - Good)</option>
+                    </select>
+                </div>
+                <div class="bhuvi-field-group">
+                    <label for="bhuviRevText">Your Review & Experience *</label>
+                    <textarea id="bhuviRevText" rows="4" required placeholder="Write about the stain color, artists patience, symmetry, and atmosphere..."></textarea>
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 14px;">
+                    <button type="submit" class="btn-royal" style="flex: 1;">
+                        <span>Publish Review</span>
+                        <span class="btn-icon-pill">✦</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div><!-- /#bhuvi-root -->
+
+<!-- ==========================================================================
+     SUPABASE OFFICIAL SDK (CDN) & AUTONOMOUS ENGINE
+     ========================================================================== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+/**
+ * ==============================================================================
+ * BHUVI MEHANDI — STANDALONE ENGINE FOR ODOO
+ * Zero Dependency on local servers • Error-Safe Supabase Integration • Odoo Isolated
+ * ==============================================================================
+ */
+(function() {
+    "use strict";
+
+    // 1. SUPABASE CREDENTIALS & RESILIENT CLIENT RESOLVER
+    const SUPABASE_URL = "https://xhduoqbhthzlvcgfafnl.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZHVvcWJodGh6bHZjZ2ZhZm5sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1NDAwNjMsImV4cCI6MjEwNTExNjA2M30.eX5dIiLhrc45ut95PkMPJbUf-WJ8oviaDs_u7JD8P-c";
+
+    let supabaseClient = null;
+    function getSupabase() {
+        if (supabaseClient) return supabaseClient;
+        if (typeof window.supabase !== "undefined" && typeof window.supabase.createClient === "function") {
+            try {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            } catch (err) {
+                console.warn("[Bhuvi Engine] Supabase Client Init:", err);
+            }
+        }
+        return supabaseClient;
+    }
+    getSupabase();
+
+    // Helper: Escape HTML
+    function esc(str) {
+        if (!str) return "";
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // Dynamic Year
+    const yearEl = document.getElementById("bhuviCurrentYear");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    // 2. HEADER SCROLL EFFECT & MOBILE DRAWER
+    const navIsland = document.getElementById("bhuviNavIsland");
+    window.addEventListener("scroll", function() {
+        if (!navIsland) return;
+        if (window.pageYOffset > 45) {
+            navIsland.classList.add("scrolled");
+        } else {
+            navIsland.classList.remove("scrolled");
+        }
+    }, { passive: true });
+
+    const mobileToggle = document.getElementById("bhuviMobileToggle");
+    const mobileDrawer = document.getElementById("bhuviMobileDrawer");
+    const drawerClose = document.getElementById("bhuviDrawerClose");
+
+    if (mobileToggle && mobileDrawer) {
+        mobileToggle.addEventListener("click", () => mobileDrawer.classList.add("active"));
+    }
+    if (drawerClose && mobileDrawer) {
+        drawerClose.addEventListener("click", () => mobileDrawer.classList.remove("active"));
+    }
+    if (mobileDrawer) {
+        mobileDrawer.querySelectorAll("a").forEach(a => {
+            a.addEventListener("click", () => mobileDrawer.classList.remove("active"));
+        });
+    }
+
+    // 3. CINEMATIC HERO CAROUSEL ENGINE
+    let currentHeroIndex = 0;
+    let heroTimer = null;
+    const heroTrack = document.getElementById("bhuviHeroTrack");
+    const heroDotsWrap = document.getElementById("heroDotsWrap");
+    const heroCounter = document.getElementById("heroSlideCounter");
+    const heroPrev = document.getElementById("heroPrevBtn");
+    const heroNext = document.getElementById("heroNextBtn");
+
+    function getHeroSlides() {
+        return heroTrack ? Array.from(heroTrack.querySelectorAll(".hero-slide")) : [];
+    }
+
+    function goToSlide(idx) {
+        const slides = getHeroSlides();
+        if (!slides.length || !heroTrack) return;
+        currentHeroIndex = (idx + slides.length) % slides.length;
+        heroTrack.style.transform = `translateX(-${currentHeroIndex * 100}%)`;
+
+        slides.forEach((s, i) => s.classList.toggle("active", i === currentHeroIndex));
+
+        if (heroDotsWrap) {
+            heroDotsWrap.querySelectorAll(".hero-dot-indicator").forEach((dot, i) => {
+                dot.classList.toggle("active", i === currentHeroIndex);
+            });
+        }
+
+        if (heroCounter) {
+            heroCounter.textContent = `0${currentHeroIndex + 1} / 0${slides.length}`;
+        }
+    }
+
+    function startHeroCycle() {
+        if (heroTimer) clearInterval(heroTimer);
+        const count = getHeroSlides().length;
+        if (count > 1) {
+            heroTimer = setInterval(() => goToSlide(currentHeroIndex + 1), 6000);
+        }
+    }
+
+    if (heroPrev) {
+        heroPrev.addEventListener("click", () => {
+            goToSlide(currentHeroIndex - 1);
+            startHeroCycle();
+        });
+    }
+
+    if (heroNext) {
+        heroNext.addEventListener("click", () => {
+            goToSlide(currentHeroIndex + 1);
+            startHeroCycle();
+        });
+    }
+
+    if (heroDotsWrap) {
+        heroDotsWrap.addEventListener("click", (e) => {
+            const btn = e.target.closest(".hero-dot-indicator");
+            if (btn && btn.dataset.slide !== undefined) {
+                goToSlide(parseInt(btn.dataset.slide, 10));
+                startHeroCycle();
+            }
+        });
+    }
+
+    startHeroCycle();
+
+    // 4. GALLERY FILTERING & INTERACTIVE LIGHTBOX
+    const galleryGrid = document.getElementById("galleryGrid");
+    const galleryFilters = document.getElementById("galleryFilters");
+    const lightboxModal = document.getElementById("bhuviLightboxModal");
+    const lightboxImg = document.getElementById("lightboxLargeImg");
+    const lightboxCap = document.getElementById("lightboxCaptionText");
+    const lightboxClose = document.getElementById("bhuviCloseLightbox");
+    const lightboxPrev = document.getElementById("lightboxPrevBtn");
+    const lightboxNext = document.getElementById("lightboxNextBtn");
+    const lightboxBookBtn = document.getElementById("lightboxBookThisBtn");
+
+    let currentLightboxIdx = 0;
+
+    function getVisibleItems() {
+        if (!galleryGrid) return [];
+        return Array.from(galleryGrid.querySelectorAll(".gallery-item")).filter(el => el.style.display !== "none");
+    }
+
+    if (galleryFilters) {
+        galleryFilters.addEventListener("click", (e) => {
+            const pill = e.target.closest(".filter-pill");
+            if (!pill || !pill.dataset.filter) return;
+
+            galleryFilters.querySelectorAll(".filter-pill").forEach(p => p.classList.remove("active"));
+            pill.classList.add("active");
+
+            const filter = pill.dataset.filter.toLowerCase();
+            if (!galleryGrid) return;
+
+            galleryGrid.querySelectorAll(".gallery-item").forEach(item => {
+                const cat = (item.dataset.category || "").toLowerCase();
+                if (filter === "all" || cat.includes(filter)) {
+                    item.style.display = "block";
+                } else {
+                    item.style.display = "none";
+                }
+            });
+        });
+    }
+
+    function openLightbox(item) {
+        const visible = getVisibleItems();
+        currentLightboxIdx = visible.indexOf(item);
+        const imgUrl = item.dataset.img || (item.querySelector("img") ? item.querySelector("img").src : "");
+        const title = item.dataset.title || "Royal Bridal Henna";
+
+        if (lightboxImg) lightboxImg.src = imgUrl;
+        if (lightboxCap) lightboxCap.textContent = title;
+        if (lightboxModal) lightboxModal.classList.add("active");
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeLightbox() {
+        if (lightboxModal) lightboxModal.classList.remove("active");
+        document.body.style.overflow = "";
+    }
+
+    if (galleryGrid) {
+        galleryGrid.addEventListener("click", (e) => {
+            const item = e.target.closest(".gallery-item");
+            if (item) openLightbox(item);
+        });
+    }
+
+    if (lightboxClose) lightboxClose.addEventListener("click", closeLightbox);
+    if (lightboxModal) {
+        lightboxModal.addEventListener("click", (e) => {
+            if (e.target === lightboxModal) closeLightbox();
+        });
+    }
+
+    if (lightboxPrev) {
+        lightboxPrev.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const visible = getVisibleItems();
+            if (!visible.length) return;
+            currentLightboxIdx = (currentLightboxIdx - 1 + visible.length) % visible.length;
+            openLightbox(visible[currentLightboxIdx]);
+        });
+    }
+
+    if (lightboxNext) {
+        lightboxNext.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const visible = getVisibleItems();
+            if (!visible.length) return;
+            currentLightboxIdx = (currentLightboxIdx + 1) % visible.length;
+            openLightbox(visible[currentLightboxIdx]);
+        });
+    }
+
+    if (lightboxBookBtn) {
+        lightboxBookBtn.addEventListener("click", () => {
+            const title = lightboxCap ? lightboxCap.textContent : "Bridal Henna";
+            closeLightbox();
+            const notes = document.getElementById("bhuviNotes");
+            if (notes) {
+                notes.value = `I am captivated by the "${title}" masterpiece from your gallery and would love to adapt it for my celebration.`;
+            }
+        });
+    }
+
+    // Keyboard navigation
+    document.addEventListener("keydown", (e) => {
+        if (!lightboxModal || !lightboxModal.classList.contains("active")) return;
+        if (e.key === "Escape") closeLightbox();
+        if (e.key === "ArrowLeft" && lightboxPrev) lightboxPrev.click();
+        if (e.key === "ArrowRight" && lightboxNext) lightboxNext.click();
+    });
+
+    // Preset service click to booking form
+    document.querySelectorAll("[data-book-service]").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const service = btn.getAttribute("data-book-service");
+            const select = document.getElementById("bhuviDesignPick");
+            if (select) {
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value.includes(service) || select.options[i].text.includes(service)) {
+                        select.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        });
+    });
+
+    // 5. FAQ ACCORDION
+    document.querySelectorAll(".faq-item").forEach(item => {
+        const btn = item.querySelector(".faq-question-btn");
+        const panel = item.querySelector(".faq-answer-panel");
+        if (btn && panel) {
+            btn.addEventListener("click", () => {
+                const isActive = item.classList.contains("active");
+                document.querySelectorAll(".faq-item").forEach(other => {
+                    other.classList.remove("active");
+                    const otherPanel = other.querySelector(".faq-answer-panel");
+                    if (otherPanel) otherPanel.style.maxHeight = null;
+                });
+
+                if (!isActive) {
+                    item.classList.add("active");
+                    panel.style.maxHeight = panel.scrollHeight + "px";
+                }
+            });
+        }
+    });
+
+    // 6. BOOKING FORM & SUPABASE INQUIRIES SUBMISSION
+    const bookingForm = document.getElementById("bhuviBookingForm");
+    const phoneInput = document.getElementById("bhuviCustPhone");
+    const phoneHint = document.getElementById("phoneHint");
+    const dateInput = document.getElementById("bhuviEventDate");
+    const statusBox = document.getElementById("bhuviStatusBox");
+
+    if (dateInput) {
+        const today = new Date().toISOString().split("T")[0];
+        dateInput.min = today;
+    }
+
+    if (phoneInput && phoneHint) {
+        phoneInput.addEventListener("input", function() {
+            this.value = this.value.replace(/\D/g, "").slice(0, 10);
+            if (this.value.length === 10) {
+                phoneHint.textContent = "✓ 10 digits entered";
+                phoneHint.style.color = "#76c893";
+            } else if (this.value.length > 0) {
+                phoneHint.textContent = `${10 - this.value.length} digits left`;
+                phoneHint.style.color = "var(--bhuvi-muted-light)";
+            } else {
+                phoneHint.textContent = "Enter 10 digit Indian mobile";
+                phoneHint.style.color = "var(--bhuvi-muted-light)";
+            }
+        });
+    }
+
+    if (bookingForm) {
+        bookingForm.addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const name = document.getElementById("bhuviCustName").value.trim();
+            const phone = document.getElementById("bhuviCustPhone").value.trim().replace(/\D/g, "");
+            const email = document.getElementById("bhuviCustEmail").value.trim();
+            const occasion = document.getElementById("bhuviEventOccasion").value;
+            const date = document.getElementById("bhuviEventDate").value;
+            const timeSlot = document.getElementById("bhuviEventTime").value;
+            const venue = document.getElementById("bhuviEventVenue").value.trim();
+            const guests = document.getElementById("bhuviGuestCount").value;
+            const design = document.getElementById("bhuviDesignPick").value;
+            const notes = document.getElementById("bhuviNotes").value.trim();
+
+            if (!name || phone.length !== 10 || !occasion || !date || !venue) {
+                alert("Please complete your name, 10-digit mobile number, occasion, date, and venue.");
+                return;
+            }
+
+            const formattedDate = new Date(date + "T00:00:00").toLocaleDateString("en-IN", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric"
+            });
+
+            // Write inquiry to Supabase
+            const client = getSupabase();
+            if (client) {
+                try {
+                    await client.from("inquiries").insert([{
+                        id: "inq-" + Date.now(),
+                        name: name,
+                        phone: phone,
+                        email: email || null,
+                        occasion: occasion,
+                        event_date: date,
+                        time_slot: timeSlot,
+                        city: venue,
+                        guests: guests,
+                        notes: notes || null,
+                        status: "New",
+                        created_at: new Date().toISOString()
+                    }]);
+                } catch (err) {
+                    try {
+                        await client.from("mehandi_inquiries").insert([{
+                            name: name,
+                            phone: phone,
+                            email: email || null,
+                            event_type: occasion,
+                            event_date: date,
+                            city_venue: venue,
+                            message: notes || null
+                        }]);
+                    } catch (e2) {}
+                }
+            }
+
+            // Construct Royal Concierge WhatsApp Itinerary
+            const waText = 
+`👑 *BHUVI MEHANDI — ROYAL BOOKING INQUIRY*
+━━━━━━━━━━━━━━━━━━━━
+👤 *Bride / Client:* ${name}
+📱 *Phone:* ${phone}
+📧 *Email:* ${email || "Not specified"}
+━━━━━━━━━━━━━━━━━━━━
+💍 *Occasion:* ${occasion}
+📅 *Ceremony Date:* ${formattedDate}
+⏰ *Time Preference:* ${timeSlot}
+📍 *Venue & City:* ${venue}
+👥 *Guest Count:* ${guests}
+🎨 *Artistry Selection:* ${design}
+━━━━━━━━━━━━━━━━━━━━
+📝 *Bespoke Notes / Story Details:*
+${notes || "None mentioned"}
+━━━━━━━━━━━━━━━━━━━━
+_Submitted via Bhuvi Mehandi Luxury Website_`;
+
+            if (statusBox) {
+                statusBox.style.display = "block";
+            }
+
+            const waURL = "https://wa.me/918094935632?text=" + encodeURIComponent(waText);
+            window.open(waURL, "_blank");
+        });
+    }
+
+    // 7. CLIENT REVIEW MODAL & SUPABASE SUBMISSION
+    const reviewModal = document.getElementById("bhuviReviewModal");
+    const openReviewBtn = document.getElementById("openReviewModalTrigger");
+    const closeReviewBtn = document.getElementById("bhuviCloseReviewModal");
+    const reviewForm = document.getElementById("bhuviReviewForm");
+    const reviewsGrid = document.getElementById("bhuviReviewsGrid");
+
+    function openReviewModal() {
+        if (reviewModal) reviewModal.classList.add("active");
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeReviewModal() {
+        if (reviewModal) reviewModal.classList.remove("active");
+        document.body.style.overflow = "";
+    }
+
+    if (openReviewBtn) openReviewBtn.addEventListener("click", openReviewModal);
+    if (closeReviewBtn) closeReviewBtn.addEventListener("click", closeReviewModal);
+    if (reviewModal) {
+        reviewModal.addEventListener("click", (e) => {
+            if (e.target === reviewModal) closeReviewModal();
+        });
+    }
+
+    if (reviewForm) {
+        reviewForm.addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const name = document.getElementById("bhuviRevName").value.trim();
+            const role = document.getElementById("bhuviRevRole").value.trim() || "Bride • Udaipur";
+            const stars = parseInt(document.getElementById("bhuviRevStars").value, 10) || 5;
+            const text = document.getElementById("bhuviRevText").value.trim();
+
+            if (!name || !text) {
+                alert("Please provide your name and review comments.");
+                return;
+            }
+
+            const newRev = {
+                id: "rev-" + Date.now(),
+                name: name,
+                role: role,
+                stars: stars,
+                text: text,
+                created_at: new Date().toISOString()
+            };
+
+            // Optimistic UI Update
+            if (reviewsGrid) {
+                const card = document.createElement("div");
+                card.className = "bezel-outer reveal-on-scroll revealed";
+                card.innerHTML = `
+                    <div class="bezel-inner review-card-inner">
+                        <div class="review-stars">${"★".repeat(stars)}</div>
+                        <div class="review-quote">"${esc(text)}"</div>
+                        <div class="review-author-wrap">
+                            <div class="review-avatar">${esc(name.charAt(0).toUpperCase())}</div>
+                            <div class="review-author-info">
+                                <span class="review-author-name">${esc(name)}</span>
+                                <span class="review-author-role">${esc(role)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                reviewsGrid.insertBefore(card, reviewsGrid.firstChild);
+            }
+
+            closeReviewModal();
+            reviewForm.reset();
+
+            // Submit to Supabase reviews table
+            const client = getSupabase();
+            if (client) {
+                try {
+                    const { error } = await client.from("reviews").insert([{
+                        id: newRev.id,
+                        name: name,
+                        role: role,
+                        stars: stars,
+                        review_text: text,
+                        created_at: newRev.created_at
+                    }]);
+                    if (error) throw error;
+                } catch (err) {
+                    try {
+                        await client.from("mehandi_reviews").insert([{
+                            client_name: name,
+                            location: role,
+                            rating: stars,
+                            comment: text,
+                            event_type: "Bridal Mehandi",
+                            author_token: "guest-" + Date.now()
+                        }]);
+                    } catch (e2) {}
+                }
+            }
+
+            alert("Thank you! Your verified bride review has been published.");
+        });
+    }
+
+    // 8. DYNAMIC DATA HYDRATION FROM SUPABASE
+    async function hydrateSupabase() {
+        let client = getSupabase();
+        if (!client) {
+            // Poll for up to 3 seconds for CDN script
+            for (let i = 0; i < 15; i++) {
+                await new Promise(r => setTimeout(r, 200));
+                client = getSupabase();
+                if (client) break;
+            }
+        }
+        if (!client) return;
+
+        // A. Load Live Reviews
+        try {
+            let reviewsData = null;
+            const { data, error } = await client
+                .from("reviews")
+                .select("*")
+                .order("created_at", { ascending: false });
+
+            if (!error && Array.isArray(data) && data.length > 0) {
+                reviewsData = data.map(r => ({
+                    id: r.id,
+                    name: r.name || "Happy Bride",
+                    role: r.role || "Bride • Udaipur",
+                    stars: parseInt(r.stars, 10) || 5,
+                    text: r.review_text || r.text || ""
+                }));
+            } else {
+                const { data: d2 } = await client.from("mehandi_reviews").select("*").order("created_at", { ascending: false });
+                if (Array.isArray(d2) && d2.length > 0) {
+                    reviewsData = d2.map(r => ({
+                        id: r.id,
+                        name: r.client_name || "Happy Bride",
+                        role: r.location ? `Bride • ${r.location}` : "Bride • Udaipur",
+                        stars: parseInt(r.rating, 10) || 5,
+                        text: r.comment || ""
+                    }));
+                }
+            }
+
+            if (reviewsData && reviewsData.length > 0 && reviewsGrid) {
+                reviewsGrid.innerHTML = reviewsData.map(r => `
+                    <div class="bezel-outer reveal-on-scroll revealed">
+                        <div class="bezel-inner review-card-inner">
+                            <div class="review-stars">${"★".repeat(Math.max(1, Math.min(5, r.stars)))}</div>
+                            <div class="review-quote">"${esc(r.text)}"</div>
+                            <div class="review-author-wrap">
+                                <div class="review-avatar">${esc(r.name.charAt(0).toUpperCase())}</div>
+                                <div class="review-author-info">
+                                    <span class="review-author-name">${esc(r.name)}</span>
+                                    <span class="review-author-role">${esc(r.role)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join("");
+            }
+        } catch (e) {
+            console.warn("[Bhuvi Engine] Reviews fetch:", e);
+        }
+
+        // B. Load Live Gallery
+        try {
+            const { data: gData, error: gErr } = await client
+                .from("gallery")
+                .select("*")
+                .order("display_order", { ascending: true });
+
+            if (!gErr && Array.isArray(gData) && gData.length > 0 && galleryGrid) {
+                galleryGrid.innerHTML = gData.map(g => {
+                    const cat = (g.category || "bridal").toLowerCase();
+                    const title = g.title || "Royal Bridal Henna";
+                    const img = g.image_url || g.src || "";
+                    const badge = g.category_label || (cat.charAt(0).toUpperCase() + cat.slice(1));
+                    return `
+                        <div class="bezel-outer gallery-item reveal-on-scroll revealed" data-category="${cat}" data-title="${esc(title)}" data-img="${esc(img)}">
+                            <div class="bezel-inner gallery-card-inner">
+                                <img src="${esc(img)}" alt="${esc(title)}" loading="lazy">
+                                <div class="gallery-overlay">
+                                    <span class="gallery-cat-label">${esc(badge)}</span>
+                                    <div class="gallery-item-title">${esc(title)}</div>
+                                </div>
+                                <div class="gallery-zoom-pill">🔍</div>
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+            }
+        } catch (e) {
+            console.warn("[Bhuvi Engine] Gallery fetch:", e);
+        }
+
+        // C. Load Live Hero Banners
+        try {
+            const { data: bData, error: bErr } = await client
+                .from("hero_banners")
+                .select("*")
+                .eq("is_active", true)
+                .order("display_order", { ascending: true });
+
+            if (!bErr && Array.isArray(bData) && bData.length > 0 && heroTrack) {
+                heroTrack.innerHTML = bData.map((b, idx) => `
+                    <div class="hero-slide ${idx === 0 ? 'active' : ''}" data-index="${idx}">
+                        <img src="${esc(b.image_url || b.image)}" alt="${esc(b.title || 'Bhuvi Mehandi Luxury Banner')}" loading="${idx === 0 ? 'eager' : 'lazy'}">
+                        <div class="hero-slide-overlay"></div>
+                    </div>
+                `).join("");
+
+                if (heroDotsWrap) {
+                    heroDotsWrap.innerHTML = bData.map((_, idx) => `
+                        <button class="hero-dot-indicator ${idx === 0 ? 'active' : ''}" data-slide="${idx}" aria-label="Slide ${idx + 1}"></button>
+                    `).join("");
+                }
+                goToSlide(0);
+                startHeroCycle();
+            }
+        } catch (e) {
+            console.warn("[Bhuvi Engine] Hero Banners fetch:", e);
+        }
+    }
+
+    hydrateSupabase();
+
+    // 9. SCROLL REVEAL OBSERVER
+    if (typeof IntersectionObserver !== "undefined") {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("revealed");
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll("#bhuvi-root .reveal-on-scroll").forEach(el => observer.observe(el));
+    } else {
+        document.querySelectorAll("#bhuvi-root .reveal-on-scroll").forEach(el => el.classList.add("revealed"));
+    }
+
+    // 10. ODOO FULL-WIDTH SNIPPET BREAKOUT ADAPTER
+    function adaptOdooFullWidth() {
+        const root = document.getElementById("bhuvi-root");
+        if (!root) return;
+        try {
+            const embedWrap = root.closest ? root.closest(".s_embed_code") : null;
+            if (embedWrap && embedWrap.parentElement && !root.dataset.lifted) {
+                embedWrap.parentElement.insertBefore(root, embedWrap.nextSibling);
+                embedWrap.style.display = "none";
+                root.dataset.lifted = "1";
+            }
+        } catch (e) {}
+    }
+
+    adaptOdooFullWidth();
+    window.addEventListener("load", adaptOdooFullWidth);
+    window.addEventListener("resize", adaptOdooFullWidth);
+
+})();
+</script>
