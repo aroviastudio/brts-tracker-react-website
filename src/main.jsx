@@ -1,9 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import WhatsAppApp from './whatsapp/WhatsAppApp.jsx'
+import IPhoneWhatsApp from './IPhoneWhatsApp.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <WhatsAppApp />
+    <IPhoneWhatsApp />
   </StrictMode>,
 )

@@ -1,0 +1,459 @@
+/* ============================================================
+   App root — full viewport, centres the phone
+   ============================================================ */
+.app-root {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* WebGL canvas fills behind everything */
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+/* ============================================================
+   iPhone 15 Pro frame — pure CSS
+   ============================================================ */
+.iphone-frame {
+  position: relative;
+  z-index: 10;
+  width: clamp(300px, 90vw, 375px);
+  height: clamp(600px, 92vh, 812px);
+  background: #1c1c1e;
+  border-radius: 50px;
+  border: 2px solid #3a3a3c;
+  box-shadow:
+    0 0 0 1px #000,
+    0 30px 80px rgba(0,0,0,0.9),
+    inset 0 0 0 2px #2c2c2e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Dynamic island */
+.dynamic-island {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 36px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 20;
+}
+
+/* Inner screen */
+.iphone-screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 48px;
+  overflow: hidden;
+  background: #111b21;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Home indicator bar */
+.iphone-home-bar {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 5px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 3px;
+  z-index: 20;
+}
+
+/* ============================================================
+   iOS Status bar
+   ============================================================ */
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 4px;
+  background: #075e54;
+  color: #fff;
+  min-height: 44px;
+  flex-shrink: 0;
+}
+
+.status-time {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.status-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ============================================================
+   WhatsApp header
+   ============================================================ */
+.wa-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #075e54;
+  flex-shrink: 0;
+}
+
+.wa-back {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.wa-back svg {
+  width: 20px;
+  height: 20px;
+}
+
+.wa-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0891b2, #1d4ed8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.wa-header-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.wa-header-name {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wa-verified {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.wa-header-status {
+  color: rgba(255,255,255,0.8);
+  font-size: 12px;
+  margin-top: 1px;
+}
+
+.wa-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.wa-icon-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  transition: background 0.15s;
+}
+
+.wa-icon-btn:active {
+  background: rgba(255,255,255,0.15);
+}
+
+.wa-icon-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ============================================================
+   Chat area — wallpaper + scroll
+   ============================================================ */
+.wa-chat-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 10px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  /* WhatsApp-style subtle wallpaper */
+  background-color: #0d1418;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.wa-chat-area::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================================
+   Encryption notice
+   ============================================================ */
+.wa-encrypt-notice {
+  align-self: center;
+  background: rgba(17, 27, 33, 0.85);
+  color: rgba(255,255,255,0.55);
+  font-size: 11px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 10px 0 8px;
+  max-width: 90%;
+  line-height: 1.4;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.wa-lock-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+/* ============================================================
+   Message bubbles
+   ============================================================ */
+.wa-bubble-wrap {
+  display: flex;
+  margin-bottom: 2px;
+  animation: wa-pop-in 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes wa-pop-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.wa-bubble-wrap--out {
+  justify-content: flex-end;
+}
+
+.wa-bubble-wrap--in {
+  justify-content: flex-start;
+}
+
+.wa-bubble {
+  max-width: 78%;
+  padding: 7px 10px 6px;
+  border-radius: 8px;
+  position: relative;
+  word-break: break-word;
+}
+
+.wa-bubble--out {
+  background: #005c4b;
+  border-top-right-radius: 2px;
+}
+
+.wa-bubble--in {
+  background: #1f2c33;
+  border-top-left-radius: 2px;
+}
+
+.wa-bubble-text {
+  color: #e9edef;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.wa-bubble-time {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+  font-size: 10px;
+  color: rgba(233,237,239,0.5);
+  margin-top: 3px;
+}
+
+.wa-tick {
+  width: 16px;
+  height: 11px;
+}
+
+/* Typing indicator */
+.wa-typing {
+  padding: 12px 14px;
+  gap: 4px;
+  display: inline-flex;
+  align-items: center;
+  min-width: 56px;
+}
+
+.wa-dot {
+  width: 7px;
+  height: 7px;
+  background: rgba(233,237,239,0.5);
+  border-radius: 50%;
+  animation: wa-bounce 1.2s infinite ease-in-out;
+}
+
+.wa-dot:nth-child(2) { animation-delay: 0.2s; }
+.wa-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes wa-bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30%            { transform: translateY(-6px); }
+}
+
+/* ============================================================
+   Quick action buttons
+   ============================================================ */
+.wa-quick-actions {
+  display: flex;
+  gap: 6px;
+  padding: 8px 10px;
+  overflow-x: auto;
+  background: #111b21;
+  flex-shrink: 0;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+
+.wa-quick-actions::-webkit-scrollbar {
+  display: none;
+}
+
+.wa-quick-btn {
+  background: none;
+  border: 1px solid #00a884;
+  color: #00a884;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.wa-quick-btn:active,
+.wa-quick-btn:hover {
+  background: #00a884;
+  color: #fff;
+}
+
+/* ============================================================
+   Input bar
+   ============================================================ */
+.wa-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px 20px;
+  background: #111b21;
+  flex-shrink: 0;
+}
+
+.wa-input-icon-btn {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.wa-input-icon-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.wa-input-wrap {
+  flex: 1;
+  background: #2a3942;
+  border-radius: 24px;
+  padding: 2px 14px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.wa-input {
+  width: 100%;
+  background: none;
+  border: none;
+  outline: none;
+  color: #e9edef;
+  font-size: 16px;
+  line-height: 1.4;
+  caret-color: #00a884;
+}
+
+.wa-input::placeholder {
+  color: rgba(233,237,239,0.35);
+}
+
+.wa-send-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #00a884;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.wa-send-btn:active {
+  background: #008f72;
+  transform: scale(0.93);
+}
+
+.wa-send-btn svg {
+  width: 20px;
+  height: 20px;
+}
