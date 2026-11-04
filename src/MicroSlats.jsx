@@ -251,101 +251,107 @@ void main() {
   vec2 center = uOrigin + vec2(cell.x, row) * uGrid.zw + uSlat * 0.5;
   float v = clamp(center.y / uSize.y, 0.0, 1.0);
 
-  vec2 fluidUv = center / uSize;
-  vec2 velocity = texture(tVelocity, fluidUv).xy * uFluid;
-  vec3 ink = texture(tInk, fluidUv).xyz * uInk;
-
-  float persp = mix(1.0, 1.0 - v * 0.6, uPerspective);
-  float fog = mix(1.0, 1.0 - v * 0.85, uFog);
-  float introFade = clamp((uIntro - (1.0 - v)) * 6.0, 0.0, 1.0);
-
-  float dir = radians(uDirection);
-  float wave = 0.0;
-  for (int i = 0; i < 4; i++) {
-    float ang = dir + TURN[i];
-    vec2 k = vec2(cos(ang), sin(ang)) / (uScale * LENGTH[float(i)]);
-    float phase = dot(center * persp, k) + uTime * HEIGHT[float(i)] + SHIFT[float(i)];
-    float raw = sin(phase);
-    float chopped = sign(raw) * pow(abs(raw), 1.0 + uChop * 2.5);
-    wave += chopped * HEIGHT[float(i)];
+  vec2 flow = vec2(0.0);
+  float ink = 0.0;
+  if (uFluid > 0.5) {
+    vec2 fluidUv = clamp(vec2(center.x / uSize.x, 1.0 - center.y / uSize.y), 0.0, 1.0);
+    flow = texture(tVelocity, fluidUv).xy * uFluidTexel * uSize;
+    ink = texture(tInk, fluidUv).x;
   }
-  wave /= 2.6;
 
-  float vel = length(velocity);
-  float velWave = wave + vel * 0.4;
-  float stretch = mix(1.0, clamp(0.5 + velWave * 0.5, 0.0, 1.0), uStretch);
-  float lean = velocity.x * uLean * 0.012;
+  float horizon = mix(8.0, 0.5, uPerspective);
+  float depth = (1.0 + horizon) / (v + horizon);
+  vec2 world = vec2((center.x - uSize.x * 0.5) / uSize.y * depth, (depth - 1.0) * horizon * 2.2);
+  world -= flow * 0.00018 * depth;
+  world /= max(uScale, 0.05);
 
-  vec2 local = (gl_FragCoord.xy - cell - 0.5) / uSlat - 0.5 + vec2(lean, 0.0);
-  float hw = uSlat.x * 0.5 / uSlat.y;
-  float r = min(hw, uSlat.x * 0.5 * 0.75 / uSlat.y);
+  float meander = 0.55 * sin(dot(world, vec2(0.23, 0.41)) * 0.9 + uTime * 0.13)
+    + 0.3 * sin(dot(world, vec2(-0.37, 0.19)) * 1.4 - uTime * 0.09);
 
-  float slatTop = 0.5 * stretch + velWave * 0.03;
-  float slatBot = -0.5 * stretch + velWave * 0.03;
-  float inSlat = step(slatBot, local.y) * step(local.y, slatTop) * step(-hw, local.x) * step(local.x, hw);
+  float steep = uChop * 0.45;
+  float height = 0.0;
+  float total = 0.0;
+  for (int i = 0; i < 4; i++) {
+    float angle = uDirection + TURN[i];
+    vec2 heading = vec2(cos(angle), sin(angle));
+    float k = 6.2831853 / LENGTH[i];
+    float omega = sqrt(9.81 * k) * 0.35;
+    float theta = k * dot(world, heading) - omega * uTime + SHIFT[i] + meander * (0.6 + 0.3 * float(i));
+    height += HEIGHT[i] * (cos(theta) + steep * cos(2.0 * theta));
+    total += HEIGHT[i] * (1.0 + steep);
+  }
+  float level = clamp(0.5 + 0.5 * height / (total * 0.85), 0.0, 1.0);
+  float crest = smoothstep(0.6, 1.0, level);
+  float glint = crest * crest * uGlint;
 
-  float corner = length(max(abs(local + vec2(0.0, -slatTop + r)) - vec2(hw - r, 0.0), 0.0)) - r;
-  float cornerB = length(max(abs(local + vec2(0.0, -slatBot - r)) - vec2(hw - r, 0.0), 0.0)) - r;
-  float roundMask = 1.0 - smoothstep(-0.5 / uSlat.y, 0.5 / uSlat.y, max(corner, cornerB));
+  float haze = mix(1.0, 1.0 - uFog, pow(1.0 - v, 1.4));
+  float light = (pow(level, uContrast) + glint * 0.8) * haze;
+  float glow = 1.0 - exp(-max(ink, 0.0) * uInk * 1.6);
+  light = 1.0 - (1.0 - clamp(light, 0.0, 1.0)) * (1.0 - glow);
 
-  float glint = clamp((velWave + 1.0) * 0.5, 0.0, 1.0) * uGlint;
+  float front = uIntro * 1.35;
+  float reveal = 1.0 - smoothstep(front - 0.35, front, v);
+  float sweep = exp(-pow((v - front + 0.22) / 0.07, 2.0)) * (1.0 - uIntro);
+  light = (light + sweep * 0.8) * reveal;
+  light = max(light, 0.045 * reveal);
+  float span = mix(1.0 - uStretch, 1.0, level) + glow * 0.3;
+  span = clamp(span, 0.08, 1.0) * mix(0.1, 1.0, reveal);
+  float tint = clamp(max(glint * 1.4, glow * 0.9) + sweep, 0.0, 1.0);
+  float lean = clamp(flow.x / 1400.0, -1.0, 1.0) * uLean * reveal;
 
-  fragColor = vec4(wave, stretch, glint, inSlat * roundMask * fog * introFade);
+  fragColor = vec4(clamp(light, 0.0, 1.0), span, tint, 0.5 + 0.5 * lean);
 }
 `;
 
-const renderFragment = `#version 300 es
+const slatFragment = `#version 300 es
 precision highp float;
 uniform sampler2D tField;
-uniform vec4 uColor;
-uniform vec4 uGlint;
-uniform vec4 uBg;
-uniform float uContrast;
-uniform vec3 uInkColor;
-uniform sampler2D tInk;
 uniform vec2 uSize;
-uniform float uInk;
+uniform float uDpr;
+uniform vec4 uGrid;
+uniform vec2 uOrigin;
+uniform vec2 uSlat;
+uniform float uRound;
+uniform float uTilt;
+uniform vec3 uColor;
+uniform vec3 uGlintColor;
+uniform vec4 uBackground;
 out vec4 fragColor;
 
+float pill(vec2 p, vec2 b, float r) {
+  vec2 q = abs(p) - b + r;
+  return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
+}
+
 void main() {
-  vec2 uv = gl_FragCoord.xy / uSize;
-  vec4 f = texture(tField, uv);
-  float wave = f.x;
-  float stretch = f.y;
-  float glint = f.z;
-  float mask = f.w;
-
-  float bright = clamp((wave + 1.0) * 0.5 * uContrast, 0.0, 1.0);
-  vec4 slatColor = mix(uColor, uGlint, glint);
-  slatColor = mix(slatColor, vec4(1.0), glint * 0.3);
-
-  vec3 inkSample = texture(tInk, uv).xyz * uInk;
-  slatColor.rgb += inkSample * (1.0 - glint);
-
-  vec4 col = mix(uBg, slatColor, mask);
-  fragColor = col;
+  vec2 p = vec2(gl_FragCoord.x, uSize.y * uDpr - gl_FragCoord.y) / uDpr;
+  vec2 local = p - uOrigin;
+  vec2 cell = floor(local / uGrid.zw);
+  vec4 background = vec4(uBackground.rgb * uBackground.a, uBackground.a);
+  vec4 slat = vec4(0.0);
+  int reach = uTilt > 0.0 ? 1 : 0;
+  for (int dx = -1; dx <= 1; dx++) {
+    if (abs(dx) > reach) continue;
+    vec2 neighbour = cell + vec2(float(dx), 0.0);
+    if (neighbour.x < 0.0 || neighbour.y < 0.0 || neighbour.x >= uGrid.x || neighbour.y >= uGrid.y) continue;
+    vec4 field = texelFetch(tField, ivec2(int(neighbour.x), int(uGrid.y - 1.0 - neighbour.y)), 0);
+    vec2 offset = local - neighbour * uGrid.zw - uSlat * 0.5;
+    float angle = (field.a - 0.5) * 2.0 * uTilt;
+    float c = cos(angle);
+    float s = sin(angle);
+    vec2 turned = vec2(c * offset.x + s * offset.y, c * offset.y - s * offset.x);
+    vec2 halfSize = vec2(uSlat.x * 0.5, uSlat.y * 0.5 * field.g);
+    float radius = uRound * min(halfSize.x, halfSize.y);
+    float alpha = clamp(0.5 - pill(turned, halfSize, radius) * uDpr, 0.0, 1.0) * field.r;
+    if (alpha > slat.a) slat = vec4(mix(uColor, uGlintColor, field.b) * alpha, alpha);
+  }
+  fragColor = slat + background * (1.0 - slat.a);
 }
 `;
 
-function makeRT(gl, w, h) {
-  return new RenderTarget(gl, {
-    width: w,
-    height: h,
-    type: gl.HALF_FLOAT,
-    format: gl.RGBA,
-    internalFormat: gl.RGBA16F,
-    minFilter: gl.LINEAR,
-    magFilter: gl.LINEAR,
-  });
-}
-
-function makeRTDouble(gl, w, h) {
-  return { read: makeRT(gl, w, h), write: makeRT(gl, w, h), swap() { const t = this.read; this.read = this.write; this.write = t; } };
-}
-
-export default function MicroSlats({
+const MicroSlats = ({
   preset = 'swell',
-  color = '#A855F7',
+  color = '#ed680b',
   glintColor = '#ffffff',
   backgroundColor = '#000000',
   slatWidth = 10,
@@ -371,312 +377,543 @@ export default function MicroSlats({
   introDuration = 1.5,
   paused = false,
   className = '',
-  style,
-}) {
+  style
+}) => {
   const containerRef = useRef(null);
-  const stateRef = useRef(null);
+  const settingsRef = useRef(null);
+  const wakeRef = useRef(null);
 
-  const presetData = useMemo(() => SWELL_PRESETS[preset] || SWELL_PRESETS.swell, [preset]);
+  const base = SWELL_PRESETS[preset] || SWELL_PRESETS.swell;
+  const pick = (value, key) => (value === undefined || value === null ? base[key] : value);
 
-  const cfg = useMemo(() => ({
-    scale: scale ?? presetData.scale,
-    speed: speed ?? presetData.speed,
-    direction: direction ?? presetData.direction,
-    chop: chop ?? presetData.chop,
-    stretch: stretch ?? presetData.stretch,
-    glint: glint ?? presetData.glint,
-    contrast: contrast ?? presetData.contrast,
-    perspective: perspective ?? presetData.perspective,
-    fog: fog ?? presetData.fog,
-  }), [preset, scale, speed, direction, chop, stretch, glint, contrast, perspective, fog, presetData]);
+  const colors = useMemo(
+    () => ({
+      color: parseColor(color, [0.93, 0.41, 0.04, 1]),
+      glintColor: parseColor(glintColor, [1, 1, 1, 1]),
+      backgroundColor: parseColor(backgroundColor, [0, 0, 0, 1])
+    }),
+    [color, glintColor, backgroundColor]
+  );
+
+  useEffect(() => {
+    settingsRef.current = {
+      ...colors,
+      slatWidth,
+      slatHeight,
+      gap,
+      roundness,
+      scale: pick(scale, 'scale'),
+      speed: pick(speed, 'speed'),
+      direction: pick(direction, 'direction'),
+      chop: pick(chop, 'chop'),
+      stretch: pick(stretch, 'stretch'),
+      glint: pick(glint, 'glint'),
+      contrast: pick(contrast, 'contrast'),
+      perspective: pick(perspective, 'perspective'),
+      fog: pick(fog, 'fog'),
+      interactive,
+      cursorStrength,
+      cursorSize,
+      swirl,
+      trail,
+      lean,
+      intro,
+      introDuration,
+      paused
+    };
+    wakeRef.current?.();
+  });
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container) return undefined;
 
-    const renderer = new Renderer({ dpr: Math.min(window.devicePixelRatio, 2), alpha: false, antialias: false });
+    const renderer = new Renderer({ alpha: true, premultipliedAlpha: true, antialias: false, depth: false });
     const gl = renderer.gl;
-    gl.clearColor(0, 0, 0, 1);
-    container.appendChild(gl.canvas);
+    if (!renderer.isWebgl2) {
+      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      return undefined;
+    }
+    gl.clearColor(0, 0, 0, 0);
+    const canvas = gl.canvas;
+    canvas.style.display = 'block';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.setAttribute('aria-hidden', 'true');
+    container.appendChild(canvas);
 
-    const tri = new Triangle(gl);
+    const geometry = new Triangle(gl);
+    const blank = new Texture(gl);
+    const floatTargets = !!(
+      gl.getExtension('EXT_color_buffer_float') || gl.getExtension('EXT_color_buffer_half_float')
+    );
 
-    const mkProg = (fragment, vertex = passVertex) => new Program(gl, {
-      vertex,
-      fragment,
-      depthTest: false,
-      depthWrite: false,
+    const dispose = target => {
+      gl.deleteFramebuffer(target.buffer);
+      gl.deleteTexture(target.texture.texture);
+    };
+
+    let fieldTarget = new RenderTarget(gl, {
+      width: 1,
+      height: 1,
+      depth: false,
+      minFilter: gl.NEAREST,
+      magFilter: gl.NEAREST
     });
 
-    const mkFluidProg = (fragment) => new Program(gl, {
-      vertex: fluidVertex,
-      fragment,
-      depthTest: false,
-      depthWrite: false,
+    const fieldUniforms = {
+      uSize: { value: [1, 1] },
+      uGrid: { value: [1, 1, 1, 1] },
+      uOrigin: { value: [0, 0] },
+      uSlat: { value: [1, 1] },
+      uTime: { value: 0 },
+      uScale: { value: 1 },
+      uDirection: { value: 0 },
+      uChop: { value: 0.5 },
+      uStretch: { value: 0.3 },
+      uGlint: { value: 1 },
+      uContrast: { value: 1 },
+      uPerspective: { value: 0.7 },
+      uFog: { value: 0.5 },
+      uIntro: { value: 0 },
+      tVelocity: { value: blank },
+      tInk: { value: blank },
+      uFluidTexel: { value: [1, 1] },
+      uFluid: { value: 0 },
+      uInk: { value: 1 },
+      uLean: { value: 0.5 }
+    };
+    const fieldMesh = new Mesh(gl, {
+      geometry,
+      program: new Program(gl, {
+        vertex: passVertex,
+        fragment: fieldFragment,
+        uniforms: fieldUniforms,
+        depthTest: false,
+        depthWrite: false
+      })
     });
 
-    const splatProg = mkFluidProg(splatFragment);
-    const curlProg = mkFluidProg(curlFragment);
-    const vorticityProg = mkFluidProg(vorticityFragment);
-    const divergenceProg = mkFluidProg(divergenceFragment);
-    const pressureProg = mkFluidProg(pressureFragment);
-    const projectProg = mkFluidProg(projectFragment);
-    const advectProg = mkFluidProg(advectFragment);
-    const scaleProg = mkFluidProg(scaleFragment);
-    const fieldProg = mkProg(fieldFragment);
-    const renderProg = mkProg(renderFragment);
+    const slatUniforms = {
+      tField: { value: fieldTarget.texture },
+      uSize: { value: [1, 1] },
+      uDpr: { value: 1 },
+      uGrid: { value: [1, 1, 1, 1] },
+      uOrigin: { value: [0, 0] },
+      uSlat: { value: [1, 1] },
+      uRound: { value: 1 },
+      uTilt: { value: 0 },
+      uColor: { value: [1, 1, 1] },
+      uGlintColor: { value: [1, 1, 1] },
+      uBackground: { value: [0, 0, 0, 1] }
+    };
+    const slatMesh = new Mesh(gl, {
+      geometry,
+      program: new Program(gl, {
+        vertex: passVertex,
+        fragment: slatFragment,
+        uniforms: slatUniforms,
+        depthTest: false,
+        depthWrite: false
+      })
+    });
 
-    const mesh = new Mesh(gl, { geometry: tri, program: splatProg });
+    const fluidTexel = { value: [1, 1] };
+    const fluidPass = (fragment, uniforms) =>
+      new Mesh(gl, {
+        geometry,
+        program: new Program(gl, {
+          vertex: fluidVertex,
+          fragment,
+          uniforms: { uTexel: fluidTexel, ...uniforms },
+          depthTest: false,
+          depthWrite: false
+        })
+      });
+    const splatPass = fluidPass(splatFragment, {
+      uTarget: { value: blank },
+      uAspect: { value: 1 },
+      uPoint: { value: [0, 0] },
+      uValue: { value: [0, 0, 0] },
+      uRadius: { value: 0.01 }
+    });
+    const curlPass = fluidPass(curlFragment, { uVelocity: { value: blank } });
+    const vorticityPass = fluidPass(vorticityFragment, {
+      uVelocity: { value: blank },
+      uCurl: { value: blank },
+      uSwirl: { value: 20 },
+      uDt: { value: 0.016 }
+    });
+    const divergencePass = fluidPass(divergenceFragment, { uVelocity: { value: blank } });
+    const pressurePass = fluidPass(pressureFragment, { uPressure: { value: blank }, uDivergence: { value: blank } });
+    const projectPass = fluidPass(projectFragment, { uPressure: { value: blank }, uVelocity: { value: blank } });
+    const advectPass = fluidPass(advectFragment, {
+      uVelocity: { value: blank },
+      uSource: { value: blank },
+      uDt: { value: 0.016 },
+      uFade: { value: 1 }
+    });
+    const scalePass = fluidPass(scaleFragment, { uSource: { value: blank }, uValue: { value: 0 } });
 
-    const fSize = FLUID_SIZE;
-    const velRT = makeRTDouble(gl, fSize, fSize);
-    const inkRT = makeRTDouble(gl, fSize, fSize);
-    const curlRT = makeRT(gl, fSize, fSize);
-    const divRT = makeRT(gl, fSize, fSize);
-    const pressureRT = makeRTDouble(gl, fSize, fSize);
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
-    let fieldRT = null;
-    let W = 0, H = 0;
-    let cols = 0, rows = 0;
-    let originX = 0, originY = 0;
+    let width = 1;
+    let height = 1;
+    let raf = 0;
+    let last = performance.now();
+    let time = 0;
+    let introClock = 0;
+    let visible = true;
+    let alive = true;
+    let fluid = null;
+    let fluidUntil = 0;
+    let fluidDirty = false;
+    let splashTurn = 0;
+    const splats = [];
+    const pointer = { x: 0, y: 0, tracked: false };
+
+    const run = (mesh, target) => renderer.render({ scene: mesh, target, clear: false });
+
+    const floatTarget = (w, h) =>
+      new RenderTarget(gl, {
+        width: w,
+        height: h,
+        depth: false,
+        type: gl.HALF_FLOAT,
+        format: gl.RGBA,
+        internalFormat: gl.RGBA16F,
+        minFilter: gl.LINEAR,
+        magFilter: gl.LINEAR
+      });
+
+    const swapPair = (w, h) => ({
+      read: floatTarget(w, h),
+      write: floatTarget(w, h),
+      swap() {
+        const next = this.read;
+        this.read = this.write;
+        this.write = next;
+      }
+    });
+
+    const disposeFluid = () => {
+      if (!fluid) return;
+      [fluid.velocity, fluid.ink, fluid.pressure].forEach(pair => {
+        dispose(pair.read);
+        dispose(pair.write);
+      });
+      dispose(fluid.divergence);
+      dispose(fluid.curl);
+      fluid = null;
+    };
+
+    const buildFluid = () => {
+      if (!floatTargets) return;
+      const aspect = width / height;
+      const w = Math.max(8, Math.round(aspect >= 1 ? FLUID_SIZE * aspect : FLUID_SIZE));
+      const h = Math.max(8, Math.round(aspect >= 1 ? FLUID_SIZE : FLUID_SIZE / aspect));
+      if (fluid && fluid.width === w && fluid.height === h) return;
+      disposeFluid();
+      fluid = {
+        width: w,
+        height: h,
+        velocity: swapPair(w, h),
+        ink: swapPair(w, h),
+        pressure: swapPair(w, h),
+        divergence: floatTarget(w, h),
+        curl: floatTarget(w, h)
+      };
+      fluidTexel.value = [1 / w, 1 / h];
+    };
 
     const resize = () => {
-      const rect = container.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio, 2);
-      let rW = Math.round(rect.width * dpr);
-      let rH = Math.round(rect.height * dpr);
-      if (rW * rH > PIXEL_BUDGET) {
-        const ratio = Math.sqrt(PIXEL_BUDGET / (rW * rH));
-        rW = Math.round(rW * ratio);
-        rH = Math.round(rH * ratio);
+      width = Math.max(1, container.clientWidth);
+      height = Math.max(1, container.clientHeight);
+      renderer.dpr = Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(PIXEL_BUDGET / (width * height)));
+      renderer.setSize(width, height);
+      buildFluid();
+      start();
+    };
+
+    const layout = s => {
+      const slatW = clamp(s.slatWidth, 1, 64);
+      const slatH = clamp(s.slatHeight, 2, 240);
+      const gapSize = clamp(s.gap, 0, 64);
+      const pitchX = slatW + gapSize;
+      const pitchY = slatH + gapSize;
+      const cols = Math.min(2048, Math.ceil((width + gapSize) / pitchX) + 1);
+      const rows = Math.min(2048, Math.ceil((height + gapSize) / pitchY) + 1);
+      const originX = (width - (cols * pitchX - gapSize)) / 2;
+      const originY = (height - (rows * pitchY - gapSize)) / 2;
+      if (fieldTarget.width !== cols || fieldTarget.height !== rows) {
+        dispose(fieldTarget);
+        fieldTarget = new RenderTarget(gl, {
+          width: cols,
+          height: rows,
+          depth: false,
+          minFilter: gl.NEAREST,
+          magFilter: gl.NEAREST
+        });
+        slatUniforms.tField.value = fieldTarget.texture;
       }
-      if (rW === W && rH === H) return;
-      W = rW; H = rH;
-      renderer.setSize(W, H);
-
-      const step = slatWidth + gap;
-      cols = Math.ceil(W / step);
-      rows = Math.ceil(H / step);
-      originX = (W - cols * step) / 2;
-      originY = (H - rows * step) / 2;
-
-      fieldRT = makeRT(gl, cols, rows);
+      const tilt = Math.min(0.42, Math.asin(clamp((pitchX * 1.5 - slatW * 0.5) / (slatH * 0.5), 0, 1)));
+      return { slatW, slatH, tilt, grid: [cols, rows, pitchX, pitchY], origin: [originX, originY] };
     };
 
-    resize();
-    const ro = new ResizeObserver(resize);
-    ro.observe(container);
-
-    let introStart = null;
-    let time = 0;
-    let lastT = null;
-    let mouse = null;
-    let lastMouse = null;
-    let raf = null;
-
-    const splat = (rt, point, value, radius) => {
-      mesh.program = splatProg;
-      splatProg.uniforms.uTarget = { value: rt.read.texture };
-      splatProg.uniforms.uAspect = { value: W / H };
-      splatProg.uniforms.uPoint = { value: point };
-      splatProg.uniforms.uValue = { value };
-      splatProg.uniforms.uRadius = { value: radius };
-      renderer.render({ scene: mesh, target: rt.write });
-      rt.swap();
+    const splat = (pair, point, value, radius) => {
+      const u = splatPass.program.uniforms;
+      u.uTarget.value = pair.read.texture;
+      u.uAspect.value = width / height;
+      u.uPoint.value = point;
+      u.uValue.value = value;
+      u.uRadius.value = radius;
+      run(splatPass, pair.write);
+      pair.swap();
     };
 
-    const stepFluid = (dt) => {
-      const texel = [1 / fSize, 1 / fSize];
+    const stepFluid = (f, dt, s) => {
+      if (s.swirl > 0) {
+        curlPass.program.uniforms.uVelocity.value = f.velocity.read.texture;
+        run(curlPass, f.curl);
 
-      // curl
-      mesh.program = curlProg;
-      curlProg.uniforms.uVelocity = { value: velRT.read.texture };
-      curlProg.uniforms.uTexel = { value: texel };
-      renderer.render({ scene: mesh, target: curlRT });
+        const vorticity = vorticityPass.program.uniforms;
+        vorticity.uVelocity.value = f.velocity.read.texture;
+        vorticity.uCurl.value = f.curl.texture;
+        vorticity.uSwirl.value = clamp(s.swirl, 0, 2) * 40;
+        vorticity.uDt.value = dt;
+        run(vorticityPass, f.velocity.write);
+        f.velocity.swap();
+      }
 
-      // vorticity
-      mesh.program = vorticityProg;
-      vorticityProg.uniforms.uVelocity = { value: velRT.read.texture };
-      vorticityProg.uniforms.uCurl = { value: curlRT.texture };
-      vorticityProg.uniforms.uSwirl = { value: swirl };
-      vorticityProg.uniforms.uDt = { value: dt };
-      vorticityProg.uniforms.uTexel = { value: texel };
-      renderer.render({ scene: mesh, target: velRT.write });
-      velRT.swap();
+      divergencePass.program.uniforms.uVelocity.value = f.velocity.read.texture;
+      run(divergencePass, f.divergence);
 
-      // divergence
-      mesh.program = divergenceProg;
-      divergenceProg.uniforms.uVelocity = { value: velRT.read.texture };
-      divergenceProg.uniforms.uTexel = { value: texel };
-      renderer.render({ scene: mesh, target: divRT });
+      scalePass.program.uniforms.uSource.value = f.pressure.read.texture;
+      scalePass.program.uniforms.uValue.value = 0.8;
+      run(scalePass, f.pressure.write);
+      f.pressure.swap();
 
-      // pressure
-      mesh.program = scaleProg;
-      scaleProg.uniforms.uSource = { value: pressureRT.read.texture };
-      scaleProg.uniforms.uValue = { value: 0.8 };
-      renderer.render({ scene: mesh, target: pressureRT.write });
-      pressureRT.swap();
-
+      pressurePass.program.uniforms.uDivergence.value = f.divergence.texture;
       for (let i = 0; i < PRESSURE_STEPS; i++) {
-        mesh.program = pressureProg;
-        pressureProg.uniforms.uPressure = { value: pressureRT.read.texture };
-        pressureProg.uniforms.uDivergence = { value: divRT.texture };
-        pressureProg.uniforms.uTexel = { value: texel };
-        renderer.render({ scene: mesh, target: pressureRT.write });
-        pressureRT.swap();
+        pressurePass.program.uniforms.uPressure.value = f.pressure.read.texture;
+        run(pressurePass, f.pressure.write);
+        f.pressure.swap();
       }
 
-      // project
-      mesh.program = projectProg;
-      projectProg.uniforms.uPressure = { value: pressureRT.read.texture };
-      projectProg.uniforms.uVelocity = { value: velRT.read.texture };
-      projectProg.uniforms.uTexel = { value: texel };
-      renderer.render({ scene: mesh, target: velRT.write });
-      velRT.swap();
+      projectPass.program.uniforms.uPressure.value = f.pressure.read.texture;
+      projectPass.program.uniforms.uVelocity.value = f.velocity.read.texture;
+      run(projectPass, f.velocity.write);
+      f.velocity.swap();
 
-      // advect velocity
-      mesh.program = advectProg;
-      advectProg.uniforms.uVelocity = { value: velRT.read.texture };
-      advectProg.uniforms.uSource = { value: velRT.read.texture };
-      advectProg.uniforms.uTexel = { value: texel };
-      advectProg.uniforms.uDt = { value: dt };
-      advectProg.uniforms.uFade = { value: 1 / trail };
-      renderer.render({ scene: mesh, target: velRT.write });
-      velRT.swap();
+      const fade = 1 / clamp(s.trail, 0.1, 10);
+      const advect = advectPass.program.uniforms;
+      advect.uDt.value = dt;
+      advect.uVelocity.value = f.velocity.read.texture;
+      advect.uSource.value = f.velocity.read.texture;
+      advect.uFade.value = fade * 1.4;
+      run(advectPass, f.velocity.write);
+      f.velocity.swap();
 
-      // advect ink
-      mesh.program = advectProg;
-      advectProg.uniforms.uSource = { value: inkRT.read.texture };
-      advectProg.uniforms.uFade = { value: 2 / trail };
-      renderer.render({ scene: mesh, target: inkRT.write });
-      inkRT.swap();
+      advect.uVelocity.value = f.velocity.read.texture;
+      advect.uSource.value = f.ink.read.texture;
+      advect.uFade.value = fade;
+      run(advectPass, f.ink.write);
+      f.ink.swap();
     };
 
-    const draw = (ts) => {
-      raf = requestAnimationFrame(draw);
-      if (!W || !H || !fieldRT) return;
+    const clearFluid = f => {
+      scalePass.program.uniforms.uValue.value = 0;
+      [f.velocity, f.ink, f.pressure].forEach(pair => {
+        scalePass.program.uniforms.uSource.value = pair.read.texture;
+        run(scalePass, pair.write);
+        pair.swap();
+      });
+    };
 
-      const dt = lastT === null ? 0.016 : Math.min((ts - lastT) / 1000, 0.05);
-      lastT = ts;
+    const frame = now => {
+      raf = 0;
+      if (!alive) return;
+      const s = settingsRef.current;
+      const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
+      last = now;
+      if (!s) return;
 
-      if (intro && introStart === null) introStart = ts;
-      const introT = intro ? Math.min((ts - introStart) / 1000 / introDuration, 1) : 1;
+      if (!s.paused && !reducedMotion) time += dt * s.speed;
+      introClock = s.intro && !reducedMotion ? introClock + dt / Math.max(0.2, s.introDuration) : 1;
+      const introLinear = Math.min(introClock, 1);
+      const introEase =
+        introLinear < 0.5 ? 4 * introLinear * introLinear * introLinear : 1 - Math.pow(-2 * introLinear + 2, 3) / 2;
 
-      if (!paused) time += dt * cfg.speed;
-
-      // mouse interaction
-      if (interactive && mouse && lastMouse) {
-        const dx = (mouse[0] - lastMouse[0]) / W;
-        const dy = (mouse[1] - lastMouse[1]) / H;
-        const len = Math.sqrt(dx * dx + dy * dy);
-        if (len > 0.0001) {
-          const pt = [mouse[0] / W, 1 - mouse[1] / H];
-          const force = [dx * SPLAT_FORCE, -dy * SPLAT_FORCE, 0];
-          const radius = Math.pow(cursorSize / Math.max(W, H), 2) * (W / H);
-          splat(velRT, pt, force, radius);
-          const strength = len * cursorStrength * 15;
-          splat(inkRT, pt, [strength, strength * 0.6, strength * 0.9], radius);
+      if (fluid && splats.length) {
+        const radius = Math.pow(clamp(s.cursorSize, 4, 600) / height, 2) * 0.35;
+        const aspect = width / height;
+        for (const [u, v, du, dv, turn] of splats) {
+          if (turn === null) {
+            splat(fluid.velocity, [u, v], [du * SPLAT_FORCE, dv * SPLAT_FORCE, 0], radius);
+            splat(fluid.ink, [u, v], [0.13, 0, 0], radius);
+            continue;
+          }
+          const jet = radius * 0.55;
+          const reach = Math.sqrt(jet * 0.5) * 1.9;
+          const push = SPLAT_FORCE * 0.08;
+          for (let i = 0; i < SPLASH_JETS; i++) {
+            const angle = turn + (i / SPLASH_JETS) * Math.PI * 2;
+            const dx = Math.cos(angle);
+            const dy = Math.sin(angle);
+            const point = [u + (dx * reach) / aspect, v + dy * reach];
+            const spin = [(dx - dy) * Math.SQRT1_2 * push, (dy + dx) * Math.SQRT1_2 * push, 0];
+            splat(fluid.velocity, point, spin, jet);
+            splat(fluid.ink, point, [0.75, 0, 0], jet);
+          }
+          splat(fluid.ink, [u, v], [0.45, 0, 0], radius);
+        }
+        splats.length = 0;
+        fluidDirty = true;
+      }
+      const fluidActive = fluid !== null && now < fluidUntil;
+      if (fluid) {
+        if (fluidActive) stepFluid(fluid, Math.min(Math.max(dt, 1 / 240), 1 / 30), s);
+        else if (fluidDirty) {
+          clearFluid(fluid);
+          fluidDirty = false;
         }
       }
-      lastMouse = mouse ? [...mouse] : null;
 
-      stepFluid(dt);
+      const grid = layout(s);
 
-      // field pass
-      mesh.program = fieldProg;
-      const step = slatWidth + gap;
-      fieldProg.uniforms.uSize = { value: [W, H] };
-      fieldProg.uniforms.uGrid = { value: [cols, rows, step, step] };
-      fieldProg.uniforms.uOrigin = { value: [originX, originY] };
-      fieldProg.uniforms.uSlat = { value: [slatWidth, slatHeight] };
-      fieldProg.uniforms.uTime = { value: time };
-      fieldProg.uniforms.uScale = { value: cfg.scale * 80 };
-      fieldProg.uniforms.uDirection = { value: cfg.direction };
-      fieldProg.uniforms.uChop = { value: cfg.chop };
-      fieldProg.uniforms.uStretch = { value: cfg.stretch };
-      fieldProg.uniforms.uGlint = { value: cfg.glint };
-      fieldProg.uniforms.uContrast = { value: cfg.contrast };
-      fieldProg.uniforms.uPerspective = { value: cfg.perspective };
-      fieldProg.uniforms.uFog = { value: cfg.fog };
-      fieldProg.uniforms.uIntro = { value: introT };
-      fieldProg.uniforms.tVelocity = { value: velRT.read.texture };
-      fieldProg.uniforms.tInk = { value: inkRT.read.texture };
-      fieldProg.uniforms.uFluidTexel = { value: [1 / fSize, 1 / fSize] };
-      fieldProg.uniforms.uFluid = { value: 0.012 };
-      fieldProg.uniforms.uInk = { value: 1.0 };
-      fieldProg.uniforms.uLean = { value: lean };
-      renderer.render({ scene: mesh, target: fieldRT });
+      fieldUniforms.uSize.value = [width, height];
+      fieldUniforms.uGrid.value = grid.grid;
+      fieldUniforms.uOrigin.value = grid.origin;
+      fieldUniforms.uSlat.value = [grid.slatW, grid.slatH];
+      fieldUniforms.uTime.value = time;
+      fieldUniforms.uScale.value = s.scale;
+      fieldUniforms.uDirection.value = (s.direction * Math.PI) / 180;
+      fieldUniforms.uChop.value = clamp(s.chop, 0, 1.5);
+      fieldUniforms.uStretch.value = clamp(s.stretch, 0, 0.95);
+      fieldUniforms.uGlint.value = Math.max(0, s.glint);
+      fieldUniforms.uContrast.value = clamp(s.contrast, 0.2, 4);
+      fieldUniforms.uPerspective.value = clamp(s.perspective, 0, 1);
+      fieldUniforms.uFog.value = clamp(s.fog, 0, 1);
+      fieldUniforms.uIntro.value = introEase;
+      fieldUniforms.uFluid.value = fluidActive ? 1 : 0;
+      fieldUniforms.tVelocity.value = fluid ? fluid.velocity.read.texture : blank;
+      fieldUniforms.tInk.value = fluid ? fluid.ink.read.texture : blank;
+      fieldUniforms.uFluidTexel.value = fluidTexel.value;
+      fieldUniforms.uInk.value = clamp(s.cursorStrength, 0, 3);
+      fieldUniforms.uLean.value = clamp(s.lean, 0, 1);
+      renderer.render({ scene: fieldMesh, target: fieldTarget });
 
-      // render pass
-      mesh.program = renderProg;
-      const col = parseColor(color, [0.659, 0.333, 0.969, 1]);
-      const glintCol = parseColor(glintColor, [1, 1, 1, 1]);
-      const bgCol = parseColor(backgroundColor, [0, 0, 0, 1]);
-      renderProg.uniforms.tField = { value: fieldRT.texture };
-      renderProg.uniforms.uColor = { value: col };
-      renderProg.uniforms.uGlint = { value: glintCol };
-      renderProg.uniforms.uBg = { value: bgCol };
-      renderProg.uniforms.uContrast = { value: cfg.contrast };
-      renderProg.uniforms.tInk = { value: inkRT.read.texture };
-      renderProg.uniforms.uSize = { value: [W, H] };
-      renderProg.uniforms.uInk = { value: 0.4 };
-      renderer.render({ scene: mesh });
+      slatUniforms.uSize.value = [width, height];
+      slatUniforms.uDpr.value = renderer.dpr;
+      slatUniforms.uGrid.value = grid.grid;
+      slatUniforms.uOrigin.value = grid.origin;
+      slatUniforms.uSlat.value = [grid.slatW, grid.slatH];
+      slatUniforms.uRound.value = clamp(s.roundness, 0, 1);
+      slatUniforms.uTilt.value = fluidActive && s.lean > 0 ? grid.tilt : 0;
+      slatUniforms.uColor.value = s.color.slice(0, 3);
+      slatUniforms.uGlintColor.value = s.glintColor.slice(0, 3);
+      slatUniforms.uBackground.value = s.backgroundColor;
+      renderer.render({ scene: slatMesh });
+
+      const moving = (!s.paused && !reducedMotion && s.speed !== 0) || introClock < 1;
+      if (visible && (moving || fluidActive || fluidDirty)) raf = requestAnimationFrame(frame);
     };
 
-    raf = requestAnimationFrame(draw);
+    const start = () => {
+      if (raf || !visible || !alive) return;
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
+    };
 
-    // --- events ---
-    const getPos = (e) => {
+    const locate = e => {
       const rect = container.getBoundingClientRect();
-      const src = e.touches ? e.touches[0] : e;
-      return [src.clientX - rect.left, src.clientY - rect.top];
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const w = Math.max(1, rect.width);
+      const h = Math.max(1, rect.height);
+      return { x, y, u: x / w, v: 1 - y / h, h, inside: x >= 0 && y >= 0 && x <= w && y <= h };
     };
 
-    const onMove = (e) => { if (interactive) mouse = getPos(e); };
-    const onLeave = () => { mouse = null; lastMouse = null; };
-    const onClick = (e) => {
-      if (!interactive) return;
-      const pt = getPos(e);
-      const npt = [pt[0] / W, 1 - pt[1] / H];
-      const radius = Math.pow(cursorSize * 2 / Math.max(W, H), 2) * (W / H);
-      for (let j = 0; j < SPLASH_JETS; j++) {
-        const ang = (j / SPLASH_JETS) * Math.PI * 2;
-        const force = [Math.cos(ang) * SPLAT_FORCE * 2, Math.sin(ang) * SPLAT_FORCE * 2, 0];
-        splat(velRT, npt, force, radius);
-        splat(inkRT, npt, [cursorStrength * 2, cursorStrength * 1.2, cursorStrength * 1.8], radius);
+    const queue = (u, v, du, dv, turn) => {
+      if (splats.length > 32) splats.shift();
+      splats.push([u, v, du, dv, turn]);
+      const s = settingsRef.current;
+      fluidUntil = performance.now() + Math.max(1.5, (s ? s.trail : 1.4) * 5) * 1000;
+      start();
+    };
+
+    const onPointerMove = e => {
+      const s = settingsRef.current;
+      const spot = locate(e);
+      if (!fluid || !s || !s.interactive || reducedMotion || !spot.inside) {
+        pointer.tracked = false;
+        return;
       }
+      if (pointer.tracked && (spot.x !== pointer.x || spot.y !== pointer.y)) {
+        queue(spot.u, spot.v, (spot.x - pointer.x) / spot.h, (pointer.y - spot.y) / spot.h, null);
+      }
+      pointer.x = spot.x;
+      pointer.y = spot.y;
+      pointer.tracked = true;
     };
 
-    container.addEventListener('mousemove', onMove);
-    container.addEventListener('mouseleave', onLeave);
-    container.addEventListener('touchmove', onMove, { passive: true });
-    container.addEventListener('touchend', onLeave);
-    container.addEventListener('click', onClick);
+    const onPointerDown = e => {
+      const s = settingsRef.current;
+      const spot = locate(e);
+      if (!fluid || !s || !s.interactive || reducedMotion || !spot.inside) return;
+      splashTurn += 2.39996;
+      queue(spot.u, spot.v, 0, 0, splashTurn);
+    };
 
-    stateRef.current = { renderer, container };
+    const onPointerLeave = () => {
+      pointer.tracked = false;
+    };
+
+    const onPointerOut = e => {
+      if (!e.relatedTarget) onPointerLeave();
+    };
+
+    const onVisibility = () => {
+      if (!document.hidden) start();
+    };
+
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('pointerdown', onPointerDown, { passive: true });
+    window.addEventListener('pointerout', onPointerOut, { passive: true });
+    window.addEventListener('blur', onPointerLeave);
+    document.addEventListener('visibilitychange', onVisibility);
+
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(container);
+    const intersectionObserver = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      start();
+    });
+    intersectionObserver.observe(container);
+
+    wakeRef.current = start;
+    resize();
 
     return () => {
+      alive = false;
+      visible = false;
       cancelAnimationFrame(raf);
-      ro.disconnect();
-      container.removeEventListener('mousemove', onMove);
-      container.removeEventListener('mouseleave', onLeave);
-      container.removeEventListener('touchmove', onMove);
-      container.removeEventListener('touchend', onLeave);
-      container.removeEventListener('click', onClick);
-      if (gl.canvas.parentNode === container) container.removeChild(gl.canvas);
+      resizeObserver.disconnect();
+      intersectionObserver.disconnect();
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointerout', onPointerOut);
+      window.removeEventListener('blur', onPointerLeave);
+      document.removeEventListener('visibilitychange', onVisibility);
+      wakeRef.current = null;
+      disposeFluid();
+      dispose(fieldTarget);
+      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
     };
   }, []);
 
-  // Update cfg live without re-mounting
-  useEffect(() => {
-    // cfg is read each frame via closure — no extra work needed
-  }, [cfg, paused, interactive, cursorStrength, cursorSize, swirl, trail, lean, color, glintColor, backgroundColor, slatWidth, slatHeight, gap, roundness, intro, introDuration]);
+  return <div ref={containerRef} className={`micro-slats ${className}`.trim()} style={style} />;
+};
 
-  return (
-    <div
-      ref={containerRef}
-      className={`micro-slats${className ? ` ${className}` : ''}`}
-      style={style}
-    />
-  );
-}
+export default MicroSlats;
