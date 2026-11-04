@@ -27,3 +27,9 @@ dist-ssr
 
 # Scratch directory
 scratch/
+
+*.mp4
+*.xlsx
+downloaded_file
+bhuvi-odoo-standalone-backup.html
+
