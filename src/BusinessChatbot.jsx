@@ -4,16 +4,11 @@ import { soundManager } from './whatsapp/audioService';
 import { 
   Send, 
   Sparkles, 
-  MessageSquare, 
-  Clock, 
   MapPin, 
   Phone, 
   Calendar, 
   CheckCircle2, 
-  Bot,
-  User,
-  ShieldCheck,
-  ArrowRight
+  Bot 
 } from 'lucide-react';
 import './BusinessChatbot.css';
 
@@ -160,19 +155,6 @@ export default function BusinessChatbot() {
       {/* Main Foreground Container */}
       <div className="chatbot-viewport-wrapper">
         <div className="chatbot-panel">
-          
-          {/* Top WhatsApp Transition Pitch Banner */}
-          <div className="whatsapp-banner">
-            <div className="whatsapp-banner-content">
-              <span className="whatsapp-pill-badge">
-                <span className="pulse-dot"></span>
-                Official WhatsApp Engine Ready
-              </span>
-              <p className="whatsapp-banner-text">
-                <strong>Live AI Demo</strong>: This exact conversational agent, real-time booking, & instant pricing logic deploys directly to your official WhatsApp Business number upon completion.
-              </p>
-            </div>
-          </div>
 
           {/* Business Header */}
           <header className="chatbot-header">
@@ -204,11 +186,6 @@ export default function BusinessChatbot() {
 
           {/* Chat Messages Stream */}
           <div className="chat-messages-container" ref={chatScrollContainerRef}>
-            <div className="security-notice">
-              <ShieldCheck size={14} />
-              <span>Direct Clinic Inquiry • Instant 24/7 AI Availability</span>
-            </div>
-
             {messages.map((msg) => (
               <div 
                 key={msg.id} 
