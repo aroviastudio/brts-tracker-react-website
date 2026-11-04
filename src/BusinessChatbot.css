@@ -51,33 +51,16 @@ html, body {
   pointer-events: auto;
 }
 
-/* Viewport & Responsive Wrapper */
+/* Viewport & Responsive Wrapper — Centered with top & bottom background visible */
 .chatbot-viewport-wrapper {
   position: relative;
   z-index: 10;
-  width: 100%;
-  max-width: 680px;
-  height: 100%;
-  max-height: 100dvh;
+  width: min(600px, 92vw);
+  height: clamp(480px, 80dvh, 700px);
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  margin: auto;
   pointer-events: none; /* Let background be clicked outside panel */
-}
-
-@media (min-width: 768px) {
-  .chatbot-viewport-wrapper {
-    max-height: 880px;
-    padding: 24px 16px;
-  }
-}
-
-@media (max-width: 640px) {
-  .chatbot-viewport-wrapper {
-    max-width: 100%;
-    padding: 0;
-    max-height: 100dvh;
-  }
 }
 
 /* Main Panel Glass Container */
@@ -92,17 +75,20 @@ html, body {
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--glass-border);
   box-shadow: 
-    0 20px 50px rgba(0, 0, 0, 0.8),
-    0 0 40px var(--brand-orange-glow);
+    0 24px 60px rgba(0, 0, 0, 0.85),
+    0 0 45px var(--brand-orange-glow);
   overflow: hidden;
   border-radius: 24px;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 480px) {
+  .chatbot-viewport-wrapper {
+    width: 93vw;
+    height: clamp(440px, 82dvh, 660px);
+  }
+
   .chatbot-panel {
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
+    border-radius: 20px;
   }
 }
 
