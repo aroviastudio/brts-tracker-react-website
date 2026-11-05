@@ -9,7 +9,10 @@ import {
   Calendar, 
   CheckCircle2, 
   Bot,
-  ChevronDown
+  ChevronDown,
+  Lock,
+  ArrowRight,
+  ChevronRight
 } from 'lucide-react';
 import './BusinessChatbot.css';
 
@@ -122,18 +125,18 @@ export const BUSINESS_REGISTRY = {
 };
 
 export default function BusinessChatbot() {
-  // Read active business from query param `?b=<id>` or fallback to 'global-dental'
+  // Read active business from query param `?b=<id>`. If omitted or invalid, render Agency Gateway.
   const [activeBusinessId, setActiveBusinessId] = useState(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const b = params.get('b') || params.get('lead');
       if (b && BUSINESS_REGISTRY[b]) return b;
     }
-    return 'global-dental';
+    return null;
   });
 
   const business = useMemo(() => {
-    return BUSINESS_REGISTRY[activeBusinessId] || BUSINESS_REGISTRY['global-dental'];
+    return activeBusinessId ? BUSINESS_REGISTRY[activeBusinessId] : null;
   }, [activeBusinessId]);
 
   const isAdmin = useMemo(() => {
@@ -152,24 +155,30 @@ export default function BusinessChatbot() {
   const inputRef = useRef(null);
   const chatScrollContainerRef = useRef(null);
 
-  // Dynamically update page title to match active business
+  // Dynamically update page title to match active business or Arovia Studio
   useEffect(() => {
-    if (typeof document !== 'undefined' && business?.name) {
-      document.title = `${business.name} | AI Assistant`;
+    if (typeof document !== 'undefined') {
+      if (business?.name) {
+        document.title = `${business.name} | AI Assistant`;
+      } else {
+        document.title = 'Arovia Studio — Web Development & AI Automation Agency';
+      }
     }
   }, [business]);
 
   // Initialize messages on business change
   useEffect(() => {
-    setMessages([
-      {
-        id: 'welcome-' + activeBusinessId,
-        sender: 'bot',
-        text: business.welcomeMessage,
-        time: 'Just now'
-      }
-    ]);
-  }, [activeBusinessId, business.welcomeMessage]);
+    if (business) {
+      setMessages([
+        {
+          id: 'welcome-' + activeBusinessId,
+          sender: 'bot',
+          text: business.welcomeMessage,
+          time: 'Just now'
+        }
+      ]);
+    }
+  }, [activeBusinessId, business]);
 
   const scrollToBottom = useCallback((behavior = 'smooth') => {
     messagesEndRef.current?.scrollIntoView({ behavior, block: 'end' });
@@ -184,7 +193,12 @@ export default function BusinessChatbot() {
     setShowSelector(false);
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
-      url.searchParams.set('b', newId);
+      if (newId) {
+        url.searchParams.set('b', newId);
+      } else {
+        url.searchParams.delete('b');
+        url.searchParams.delete('lead');
+      }
       window.history.pushState({}, '', url.toString());
     }
   };
@@ -291,9 +305,10 @@ export default function BusinessChatbot() {
         />
       </div>
 
-      {/* Main Foreground Container */}
-      <div className="chatbot-viewport-wrapper">
-        <div className="chatbot-panel">
+      {/* Main Content: Either Dedicated Client Chatbot OR Arovia Studio Agency Gateway */}
+      {business ? (
+        <div className="chatbot-viewport-wrapper">
+          <div className="chatbot-panel">
 
           {/* Business Header with Lead Switcher */}
           <header className="chatbot-header">
@@ -331,7 +346,16 @@ export default function BusinessChatbot() {
 
                   {showSelector && (
                     <div className="lead-switcher-dropdown">
-                      <div className="dropdown-title">Select Client Demo:</div>
+                      <div className="dropdown-title">Admin Controls:</div>
+                      <button
+                        type="button"
+                        className="dropdown-item"
+                        onClick={() => switchBusiness(null)}
+                      >
+                        <span className="item-name">← Arovia Studio Portal</span>
+                        <span className="item-city">Agency Root Gateway</span>
+                      </button>
+                      <div className="dropdown-title" style={{ marginTop: '6px' }}>Select Client Demo:</div>
                       {Object.values(BUSINESS_REGISTRY).map(b => (
                         <button
                           key={b.id}
@@ -460,6 +484,103 @@ export default function BusinessChatbot() {
 
         </div>
       </div>
-    </div>
-  );
+    ) : (
+      /* Arovia Studio Agency Gateway */
+      <div className="agency-viewport-wrapper">
+        <div className="agency-panel">
+          <div className="agency-header-row">
+            <div className="agency-badge">
+              <span className="agency-badge-dot" />
+              <span>AROVIA STUDIO</span>
+            </div>
+            <div className="agency-lock-tag">
+              <Lock size={12} />
+              <span>Private Client Portal</span>
+            </div>
+          </div>
+
+          <div className="agency-hero">
+            <h1 className="agency-title">
+              Web Development &amp; <span className="text-gradient-orange">AI Automation</span> Agency
+            </h1>
+            <p className="agency-subtitle">
+              Enterprise AI WhatsApp Assistants &amp; High-Performance Digital Experiences
+            </p>
+          </div>
+
+          <div className="agency-notice-card">
+            <div className="notice-icon-circle">
+              <Sparkles size={18} />
+            </div>
+            <div className="notice-text-col">
+              <h3 className="notice-title">Private Demo Access Required</h3>
+              <p className="notice-desc">
+                Our 24/7 AI WhatsApp Assistants are bespoke and isolated to individual verified organizations. To access your business prototype, please open the private demo URL shared directly with your team.
+              </p>
+            </div>
+          </div>
+
+          <div className="agency-feature-grid">
+            <div className="agency-feature-item">
+              <CheckCircle2 size={15} className="feature-check-icon" />
+              <span>24/7 WhatsApp AI Agents</span>
+            </div>
+            <div className="agency-feature-item">
+              <CheckCircle2 size={15} className="feature-check-icon" />
+              <span>Custom CRM &amp; Booking Sync</span>
+            </div>
+            <div className="agency-feature-item">
+              <CheckCircle2 size={15} className="feature-check-icon" />
+              <span>Zero-Leak Data Isolation</span>
+            </div>
+            <div className="agency-feature-item">
+              <CheckCircle2 size={15} className="feature-check-icon" />
+              <span>Production Web Systems</span>
+            </div>
+          </div>
+
+          {isAdmin ? (
+            <div className="agency-admin-box">
+              <div className="agency-admin-title">
+                <Bot size={15} />
+                <span>Admin Mode — Select a Client Demo:</span>
+              </div>
+              <div className="agency-admin-grid">
+                {Object.values(BUSINESS_REGISTRY).map(b => (
+                  <button
+                    key={b.id}
+                    type="button"
+                    className="agency-admin-lead-btn"
+                    onClick={() => switchBusiness(b.id)}
+                  >
+                    <div>
+                      <div className="admin-lead-title">{b.name}</div>
+                      <div className="admin-lead-meta">{b.city} • {b.category}</div>
+                    </div>
+                    <ChevronRight size={16} color="#ed680b" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="agency-cta-section">
+              <a 
+                href="https://wa.me/918094935632?text=Hello%20Arovia%20Studio%2C%20I%20would%20like%20to%20request%20a%20custom%20AI%20WhatsApp%20assistant%20demo%20for%20my%20business."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="agency-cta-btn"
+              >
+                <span>Request Custom AI Assistant</span>
+                <ArrowRight size={16} />
+              </a>
+              <p className="agency-footer-meta">
+                Arovia Studio • Web Development &amp; AI Automation Agency
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    )}
+  </div>
+);
 }
