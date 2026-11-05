@@ -565,7 +565,7 @@ export default function BusinessChatbot() {
           ) : (
             <div className="agency-cta-section">
               <a 
-                href="https://wa.me/918094935632?text=Hello%20Arovia%20Studio%2C%20I%20would%20like%20to%20request%20a%20custom%20AI%20WhatsApp%20assistant%20demo%20for%20my%20business."
+                href="https://wa.me/919724956932?text=Hello%20Arovia%20Studio%2C%20I%20would%20like%20to%20request%20a%20custom%20AI%20WhatsApp%20assistant%20demo%20for%20my%20business."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="agency-cta-btn"
@@ -574,7 +574,7 @@ export default function BusinessChatbot() {
                 <ArrowRight size={16} />
               </a>
               <p className="agency-footer-meta">
-                Arovia Studio • Web Development &amp; AI Automation Agency
+                Arovia Studio • Web Development &amp; AI Automation Agency • <a href="tel:+919724956932">+91 97249 56932</a>
               </p>
             </div>
           )}

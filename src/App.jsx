@@ -4,8 +4,8 @@ import initialData from './data/data_store.json';
 export default function App() {
   // --- SITE STATES HYDRATED FROM DATA STORE ---
   const [settings, setSettings] = useState(initialData.settings || {
-    whatsapp: '918094935632',
-    phone: '+91 80949 35632',
+    whatsapp: '919724956932',
+    phone: '+91 97249 56932',
     email: 'prajapatbhavna2003@gmail.com',
     address: 'Near Mohanlal Sukhadia University, Udaipur, Rajasthan 313001',
     instagram: 'bhuvi_mehandi_24',
