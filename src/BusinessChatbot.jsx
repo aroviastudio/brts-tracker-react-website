@@ -136,6 +136,14 @@ export default function BusinessChatbot() {
     return BUSINESS_REGISTRY[activeBusinessId] || BUSINESS_REGISTRY['global-dental'];
   }, [activeBusinessId]);
 
+  const isAdmin = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('admin') === 'true';
+    }
+    return false;
+  }, []);
+
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -143,6 +151,13 @@ export default function BusinessChatbot() {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const chatScrollContainerRef = useRef(null);
+
+  // Dynamically update page title to match active business
+  useEffect(() => {
+    if (typeof document !== 'undefined' && business?.name) {
+      document.title = `${business.name} | AI Assistant`;
+    }
+  }, [business]);
 
   // Initialize messages on business change
   useEffect(() => {
@@ -301,35 +316,37 @@ export default function BusinessChatbot() {
             </div>
 
             <div className="header-meta">
-              {/* Quick Switch Dropdown for Demoing all 5 leads */}
-              <div className="lead-switcher-container">
-                <button 
-                  type="button" 
-                  className="lead-switcher-btn"
-                  onClick={() => setShowSelector(prev => !prev)}
-                  title="Switch between 5 client demos"
-                >
-                  <span>Switch Lead</span>
-                  <ChevronDown size={14} />
-                </button>
+              {/* Quick Switch Dropdown only visible in Admin mode (?admin=true) */}
+              {isAdmin && (
+                <div className="lead-switcher-container">
+                  <button 
+                    type="button" 
+                    className="lead-switcher-btn"
+                    onClick={() => setShowSelector(prev => !prev)}
+                    title="Switch between 5 client demos (Admin mode)"
+                  >
+                    <span>Switch Lead</span>
+                    <ChevronDown size={14} />
+                  </button>
 
-                {showSelector && (
-                  <div className="lead-switcher-dropdown">
-                    <div className="dropdown-title">Select Client Demo:</div>
-                    {Object.values(BUSINESS_REGISTRY).map(b => (
-                      <button
-                        key={b.id}
-                        type="button"
-                        className={`dropdown-item ${b.id === activeBusinessId ? 'active' : ''}`}
-                        onClick={() => switchBusiness(b.id)}
-                      >
-                        <span className="item-name">{b.name}</span>
-                        <span className="item-city">{b.city} • {b.category}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                  {showSelector && (
+                    <div className="lead-switcher-dropdown">
+                      <div className="dropdown-title">Select Client Demo:</div>
+                      {Object.values(BUSINESS_REGISTRY).map(b => (
+                        <button
+                          key={b.id}
+                          type="button"
+                          className={`dropdown-item ${b.id === activeBusinessId ? 'active' : ''}`}
+                          onClick={() => switchBusiness(b.id)}
+                        >
+                          <span className="item-name">{b.name}</span>
+                          <span className="item-city">{b.city} • {b.category}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <a href={`tel:${business.phone}`} className="clinic-phone-pill" title="Call directly">
                 <Phone size={13} />
