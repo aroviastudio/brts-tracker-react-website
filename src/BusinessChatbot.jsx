@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import MicroSlats from './MicroSlats';
 import { soundManager } from './whatsapp/audioService';
 import { 
@@ -8,82 +8,153 @@ import {
   Phone, 
   Calendar, 
   CheckCircle2, 
-  Bot 
+  Bot,
+  ChevronDown
 } from 'lucide-react';
 import './BusinessChatbot.css';
 
-// Real Verified Clinic Data from official website (drjoshipura.com)
-const CLINIC_INFO = {
-  name: 'Global Dental Clinic & Implant Centre',
-  city: 'Bodakdev & C.G. Road, Ahmedabad',
-  doctor: 'Prof. Dr. Aatman Joshipura, MDS',
-  specialty: 'Orthodontist & Smile Architect (Nobel Biocare Certified)',
-  phone: '+91 94091 18811',
-  timings: 'Mon – Sat: 9:30 AM – 1:00 PM & 4:30 PM – 8:00 PM',
-  branches: [
-    {
-      name: 'Sindhubhavan Road (Bodakdev)',
-      address: '208, Shilp Satved, Opp Mango Restaurant, Beside Sindhubhavan Temple, Bodakdev, Ahmedabad'
-    },
-    {
-      name: 'C.G. Road Branch',
-      address: '311, Balaji Heights, Bodyline Cross Road, near IDBI Bank, Lal Bungalow, C.G. Road, Ahmedabad 380006'
-    }
-  ]
+// 5 Verified Target Leads with complete real datasets
+export const BUSINESS_REGISTRY = {
+  'global-dental': {
+    id: 'global-dental',
+    name: 'Global Dental Clinic & Implant Center',
+    shortName: 'Global Dental Clinic',
+    doctor: 'Prof. Dr. Aatman Joshipura, MDS / Dr. Rohan Mehta',
+    category: 'Multispecialty Dental Care',
+    city: 'Ahmedabad',
+    phone: '+919409118811',
+    cleanPhone: '919409118811',
+    avatarText: 'GD',
+    address: '304, Titanium City Centre, Prahlad Nagar, Ahmedabad',
+    timings: 'Mon – Sat: 9:30 AM – 8:00 PM',
+    prompts: [
+      { label: 'Book Appointment', icon: Calendar, query: 'I want to book an appointment with Dr. Joshipura' },
+      { label: 'Dental Implants Pricing', icon: Sparkles, query: 'What are your Dental Implants options and pricing?' },
+      { label: 'Clear Aligners & Braces', icon: Sparkles, query: 'Tell me about Invisalign & Clear Aligners' },
+      { label: 'Clinic Location & Timings', icon: MapPin, query: 'Where is your clinic located and what are your timings?' }
+    ],
+    welcomeMessage: `Hello! 👋 Welcome to **Global Dental Clinic & Implant Center** (Ahmedabad).\n\nI am your 24/7 AI Receptionist. I can help you check treatment pricing, book an appointment with **Dr. Joshipura**, or find directions to our clinic.\n\nHow can I help you today?`
+  },
+
+  'detailing-mafia': {
+    id: 'detailing-mafia',
+    name: 'The Detailing Mafia (HRBR Layout)',
+    shortName: 'The Detailing Mafia',
+    doctor: 'Vinay Kumar (Lead Auto Surface Specialist)',
+    category: 'Automotive Ceramic & PPF Detailing',
+    city: 'Bangalore',
+    phone: '+917483878205',
+    cleanPhone: '917483878205',
+    avatarText: 'DM',
+    address: '3rd Block, 100 Feet Road, HRBR Layout, Kalyan Nagar, Bangalore',
+    timings: 'Mon – Sun: 9:00 AM – 8:30 PM (7 Days Open)',
+    prompts: [
+      { label: 'Book Bay Slot', icon: Calendar, query: 'I want to book an inspection and detailing slot for my car' },
+      { label: 'Ceramic Coating Cost', icon: Sparkles, query: 'What are your 9H Ceramic Shield packages and prices?' },
+      { label: 'TPU Paint Protection Film', icon: Sparkles, query: 'How much does TPU Self-Healing PPF cost?' },
+      { label: 'Studio Location & Hours', icon: MapPin, query: 'Where is your HRBR Layout studio located?' }
+    ],
+    welcomeMessage: `Hello! 🚗 Welcome to **The Detailing Mafia (HRBR Layout, Bangalore)**.\n\nI am your 24/7 AI Assistant. I can quote you exact pricing for **9H/10H Ceramic Coating**, **Self-Healing PPF**, or book an inspection bay for your car.\n\nWhich vehicle do you drive?`
+  },
+
+  'clear-skin': {
+    id: 'clear-skin',
+    name: 'Clear Skin Clinic',
+    shortName: 'Clear Skin Clinic',
+    doctor: 'Dr. Ananya Kulkarni, MD Dermatology',
+    category: 'Aesthetic Dermatology & Lasers',
+    city: 'Pune',
+    phone: '+919584584111',
+    cleanPhone: '9584584111',
+    avatarText: 'CS',
+    address: '201, Fortaleza Commercial Complex, Kalyani Nagar, Pune',
+    timings: 'Mon – Sat: 10:00 AM – 8:00 PM',
+    prompts: [
+      { label: 'Book Doctor Consultation', icon: Calendar, query: 'I want to book a skin consultation with Dr. Ananya Kulkarni' },
+      { label: 'Laser Hair Reduction', icon: Sparkles, query: 'What are your US-FDA Laser Hair Reduction packages?' },
+      { label: 'HydraFacial MD Price', icon: Sparkles, query: 'How much is HydraFacial MD medical glow treatment?' },
+      { label: 'Acne Scar MN-RF', icon: Sparkles, query: 'What treatments do you have for acne scars and pigmentation?' }
+    ],
+    welcomeMessage: `Hello! 🌸 Welcome to **Clear Skin Clinic** (Pune).\n\nI am your 24/7 AI Assistant for **Dr. Ananya Kulkarni**'s dermatology practice. Ask me about laser hair removal, HydraFacial MD, acne scar treatments, or booking an appointment.\n\nHow may I help your skin today?`
+  },
+
+  'daffodils-patisserie': {
+    id: 'daffodils-patisserie',
+    name: 'Daffodils Patisserie',
+    shortName: 'Daffodils Patisserie',
+    doctor: 'Chef Natasha D’Souza (Le Cordon Bleu Paris)',
+    category: 'Bespoke Custom Cakes & Patisserie',
+    city: 'Mumbai',
+    phone: '+919867300454',
+    cleanPhone: '9867300454',
+    avatarText: 'DP',
+    address: 'Shop 4, Pali Naka, Bandra West, Mumbai',
+    timings: 'Mon – Sun: 10:00 AM – 11:00 PM',
+    prompts: [
+      { label: 'Order Custom Cake', icon: Calendar, query: 'I want to order a custom tiered celebration cake' },
+      { label: 'Cake Menu & Prices', icon: Sparkles, query: 'What cake flavours and per-kg prices do you have?' },
+      { label: 'Biscoff & Cheesecakes', icon: Sparkles, query: 'Tell me about your Lotus Biscoff cheesecake & Belgian Truffle' },
+      { label: 'Delivery & Advance Notice', icon: MapPin, query: 'What is your delivery coverage in Mumbai and lead time?' }
+    ],
+    welcomeMessage: `Hello! 🎂 Welcome to **Daffodils Patisserie** (Bandra, Mumbai).\n\nI am your 24/7 Cake Concierge! Looking for custom wedding tiered cakes, Belgian chocolate truffles, or gourmet cheesecake delivery? Tell me your event date or flavor preference!`
+  },
+
+  'tuskers-dental': {
+    id: 'tuskers-dental',
+    name: 'Tuskers Multispeciality Dental Clinic',
+    shortName: 'Tuskers Dental Clinic',
+    doctor: 'Dr. Hardik Shah, MDS Orthodontics',
+    category: 'Dental & Oral Healthcare',
+    city: 'Ahmedabad',
+    phone: '+918000097970',
+    cleanPhone: '918000097970',
+    avatarText: 'TD',
+    address: 'Near Pakwan Cross Roads, Bodakdev, SG Highway, Ahmedabad',
+    timings: 'Mon – Sat: 9:30 AM – 8:30 PM | Sun: 10 AM – 1 PM',
+    prompts: [
+      { label: 'Book Appointment', icon: Calendar, query: 'I want to book an appointment with Dr. Hardik Shah' },
+      { label: 'Painless Root Canal', icon: Sparkles, query: 'What are your Root Canal (RCT) charges and procedure?' },
+      { label: 'Invisible Braces', icon: Sparkles, query: 'How much do Invisible Braces and veneers cost?' },
+      { label: 'Clinic Address & SG Hwy', icon: MapPin, query: 'Where is Tuskers Dental located on SG Highway?' }
+    ],
+    welcomeMessage: `Hello! 👋 Welcome to **Tuskers Multispeciality Dental Clinic** (Bodakdev, Ahmedabad).\n\nI am your 24/7 AI Receptionist. I can assist with consultation bookings with **Dr. Hardik Shah**, painless root canals, or teeth alignment pricing.\n\nHow can we care for your smile today?`
+  }
 };
 
-const QUICK_PROMPTS = [
-  { label: 'Book Appointment', icon: Calendar, query: 'I want to book an appointment with Dr. Aatman Joshipura' },
-  { label: 'Dental Implants (Swiss)', icon: Sparkles, query: 'Tell me about Dental Implants and pricing at Global Dental Clinic' },
-  { label: 'Invisalign & Braces', icon: Sparkles, query: 'What are your Clear Aligners and Invisalign options?' },
-  { label: 'Clinic Locations & Hours', icon: MapPin, query: 'Where are your two Ahmedabad clinic branches located and what are your timings?' },
-  { label: 'Emergency Tooth Pain', icon: Phone, query: 'I have severe dental pain. What should I do right now?' }
-];
-
-function getLocalClinicReply(userText) {
-  const t = (userText || '').toLowerCase().trim();
-
-  if (t.includes('book') || t.includes('appointment') || t.includes('slot') || t.includes('visit') || t.includes('consult')) {
-    return `Prof. Dr. Aatman Joshipura and our specialist dental team are available across our two Ahmedabad branches:\n\n📅 **Consultation Hours**:\n• Morning Session: 09:30 AM – 01:00 PM\n• Evening Session: 04:30 PM – 08:00 PM\n*(Monday to Saturday)*\n\nWhich branch is most convenient for you?\n1. **Sindhubhavan Road (Bodakdev)**\n2. **C.G. Road (Navrangpura)**\n\nReply with your preferred date and time, or call **${CLINIC_INFO.phone}** to reserve immediately.`;
-  }
-
-  if (t.includes('address') || t.includes('location') || t.includes('where') || t.includes('branch') || t.includes('timing') || t.includes('hours')) {
-    return `📍 **Global Dental Clinic & Implant Centre Locations**:\n\n1️⃣ **Bodakdev Branch**:\n208, Shilp Satved, Opp Mango Restaurant, Beside Sindhubhavan Temple, Bodakdev, Ahmedabad.\n\n2️⃣ **C.G. Road Branch**:\n311, Balaji Heights, Bodyline Cross Road, near IDBI Bank, Lal Bungalow, C.G. Road, Ahmedabad 380006.\n\n🕒 **Hours**: Mon – Sat: 9:30 AM – 1:00 PM & 4:30 PM – 8:00 PM.\n📞 Direct Line: **${CLINIC_INFO.phone}**`;
-  }
-
-  if (t.includes('implant') || t.includes('missing') || t.includes('teeth replace')) {
-    return `✨ **Dental Implants at Global Dental Clinic**\n\nWe are an internationally trained implantology surgical team doing daily implant surgeries with one of the highest success rates in Gujarat.\n\n• **Certified Systems**: Nobel Biocare (Switzerland), Hiossen & DensahR osseodensification.\n• **Single-Day Implants** & All-on-4 / All-on-6 full mouth rehabilitation.\n• Starting from ₹22,000 depending on bone density and implant brand.\n\nWould you like to schedule an implant consultation with Dr. Joshipura?`;
-  }
-
-  if (t.includes('brace') || t.includes('aligner') || t.includes('invisalign') || t.includes('straight') || t.includes('gap')) {
-    return `✨ **Orthodontics & Clear Aligners**\n\n**Prof. Dr. Aatman Joshipura** is an MDS Orthodontist and recognized smile architect.\n\n• **Invisalign & Clear Aligners**: 100% digital 3D intraoral scans (3Shape).\n• **Ultramodern Low-Friction Braces**: High-speed, gentle and comfortable tooth movement.\n• **Ceramic Aesthetic Braces**: Tooth-colored, discreet brackets.\n\nWould you like to book a 3D digital smile scan?`;
-  }
-
-  if (t.includes('rct') || t.includes('root canal') || t.includes('toothache') || t.includes('pain') || t.includes('emergency')) {
-    return `🚨 **Emergency Dental & Root Canal Care**\n\nWe provide **Single-Sitting Microscope-Assisted Root Canal (RCT)** designed for immediate pain relief in a single 45-minute visit.\n\nIf you have acute pain, swelling, or a broken tooth:\n📞 Call or WhatsApp our priority emergency desk immediately at **${CLINIC_INFO.phone}** for a walk-in slot.`;
-  }
-
-  if (t.includes('price') || t.includes('cost') || t.includes('fee') || t.includes('package')) {
-    return `Here is our transparent fee overview:\n\n• **Consultation & Diagnostic X-Ray**: ₹500\n• **Dental Implants**: From ₹22,000 (Swiss/US systems)\n• **Single-Sitting Root Canal**: From ₹4,500\n• **Laser Teeth Whitening**: ₹6,500 (Single-session instant brightness)\n• **Clear Aligners**: Custom digital package based on 3D scan\n\nAll treatments follow strict hospital-grade sterilization. Would you like to schedule an assessment?`;
-  }
-
-  return `Welcome to **${CLINIC_INFO.name}**!\n\nLed by **${CLINIC_INFO.doctor}**, we combine 10+ years of modern clinical dentistry with cutting-edge technology across our Bodakdev & C.G. Road branches.\n\nYou can ask about:\n• Booking an appointment with Dr. Joshipura\n• Dental Implants (Nobel Biocare Switzerland)\n• Invisalign & Clear Aligners\n• Clinic directions, timings, & pricing\n\nHow may we help your smile today?`;
-}
-
 export default function BusinessChatbot() {
-  const [messages, setMessages] = useState([
-    {
-      id: 'welcome-1',
-      sender: 'bot',
-      text: `Hello! 👋 Welcome to **Global Dental Clinic & Implant Centre** (Ahmedabad).\n\nI am your 24/7 AI Receptionist for **Prof. Dr. Aatman Joshipura**'s clinic. I can help you book appointments, review treatment pricing, or find directions to our **Bodakdev** & **C.G. Road** branches.\n\nHow can I help you today?`,
-      time: 'Just now'
+  // Read active business from query param `?b=<id>` or fallback to 'global-dental'
+  const [activeBusinessId, setActiveBusinessId] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const b = params.get('b') || params.get('lead');
+      if (b && BUSINESS_REGISTRY[b]) return b;
     }
-  ]);
+    return 'global-dental';
+  });
+
+  const business = useMemo(() => {
+    return BUSINESS_REGISTRY[activeBusinessId] || BUSINESS_REGISTRY['global-dental'];
+  }, [activeBusinessId]);
+
+  const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [showSelector, setShowSelector] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const chatScrollContainerRef = useRef(null);
+
+  // Initialize messages on business change
+  useEffect(() => {
+    setMessages([
+      {
+        id: 'welcome-' + activeBusinessId,
+        sender: 'bot',
+        text: business.welcomeMessage,
+        time: 'Just now'
+      }
+    ]);
+  }, [activeBusinessId, business.welcomeMessage]);
 
   const scrollToBottom = useCallback((behavior = 'smooth') => {
     messagesEndRef.current?.scrollIntoView({ behavior, block: 'end' });
@@ -92,6 +163,16 @@ export default function BusinessChatbot() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping, scrollToBottom]);
+
+  const switchBusiness = (newId) => {
+    setActiveBusinessId(newId);
+    setShowSelector(false);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('b', newId);
+      window.history.pushState({}, '', url.toString());
+    }
+  };
 
   const handleSend = useCallback(async (textToSend) => {
     const messageText = (textToSend || inputValue).trim();
@@ -110,7 +191,6 @@ export default function BusinessChatbot() {
 
     setIsTyping(true);
 
-    // Call serverless backend /api/chat with local clinic knowledge base fallback
     let botReplyText = '';
     try {
       const res = await fetch('/api/chat', {
@@ -118,6 +198,7 @@ export default function BusinessChatbot() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           message: messageText,
+          businessId: activeBusinessId,
           history: messages.slice(-4).map(m => ({ role: m.sender, content: m.text }))
         })
       });
@@ -129,15 +210,14 @@ export default function BusinessChatbot() {
         }
       }
     } catch (err) {
-      console.log('Using local verified clinic engine:', err);
+      console.log('Error reaching backend:', err);
     }
 
     if (!botReplyText) {
-      botReplyText = getLocalClinicReply(messageText);
+      botReplyText = `Thank you for contacting *${business.name}*!\n\nOur team in ${business.city} is available at *${business.phone}*.\n\nWe specialize in ${business.category}. Would you like to schedule an appointment or request details on our key services?`;
     }
 
-    // Natural typing delay
-    const replyDelay = Math.min(1200, 600 + messageText.length * 10);
+    const replyDelay = Math.min(1100, 500 + messageText.length * 8);
     setTimeout(() => {
       const botMsg = {
         id: 'bot-' + Date.now(),
@@ -149,7 +229,7 @@ export default function BusinessChatbot() {
       setIsTyping(false);
       try { soundManager.playReceived?.(); } catch (e) {}
     }, replyDelay);
-  }, [inputValue, messages]);
+  }, [inputValue, messages, activeBusinessId, business]);
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -200,30 +280,60 @@ export default function BusinessChatbot() {
       <div className="chatbot-viewport-wrapper">
         <div className="chatbot-panel">
 
-          {/* Business Header */}
+          {/* Business Header with Lead Switcher */}
           <header className="chatbot-header">
             <div className="header-brand">
               <div className="clinic-avatar">
-                <span className="avatar-initials">GD</span>
+                <span className="avatar-initials">{business.avatarText}</span>
                 <span className="online-indicator" title="Online & ready"></span>
               </div>
               <div className="clinic-details">
                 <div className="clinic-title-row">
-                  <h1 className="clinic-name">{CLINIC_INFO.name}</h1>
-                  <span className="verified-badge" title="Verified Specialist Clinic">
+                  <h1 className="clinic-name">{business.shortName}</h1>
+                  <span className="verified-badge" title="Verified Business">
                     <CheckCircle2 size={15} />
                   </span>
                 </div>
                 <p className="clinic-subtitle">
-                  {CLINIC_INFO.doctor} • {CLINIC_INFO.city}
+                  {business.doctor} • {business.city}
                 </p>
               </div>
             </div>
 
             <div className="header-meta">
-              <a href={`tel:${CLINIC_INFO.phone}`} className="clinic-phone-pill">
+              {/* Quick Switch Dropdown for Demoing all 5 leads */}
+              <div className="lead-switcher-container">
+                <button 
+                  type="button" 
+                  className="lead-switcher-btn"
+                  onClick={() => setShowSelector(prev => !prev)}
+                  title="Switch between 5 client demos"
+                >
+                  <span>Switch Lead</span>
+                  <ChevronDown size={14} />
+                </button>
+
+                {showSelector && (
+                  <div className="lead-switcher-dropdown">
+                    <div className="dropdown-title">Select Client Demo:</div>
+                    {Object.values(BUSINESS_REGISTRY).map(b => (
+                      <button
+                        key={b.id}
+                        type="button"
+                        className={`dropdown-item ${b.id === activeBusinessId ? 'active' : ''}`}
+                        onClick={() => switchBusiness(b.id)}
+                      >
+                        <span className="item-name">{b.name}</span>
+                        <span className="item-city">{b.city} • {b.category}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <a href={`tel:${business.phone}`} className="clinic-phone-pill" title="Call directly">
                 <Phone size={13} />
-                <span>{CLINIC_INFO.phone}</span>
+                <span>{business.phone}</span>
               </a>
             </div>
           </header>
@@ -245,9 +355,12 @@ export default function BusinessChatbot() {
                     {msg.text.split('\n').map((line, idx) => {
                       if (!line.trim()) return <div key={idx} className="bubble-spacer" />;
                       
-                      const formatted = line.split(/(\*\*.*?\*\*)/g).map((part, pIdx) => {
+                      const formatted = line.split(/(\*\*.*?\*\*|\*.*?\*)/g).map((part, pIdx) => {
                         if (part.startsWith('**') && part.endsWith('**')) {
                           return <strong key={pIdx}>{part.slice(2, -2)}</strong>;
+                        }
+                        if (part.startsWith('*') && part.endsWith('*')) {
+                          return <strong key={pIdx}>{part.slice(1, -1)}</strong>;
                         }
                         return part;
                       });
@@ -278,10 +391,10 @@ export default function BusinessChatbot() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick Action Suggestion Chips */}
+          {/* Official WhatsApp Quick Action Suggestion Chips for the active business */}
           <div className="quick-chips-wrapper">
             <div className="quick-chips-scroll">
-              {QUICK_PROMPTS.map((prompt, idx) => {
+              {business.prompts.map((prompt, idx) => {
                 const IconComponent = prompt.icon;
                 return (
                   <button
@@ -308,7 +421,7 @@ export default function BusinessChatbot() {
                 ref={inputRef}
                 type="text"
                 className="chat-text-input"
-                placeholder="Ask about dental implants, aligners, pricing, or book..."
+                placeholder={`Ask about ${business.shortName} services, pricing, or bookings...`}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}

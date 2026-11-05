@@ -175,7 +175,99 @@ html, body {
 }
 
 .header-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex-shrink: 0;
+}
+
+/* Lead Switcher Dropdown */
+.lead-switcher-container {
+  position: relative;
+}
+
+.lead-switcher-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #d1d5db;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 5px 9px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lead-switcher-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.lead-switcher-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 250px;
+  background: rgba(24, 24, 28, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(20px);
+  padding: 6px;
+  z-index: 100;
+  animation: dropdown-fade 0.18s ease-out both;
+}
+
+@keyframes dropdown-fade {
+  from { opacity: 0; transform: translateY(-4px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.dropdown-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #9ca3af;
+  padding: 6px 10px 4px;
+}
+
+.dropdown-item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: none;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+
+.dropdown-item:hover {
+  background: rgba(237, 104, 11, 0.15);
+}
+
+.dropdown-item.active {
+  background: rgba(237, 104, 11, 0.25);
+  border-left: 2px solid var(--brand-orange);
+}
+
+.item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f3f4f6;
+}
+
+.item-city {
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 1px;
 }
 
 .clinic-phone-pill {
