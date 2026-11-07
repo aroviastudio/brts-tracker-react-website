@@ -97,19 +97,19 @@ function generateFallbackReply(biz, userText) {
   const t = (userText || '').toLowerCase().trim();
 
   if (t.includes('book') || t.includes('appointment') || t.includes('slot') || t.includes('visit') || t.includes('consult')) {
-    return `Hello! We would be delighted to schedule your visit at *${biz.name}*:\n\n🕒 *Hours*: ${biz.timings}\n📍 *Address*: ${biz.address}\n\nWhich day and preferred time works best for you? Reply with your slot, or call/WhatsApp us directly at *${biz.phone}* for instant confirmation!`;
+    return `We would be pleased to schedule your visit at *${biz.name}*.\n\nHours: ${biz.timings}\nLocation: ${biz.address}\n\nPlease share your preferred date and time, or contact our desk directly at *${biz.phone}* for immediate confirmation.`;
   }
 
   if (t.includes('price') || t.includes('cost') || t.includes('fee') || t.includes('rate') || t.includes('charges') || t.includes('package')) {
-    const list = biz.services.map((s, i) => `• *${s.name}*: ${s.price} (${s.time})`).join('\n');
-    return `Here is our transparent price list for *${biz.name}*:\n\n${list}\n\nWould you like to book a slot for any of these services?`;
+    const list = biz.services.map((s) => `• *${s.name}*: ${s.price} (${s.time})`).join('\n');
+    return `Here is our pricing for *${biz.name}*:\n\n${list}\n\nWould you like to schedule an appointment for any of these services?`;
   }
 
   if (t.includes('address') || t.includes('location') || t.includes('where') || t.includes('timing') || t.includes('hours') || t.includes('open')) {
-    return `📍 *${biz.name}*\n${biz.address}\n\n🕒 *Operating Timings*:\n${biz.timings}\n\n📞 Direct Desk: *${biz.phone}*`;
+    return `*${biz.name}*\nAddress: ${biz.address}\nHours: ${biz.timings}\nPhone: *${biz.phone}*`;
   }
 
-  return `Welcome to *${biz.name}*!\n\nLed by ${biz.founder} in ${biz.city}, we specialize in ${biz.specialties}.\n\nHow can we help you today?\n• Book an appointment / visit\n• Get pricing & service details\n• Location directions & timings\n\nFeel free to ask any question or call *${biz.phone}* directly!`;
+  return `Thank you for contacting *${biz.name}* in ${biz.city}.\n\nWe specialize in ${biz.specialties}.\n\nPlease let me know if you would like service details, pricing, or to book an appointment. You can also call us directly at *${biz.phone}*.`;
 }
 
 export default async function handler(req, res) {
@@ -133,21 +133,23 @@ export default async function handler(req, res) {
     if (GEMINI_API_KEY) {
       try {
         const servicesText = biz.services.map(s => `- ${s.name}: ${s.price} (${s.time})`).join('\n');
-        const systemPrompt = `You are the official 24/7 WhatsApp AI Assistant for "${biz.name}".
+        const systemPrompt = `You are the official WhatsApp assistant for "${biz.name}".
 Location: ${biz.address}
-Lead / Doctor / Head: ${biz.founder}
+Lead / Specialist: ${biz.founder}
 Category: ${biz.category}
-Phone / WhatsApp: ${biz.phone}
+Phone: ${biz.phone}
 Timings: ${biz.timings}
 Key Services & Pricing:
 ${servicesText}
 Specialties: ${biz.specialties}
 
-Rules:
-1. Always stay in character as the friendly, professional WhatsApp representative for this specific business.
-2. Format answers using WhatsApp-native formatting: *bold* for key terms, clear bullet points, concise paragraphs.
-3. Keep answers under 3-4 short paragraphs so they read naturally like WhatsApp chat messages.
-4. Always invite the customer to book, ask questions, or call/WhatsApp ${biz.phone}.`;
+Strict Guidelines:
+1. Tone: Courteous, polite, and direct. Speak like a professional front-desk manager.
+2. NO EMOJIS: Do NOT use any emojis under any circumstances. Keep responses 100% text-only.
+3. Length: Keep responses concise (maximum 2 to 3 sentences). Avoid long paragraphs, filler, or over-explaining.
+4. Directness: Answer the user's specific question immediately in the first sentence.
+5. Formatting: Use standard WhatsApp formatting with *bold* for key terms, prices, or contact numbers. If listing prices or services, use simple short bullet points.
+6. Closing: End with a single, polite question or offer to book/call ${biz.phone}.`;
 
         const payload = {
           contents: [

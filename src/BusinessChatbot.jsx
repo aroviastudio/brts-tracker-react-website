@@ -36,7 +36,7 @@ export const BUSINESS_REGISTRY = {
       { label: 'Clear Aligners & Braces', icon: Sparkles, query: 'Tell me about Invisalign & Clear Aligners' },
       { label: 'Clinic Location & Timings', icon: MapPin, query: 'Where is your clinic located and what are your timings?' }
     ],
-    welcomeMessage: `Hello! 👋 Welcome to **Global Dental Clinic & Implant Center** (Ahmedabad).\n\nI am your 24/7 AI Receptionist. I can help you check treatment pricing, book an appointment with **Dr. Joshipura**, or find directions to our clinic.\n\nHow can I help you today?`
+    welcomeMessage: `Welcome to *Global Dental Clinic & Implant Center*, Ahmedabad.\n\nI can assist you with treatment pricing, appointment scheduling with Dr. Joshipura, and clinic directions.\n\nHow may I help you today?`
   },
 
   'detailing-mafia': {
@@ -57,7 +57,7 @@ export const BUSINESS_REGISTRY = {
       { label: 'TPU Paint Protection Film', icon: Sparkles, query: 'How much does TPU Self-Healing PPF cost?' },
       { label: 'Studio Location & Hours', icon: MapPin, query: 'Where is your HRBR Layout studio located?' }
     ],
-    welcomeMessage: `Hello! 🚗 Welcome to **The Detailing Mafia (HRBR Layout, Bangalore)**.\n\nI am your 24/7 AI Assistant. I can quote you exact pricing for **9H/10H Ceramic Coating**, **Self-Healing PPF**, or book an inspection bay for your car.\n\nWhich vehicle do you drive?`
+    welcomeMessage: `Welcome to *The Detailing Mafia*, HRBR Layout, Bangalore.\n\nI can assist you with package pricing for Ceramic Coating and PPF, or check bay availability for your vehicle.\n\nWhich vehicle do you drive?`
   },
 
   'clear-skin': {
@@ -78,7 +78,7 @@ export const BUSINESS_REGISTRY = {
       { label: 'HydraFacial MD Price', icon: Sparkles, query: 'How much is HydraFacial MD medical glow treatment?' },
       { label: 'Acne Scar MN-RF', icon: Sparkles, query: 'What treatments do you have for acne scars and pigmentation?' }
     ],
-    welcomeMessage: `Hello! 🌸 Welcome to **Clear Skin Clinic** (Pune).\n\nI am your 24/7 AI Assistant for **Dr. Ananya Kulkarni**'s dermatology practice. Ask me about laser hair removal, HydraFacial MD, acne scar treatments, or booking an appointment.\n\nHow may I help your skin today?`
+    welcomeMessage: `Welcome to *Clear Skin Clinic*, Pune.\n\nI can assist you with consultation appointments with Dr. Ananya Kulkarni, treatment procedures, and session pricing.\n\nHow may I assist you today?`
   },
 
   'daffodils-patisserie': {
@@ -99,7 +99,7 @@ export const BUSINESS_REGISTRY = {
       { label: 'Biscoff & Cheesecakes', icon: Sparkles, query: 'Tell me about your Lotus Biscoff cheesecake & Belgian Truffle' },
       { label: 'Delivery & Advance Notice', icon: MapPin, query: 'What is your delivery coverage in Mumbai and lead time?' }
     ],
-    welcomeMessage: `Hello! 🎂 Welcome to **Daffodils Patisserie** (Bandra, Mumbai).\n\nI am your 24/7 Cake Concierge! Looking for custom wedding tiered cakes, Belgian chocolate truffles, or gourmet cheesecake delivery? Tell me your event date or flavor preference!`
+    welcomeMessage: `Welcome to *Daffodils Patisserie*, Bandra West, Mumbai.\n\nI can assist you with custom celebration cake orders, flavor options, pricing, and delivery timelines.\n\nWhat type of cake or event are you planning?`
   },
 
   'tuskers-dental': {
@@ -120,7 +120,7 @@ export const BUSINESS_REGISTRY = {
       { label: 'Invisible Braces', icon: Sparkles, query: 'How much do Invisible Braces and veneers cost?' },
       { label: 'Clinic Address & SG Hwy', icon: MapPin, query: 'Where is Tuskers Dental located on SG Highway?' }
     ],
-    welcomeMessage: `Hello! 👋 Welcome to **Tuskers Multispeciality Dental Clinic** (Bodakdev, Ahmedabad).\n\nI am your 24/7 AI Receptionist. I can assist with consultation bookings with **Dr. Hardik Shah**, painless root canals, or teeth alignment pricing.\n\nHow can we care for your smile today?`
+    welcomeMessage: `Welcome to *Tuskers Multispeciality Dental Clinic*, Bodakdev, Ahmedabad.\n\nI can assist you with appointment bookings with Dr. Hardik Shah, root canal consultations, and teeth alignment pricing.\n\nHow can I help you today?`
   }
 };
 
@@ -243,7 +243,7 @@ export default function BusinessChatbot() {
     }
 
     if (!botReplyText) {
-      botReplyText = `Thank you for contacting *${business.name}*!\n\nOur team in ${business.city} is available at *${business.phone}*.\n\nWe specialize in ${business.category}. Would you like to schedule an appointment or request details on our key services?`;
+      botReplyText = `Thank you for contacting *${business.name}* in ${business.city}.\n\nWe specialize in ${business.category}. Would you like to schedule an appointment or request details on our services?`;
     }
 
     const replyDelay = Math.min(1100, 500 + messageText.length * 8);
